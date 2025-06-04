@@ -1,18 +1,21 @@
 name: Auto-add PRs to GitHub Project
 
 on:
-     pull_request:
-          types: [opened, reopened]
+  pull_request:
+    types: [opened, reopened]
+  push:
+    branches:
+      - main
 
 jobs:
-     add-to-project:
-          runs-on: ubuntu-latest
-          permissions:
-               contents: read
-               pull-requests: write
+  add-to-project:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
-          steps:
-               - uses: actions/add-to-project@v1
-                 with:
-                      project-url: https://github.com/users/MarkOtwane/projects/6
-                      github-token: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/add-to-project@v1
+        with:
+          project-url: https://github.com/users/MarkOtwane/projects/6
+          github-token: ${{ secrets.GITHUB_TOKEN }}
