@@ -1,11 +1,8 @@
-name: Auto-add PRs and Commits to GitHub Project
+name: Auto-add PRs to GitHub Project
 
 on:
   pull_request:
-    types: [opened, reopened]
-  push:
-    branches:
-      - main
+    types: [opened, reopened, synchronize]
 
 jobs:
   add-to-project:
@@ -15,8 +12,8 @@ jobs:
       pull-requests: write
       repository-projects: write
     steps:
-      - name: Add to GitHub Project
-        uses: actions/add-to-project@v1.0.1
+      - name: Add Pull Request to GitHub Project
+        uses: actions/add-to-project@v0.6.0
         with:
           project-url: https://github.com/users/MarkOtwane/projects/6
           github-token: ${{ secrets.MY_PROJECT_TOKEN }}
