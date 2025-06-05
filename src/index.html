@@ -5,34 +5,62 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Shoe Haven</title>
 		<link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="media.queries.css" />
 		<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 		<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 	</head>
 	<body>
-		<header>
-			<div class="logo">
-                <img src="/images/logo.jpg" alt="">
-            </div>
-			<div class="navigation-links">
-				<li><a href="">New Arrival</a></li>
-				<li><a href="">Back To School</a></li>
-				<li><a href="">Shop</a></li>
-				<li><a href="">Brand Story</a></li>
-				<li><a href="">Outlets</a></li>
-				<li><a href="">Blogs</a></li>
-				<li><a href="">Policies</a></li>
-				<li><a href="">Deals & Offers</a></li>
+		<div class="home">
+			<header>
+				<div class="logo">
+					<img src="/images/logo.jpg" alt="" />
+				</div>
+				<div class="navigation-links">
+					<li><a href="">New Arrival</a></li>
+					<li><a href="">Back To School</a></li>
+					<li><a href="">Shop</a></li>
+					<li><a href="">Brand Story</a></li>
+					<li><a href="">Outlets</a></li>
+					<li><a href="">Blogs</a></li>
+					<li><a href="">Policies</a></li>
+					<li><a href="">Deals & Offers</a></li>
+				</div>
+				<div class="icon">
+					<ion-icon name="search-outline"></ion-icon>
+					<!-- Search Icon -->
+
+					<ion-icon name="person-outline"></ion-icon>
+					<!-- Person Icon -->
+					<ion-icon name="cart"></ion-icon>
+					<!-- Cart Icon -->
+				</div>
+			</header>
+			<hr />
+		</div>
+
+		<div class="newArrivals">
+			<div class="title">
+				<h1>New Arrivals – Fresh Styles & Trending Looks</h1>
+				<p>Stay fresh with our latest arrivals—from stylish handbags to trend-setting sneakers. Discover</p>
+				<p>new styles for men, women, and kids designed for comfort, fashion, and everyday life. <span>Shop</span></p>
+				<p><span>now and update your look.</span></p>
+				<!-- pictures  https://www.freepik.com/free-photos-vectors/shoes-->
 			</div>
-			<div class="icon">
-                <ion-icon name="search-outline"></ion-icon>
-				<!-- Search Icon -->
-				
-				<ion-icon name="person-outline"></ion-icon>
-				<!-- Person Icon -->
-                <ion-icon name="cart"></ion-icon>
-				<!-- Cart Icon -->
-			</div>
-		</header>
+			<div class="itemsArrived"></div>
+			<button><a href="">View All</a></button>
+		</div>
+
+		<div class="women"></div>
+		<div class="men"></div>
+		<div class="kids"></div>
+		<div class="sandals-slippers"></div>
+		<div class="accessories"></div>
+
+		<div class="location"></div>
+
+		<div class="conditions"></div>
+
+		<footer></footer>
 		<script src="/dist/index.js"></script>
 	</body>
 </html>
