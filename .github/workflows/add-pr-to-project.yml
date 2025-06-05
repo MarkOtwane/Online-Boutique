@@ -16,7 +16,7 @@ jobs:
       repository-projects: write
     steps:
       - name: Add to GitHub Project
-        uses: actions/add-to-project@v1.0.1  # Use a specific version for stability
+        uses: actions/add-to-project@v1.0.1
         with:
           project-url: https://github.com/users/MarkOtwane/projects/6
           github-token: ${{ secrets.MY_PROJECT_TOKEN }}
