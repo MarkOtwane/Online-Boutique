@@ -16,7 +16,7 @@ jobs:
       repository-projects: write
     steps:
       - name: Add to GitHub Project
-        uses: mheap/add-to-project@v1
+        uses: mheap/add-to-project@main  # 👈 Use `@main` here!
         with:
           project-url: https://github.com/users/MarkOtwane/projects/6
         env:
