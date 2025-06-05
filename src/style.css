@@ -2,10 +2,10 @@
 	margin: 0;
 	padding: 0;
 }
-body {
+/* body {
 	margin: 1rem;
 	padding: 1rem;
-}
+} */
 
 a{
 	color: black;
@@ -43,6 +43,7 @@ header {
 	gap: 2rem;
 	justify-content: center;
 	align-items: center;
+	margin-bottom: 2rem;
 	.title{
 		display: flex;
 		flex-direction: column;
@@ -53,5 +54,47 @@ header {
 	button{
 		width: 7rem;
 		height: 3rem;
+	}
+}
+
+
+.conditions{
+	display: flex;
+	gap: 2rem;
+	align-items: center;
+	justify-content: center;
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+	.terms{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+}
+
+footer{
+	display: flex;
+	flex-direction: column;
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+	background-color: grey;
+	padding: 2rem;
+	.top{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 2rem;
+		margin-top: 2rem;
+		background-color: grey;
+		li{
+			list-style: none;
+		}
+	}
+	.bottom{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: gray;
 	}
 }
