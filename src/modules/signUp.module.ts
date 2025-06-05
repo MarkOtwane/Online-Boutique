@@ -1,5 +1,6 @@
 /**
  * sign up module
+ * https://umoja.africa/?srsltid=AfmBOorzKnu2R_2hSaZRytLjhEyA36u0PQkOYIEF-g-un0BmDzxGHdXc
  * @param
  * @return sign up
  */
@@ -26,6 +27,8 @@ const streetInput = document.getElementById("lastName") as HTMLInputElement;
 const cityInput = document.getElementById("lastName") as HTMLInputElement;
 const zipCodeInput = document.getElementById("lastName") as HTMLInputElement;
 const passwordInput = document.getElementById("lastName") as HTMLInputElement;
+const signUpButton = document.getElementById("signUpBtn") as HTMLButtonElement;
+
 
 
 let signUpNewUser: SignUp[] = JSON.parse(localStorage.getItem("signUpNewUser") || "[]");
@@ -50,6 +53,13 @@ const signUp = () => {
 		}
     };
     if (!signUp.firstName || !signUp.lastName || !signUp.email || !signUp.phoneNumber || !signUp.password || !signUp.address) {
-        alert('All the input fields are required!')
+        alert('All the input fields are required!');
+        return;
     }
+	// Save the new user to localStorage
+	signUpNewUser.push(signUp);
+	localStorage.setItem("signUpNewUser", JSON.stringify(signUpNewUser));
+	alert('Sign up successful!');
 }
+
+signUpButton.addEventListener('click', signUp);
