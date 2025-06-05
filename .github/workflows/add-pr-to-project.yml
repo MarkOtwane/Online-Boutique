@@ -1,4 +1,4 @@
-# name: Auto-add PRs to GitHub Project
+name: Auto-add PRs to GitHub Project
 
 on:
   pull_request:
@@ -6,16 +6,17 @@ on:
   push:
     branches:
       - main
+
 jobs:
   add-to-project:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
+      repository-projects: write  # ✅ Correct permission for interacting with projects
 
     steps:
-      - uses: actions/add-to-project@v1
+      - uses: actions/add-to-project@v0.5.0  # ✅ Correct action
         with:
           project-url: https://github.com/users/MarkOtwane/projects/6
           github-token: ${{ secrets.GITHUB_TOKEN }}
-  
