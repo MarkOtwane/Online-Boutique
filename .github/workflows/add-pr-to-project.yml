@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add to GitHub Project
-        uses: mheap/add-to-project@v1
+        uses: mheap/github-action-add-to-project@v1
         with:
           project-url: https://github.com/users/MarkOtwane/projects/6
         env:
