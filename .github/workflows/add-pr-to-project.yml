@@ -6,14 +6,6 @@ on:
   push:
     branches:
       - main
-name: Auto-add PRs and Commits to GitHub Project
-
-on:
-  pull_request:
-    types: [opened, reopened]
-  push:
-    branches:
-      - main
 
 jobs:
   add-to-project:
@@ -24,22 +16,7 @@ jobs:
       repository-projects: write
     steps:
       - name: Add to GitHub Project
-        uses: mheap/add-to-project@main  # 👈 Use `@main` here!
+        uses: actions/add-to-project@v1.0.1  # Use a specific version for stability
         with:
           project-url: https://github.com/users/MarkOtwane/projects/6
-        env:
-          GH_TOKEN: ${{ secrets.MY_PROJECT_TOKEN }}
-jobs:
-  add-to-project:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      repository-projects: write
-    steps:
-      - name: Add to GitHub Project
-        uses: mheap/add-to-project@v1.2.0
-        with:
-          project-url: https://github.com/users/MarkOtwane/projects/6
-        env:
-          GH_TOKEN: ${{ secrets.MY_PROJECT_TOKEN }}
+          github-token: ${{ secrets.MY_PROJECT_TOKEN }}
