@@ -22,36 +22,44 @@ let newArrivals: AddItems[] = JSON.parse(localStorage.getItem("newArrivals") || 
 let editNewArrival: number | null = null; //track iindex for editing
 
 const addNewArrivals = () => {
+	const file = pictureItem.files?.[0];
 
-    const file = pictureItem.files?.[0];
-
-	const newAdds = {
-		picture: pictureItem.value,
-		title: titleInput.value,
-		price: priceInput.value,
-	};
 	// check empty input
 
-	if (!newAdds.picture || !newAdds.title || !newAdds.price) {
+	if (!file || !titleInput.value || !priceInput.value) {
 		alert("Please fill all the fields");
 		return;
 	}
-	if (editNewArrival !== null) {
-		newArrivals[editNewArrival] = newAdds;
-		editNewArrival = null;
-	} else {
-		newArrivals.push(newAdds); //✅
-	}
-	//  store to local storage
-	localStorage.setItem("newArrivals", JSON.stringify(newArrivals));
-	displayNewArrivals();
-	// clearForm();
+
+	const reader = new FileReader(); 
+
+	reader.onload = () => {
+		const base64Image = reader.result as string;
+
+		const newAdds: AddItems = {
+			picture: base64Image,
+			title: titleInput.value,
+			price: priceInput.value,
+		};
+
+		if (editNewArrival !== null) {
+			newArrivals[editNewArrival] = newAdds;
+			editNewArrival = null;
+		} else {
+			newArrivals.push(newAdds); //✅
+		}
+		//  store to local storage
+		localStorage.setItem("newArrivals", JSON.stringify(newArrivals));
+		displayNewArrivals();
+		clearForm();
+	};
+	reader.readAsDataURL(file);
 };
 
 //functions to display new Items
 
 const displayNewArrivals = () => {
-    newArrivalInput.innerHTML = "";
+	newArrivalInput.innerHTML = "";
 
 	newArrivals.forEach((item, index) => {
 		const container = document.createElement("div");
@@ -72,6 +80,12 @@ const displayNewArrivals = () => {
 
 		newArrivalInput.appendChild(container);
 	});
+};
+
+const clearForm = () => {
+	pictureItem.value = "";
+	titleInput.value = "";
+	priceInput.value = "";
 };
 
 AddButton.addEventListener("click", addNewArrivals);
