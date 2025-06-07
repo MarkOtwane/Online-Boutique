@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add to GitHub Project V2
-        uses: mheap/github-project-action@v2
+        uses: actions/add-to-project@v1.0.1
         with:
           project-url: https://github.com/users/MarkOtwane/projects/6
-        env:
-          GH_TOKEN: ${{ secrets.MY_PROJECT_TOKEN }}
+          github-token: ${{ secrets.MY_PROJECT_TOKEN }}
