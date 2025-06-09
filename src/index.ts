@@ -31,7 +31,7 @@ const addNewArrivals = () => {
 		return;
 	}
 
-	const reader = new FileReader(); 
+	const reader = new FileReader();
 
 	reader.onload = () => {
 		const base64Image = reader.result as string;
