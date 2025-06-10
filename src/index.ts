@@ -11,6 +11,7 @@ interface AddItems {
 }
 
 const newArrivalInput = document.querySelector(".itemsArrived") as HTMLDivElement;
+const womenArrivalInput = document.querySelector(".womenClothes") as HTMLDivElement;
 const viewAllButton = document.querySelector(".viewAll") as HTMLButtonElement;
 const AddButton = document.querySelector(".addItem") as HTMLButtonElement;
 
@@ -77,16 +78,36 @@ const displayNewArrivals = () => {
             <p>${item.price}</h3>
             <button class="viewOption">View OPtion</button>
         `;
+		let option: number = 1 | 2 | 3;
+		alert("Choose availabel option.");
 
-		newArrivalInput.appendChild(container);
-	});
-};
+		alert("option 1 to insert new arrivals");
+		alert("Option 2 to insert the women dashboard");
+
+		if (option === 1) {
+			alert('insert to newArrivals');
+			newArrivalInput.appendChild(container);
+		} else {
+			womenArrivalInput.appendChild(container)
+		}
+			});
+		};
 
 const clearForm = () => {
 	pictureItem.value = "";
 	titleInput.value = "";
 	priceInput.value = "";
 };
+let option: number = 1 | 2 | 3 
+console.log("Choose availabel option.");
+
+console.log("option 1 to insert new arrivals");
+console.log("Option 2 to insert the women dashboard");
+
+if (option === 1) {
+	alert('insert to newArrivals');
+
+}
 
 AddButton.addEventListener("click", addNewArrivals);
 displayNewArrivals();
