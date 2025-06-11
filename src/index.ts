@@ -61,6 +61,7 @@ const addNewArrivals = () => {
 
 const displayNewArrivals = () => {
 	newArrivalInput.innerHTML = "";
+	womenArrivalInput.innerHTML = "";
 
 	newArrivals.forEach((item, index) => {
 		const container = document.createElement("div");
@@ -75,39 +76,25 @@ const displayNewArrivals = () => {
 		container.innerHTML = `
             <img src="${item.picture}" alt="item picture">
             <h3>$${item.title}</h3>
-            <p>${item.price}</h3>
+            <p>${item.price}</p>
             <button class="viewOption">View OPtion</button>
         `;
-		let option: number = 1 | 2 | 3;
-		alert("Choose availabel option.");
+		let selectedOption = (document.getElementById("option") as HTMLSelectElement).value;
+		// alert("Choose availabel option 1 for new arrivals 2 women wear.");
 
-		alert("option 1 to insert new arrivals");
-		alert("Option 2 to insert the women dashboard");
-
-		if (option === 1) {
-			alert('insert to newArrivals');
+		if (selectedOption === "1") {
 			newArrivalInput.appendChild(container);
-		} else {
-			womenArrivalInput.appendChild(container)
+		} else if (selectedOption === "2") {
+			womenArrivalInput.appendChild(container);
 		}
-			});
-		};
+	});
+};
 
 const clearForm = () => {
 	pictureItem.value = "";
 	titleInput.value = "";
 	priceInput.value = "";
 };
-let option: number = 1 | 2 | 3 
-console.log("Choose availabel option.");
-
-console.log("option 1 to insert new arrivals");
-console.log("Option 2 to insert the women dashboard");
-
-if (option === 1) {
-	alert('insert to newArrivals');
-
-}
 
 AddButton.addEventListener("click", addNewArrivals);
 displayNewArrivals();
