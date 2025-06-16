@@ -3,3 +3,4 @@ package.json
 tsconfig.json
 images
 node_modules
+.env
