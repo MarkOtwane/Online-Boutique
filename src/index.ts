@@ -95,6 +95,7 @@ const clearForm = () => {
 	titleInput.value = "";
 	priceInput.value = "";
 };
-
-AddButton.addEventListener("click", addNewArrivals);
-displayNewArrivals();
+if (AddButton) {
+	AddButton.addEventListener("click", addNewArrivals);
+	displayNewArrivals();
+}

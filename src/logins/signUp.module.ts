@@ -115,12 +115,16 @@ const clearLogins = () => {
 	loginPassword.value = "";
 };
 
-signUpButton.addEventListener("click", (event) => {
-	event.preventDefault();
-	signUp();
-});
+if (loginBtn) {
+	loginBtn.addEventListener("click", (e) => {
+		e.preventDefault();
+		login();
+	});
+}
 
-loginBtn.addEventListener("click", (e) => {
-	e.preventDefault();
-	login();
-});
+if (signUpButton) {
+	signUpButton.addEventListener("click", (event) => {
+		event.preventDefault();
+		signUp();
+	});
+}
