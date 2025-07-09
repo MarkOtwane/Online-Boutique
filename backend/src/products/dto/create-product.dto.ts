@@ -1,6 +1,7 @@
 export class CreateProductDto {
   name: string;
   description: string;
-  price: string;
+  price: number;
   image: string;
+  stripePriceId: string;
 }

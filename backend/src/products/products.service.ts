@@ -24,7 +24,13 @@ export class ProductsService {
       }
 
       return await this.prisma.product.create({
-        data
+        data: {
+          name: data.name,
+          descripton: data.description,
+          price: data.price,
+          image: data.image,
+          stripePriceId: data.stripePriceId,
+        }
       });
     } catch (error) {
       throw new Error(`Failed to create product: ${error.message}`);
