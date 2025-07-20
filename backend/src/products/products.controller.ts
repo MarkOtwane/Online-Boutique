@@ -9,14 +9,15 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
 
 @Controller('products')
 @UseGuards(RolesGuard)
+// https://www.digitalocean.com/community/tutorials/understanding-guards-in-nestjs
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
