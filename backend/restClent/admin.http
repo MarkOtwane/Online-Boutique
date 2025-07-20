@@ -1,5 +1,5 @@
 ### Create a new user
-POST http://localhost:3000/admin/users
+POST http://localhost:3000/admin
 Content-Type: application/json
 
 {
@@ -11,13 +11,14 @@ Content-Type: application/json
 }
 
 ### Get all users
-GET http://localhost:3000/api/admin/users
+
+GET http://localhost:3000/admin
 
 ### Get a specific user by ID
-GET http://localhost:3000/api/admin/users/1
+GET http://localhost:3000/admin/1
 
 ### Update a user's details
-PUT http://localhost:3000/api/admin/users/1
+PUT http://localhost:3000/admin/1
 Content-Type: application/json
 
 {
