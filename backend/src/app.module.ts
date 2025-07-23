@@ -9,11 +9,13 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { AdminController } from './admin/admin.controller';
 import { ProductsController } from './products/products.controller';
 import { CustomerController } from './customer/customer.controller';
+import { UsersResolver } from './users/users.resolver';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [AdminModule, PrismaModule, CustomerModule],
+  imports: [AdminModule, PrismaModule, CustomerModule, UsersModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, UsersResolver],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer){
