@@ -1,5 +1,10 @@
 <div class="products-container">
   <h1>Our Products</h1>
-  <p>Browse our collection of boutique items.</p>
+  <div class="product-list">
+    <div *ngFor="let product of products" class="product-card">
+      <h3>{{ product.name }}</h3>
+      <p>Price: ${{ product.price }}</p>
+      <p>Added: {{ product.createdAt | date : "short" }}</p>
+    </div>
+  </div>
 </div>
-<!-- Some errors -->

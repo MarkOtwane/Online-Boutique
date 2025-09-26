@@ -1,12 +1,30 @@
 .products-container {
-  text-align: center;
+  max-width: 800px;
+  margin: 20px auto;
   padding: 20px;
   font-family: Arial, sans-serif;
 }
 h1 {
+  text-align: center;
   color: #333;
 }
-p {
-  font-size: 1.2em;
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+.product-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 5px;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+.product-card h3 {
+  margin: 0 0 10px;
+  color: #333;
+}
+.product-card p {
+  margin: 5px 0;
   color: #666;
 }
