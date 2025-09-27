@@ -1,20 +1,21 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
-  Validators,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { ProductService } from '../product.service';
 import { Router } from '@angular/router';
+import { ProductService } from '../product.service';
+import { Product } from '../products/products';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './product-form.component.html',
-  styleUrls: ['./product-form.component.css'],
+  styleUrls: ['./product-form.component.scss'],
 })
 export class ProductFormComponent implements OnInit {
   productForm: FormGroup;
@@ -41,14 +42,14 @@ export class ProductFormComponent implements OnInit {
         price: this.productForm.value.price,
       };
       this.productService.createProduct(productData).subscribe({
-        next: (product) => {
+        next: (product: Product) => {
           this.successMessage = `Product "${product.name}" added successfully!`;
           this.errorMessage = null;
           this.productForm.reset();
           setTimeout(() => this.router.navigate(['/products']), 2000); // Redirect after 2 seconds
         },
-        error: (err) => {
-          this.errorMessage = `Failed to add product: ${err.message}`;
+        error: (err: any) => {
+          this.errorMessage = `Failed to add product: ${err.message || 'Unknown error'}`;
           this.successMessage = null;
         },
       });

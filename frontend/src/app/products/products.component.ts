@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../product.service';
+import { ProductService } from './product.service';
 import { Product } from './products';
 
 @Component({
@@ -8,7 +8,7 @@ import { Product } from './products';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './products.component.html',
-  styleUrls: ['./products.component.css'],
+  styleUrls: ['./products.component.scss'],
 })
 export class ProductsComponent implements OnInit {
   products: Product[] = [];
