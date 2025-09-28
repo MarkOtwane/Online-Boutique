@@ -6,9 +6,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../product.service';
-import { Product } from '../products/products';
 
 @Component({
   selector: 'app-product-form',
@@ -21,11 +20,14 @@ export class ProductFormComponent implements OnInit {
   productForm: FormGroup;
   successMessage: string | null = null;
   errorMessage: string | null = null;
+  isEditMode = false;
+  productId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -33,7 +35,26 @@ export class ProductFormComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      if (id) {
+        this.isEditMode = true;
+        this.productId = +id;
+        this.productService.getProduct(this.productId).subscribe({
+          next: (product) => {
+            this.productForm.patchValue({
+              name: product.name,
+              price: product.price,
+            });
+          },
+          error: (err) => {
+            this.errorMessage = `Failed to load product: ${err.message}`;
+          },
+        });
+      }
+    });
+  }
 
   onSubmit(): void {
     if (this.productForm.valid) {
@@ -41,18 +62,35 @@ export class ProductFormComponent implements OnInit {
         name: this.productForm.value.name,
         price: this.productForm.value.price,
       };
-      this.productService.createProduct(productData).subscribe({
-        next: (product: Product) => {
-          this.successMessage = `Product "${product.name}" added successfully!`;
-          this.errorMessage = null;
-          this.productForm.reset();
-          setTimeout(() => this.router.navigate(['/products']), 2000); // Redirect after 2 seconds
-        },
-        error: (err: any) => {
-          this.errorMessage = `Failed to add product: ${err.message || 'Unknown error'}`;
-          this.successMessage = null;
-        },
-      });
+      if (this.isEditMode && this.productId) {
+        this.productService
+          .updateProduct(this.productId, productData)
+          .subscribe({
+            next: (product) => {
+              this.successMessage = `Product "${product.name}" updated successfully!`;
+              this.errorMessage = null;
+              this.productForm.reset();
+              setTimeout(() => this.router.navigate(['/products']), 2000);
+            },
+            error: (err) => {
+              this.errorMessage = `Failed to update product: ${err.message}`;
+              this.successMessage = null;
+            },
+          });
+      } else {
+        this.productService.createProduct(productData).subscribe({
+          next: (product) => {
+            this.successMessage = `Product "${product.name}" added successfully!`;
+            this.errorMessage = null;
+            this.productForm.reset();
+            setTimeout(() => this.router.navigate(['/products']), 2000);
+          },
+          error: (err) => {
+            this.errorMessage = `Failed to add product: ${err.message}`;
+            this.successMessage = null;
+          },
+        });
+      }
     } else {
       this.errorMessage = 'Please fill out the form correctly.';
       this.successMessage = null;

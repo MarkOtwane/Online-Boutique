@@ -4,7 +4,9 @@
     <div *ngFor="let product of products" class="product-card">
       <h3>{{ product.name }}</h3>
       <p>Price: ${{ product.price }}</p>
-      <p>Added: {{ product.createdAt | date : "short" }}</p>
+      <p>Added: {{ product.createdAt | date:'short' }}</p>
+      <button (click)="editProduct(product.id)">Edit</button>
+      <button (click)="deleteProduct(product.id)">Delete</button>
     </div>
   </div>
 </div>

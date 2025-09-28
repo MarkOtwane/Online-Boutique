@@ -1,24 +1,55 @@
 <div class="form-container">
-  <h2>Add a New Product</h2>
+  <h2>{{ isEditMode ? "Edit Product" : "Add a New Product" }}</h2>
   <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
   <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
   <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="name">Product Name:</label>
-      <input id="name" formControlName="name" type="text" placeholder="Enter product name">
-      <div *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched" class="error">
-        <span *ngIf="productForm.get('name')?.errors?.['required']">Name is required.</span>
-        <span *ngIf="productForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters.</span>
+      <input
+        id="name"
+        formControlName="name"
+        type="text"
+        placeholder="Enter product name"
+      />
+      <div
+        *ngIf="
+          productForm.get('name')?.invalid && productForm.get('name')?.touched
+        "
+        class="error"
+      >
+        <span *ngIf="productForm.get('name')?.errors?.['required']"
+          >Name is required.</span
+        >
+        <span *ngIf="productForm.get('name')?.errors?.['minlength']"
+          >Name must be at least 3 characters.</span
+        >
       </div>
     </div>
     <div class="form-group">
       <label for="price">Price:</label>
-      <input id="price" formControlName="price" type="number" step="0.01" placeholder="Enter price">
-      <div *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched" class="error">
-        <span *ngIf="productForm.get('price')?.errors?.['required']">Price is required.</span>
-        <span *ngIf="productForm.get('price')?.errors?.['min']">Price must be greater than 0.</span>
+      <input
+        id="price"
+        formControlName="price"
+        type="number"
+        step="0.01"
+        placeholder="Enter price"
+      />
+      <div
+        *ngIf="
+          productForm.get('price')?.invalid && productForm.get('price')?.touched
+        "
+        class="error"
+      >
+        <span *ngIf="productForm.get('price')?.errors?.['required']"
+          >Price is required.</span
+        >
+        <span *ngIf="productForm.get('price')?.errors?.['min']"
+          >Price must be greater than 0.</span
+        >
       </div>
     </div>
-    <button type="submit" [disabled]="productForm.invalid">Add Product</button>
+    <button type="submit" [disabled]="productForm.invalid">
+      {{ isEditMode ? "Update Product" : "Add Product" }}
+    </button>
   </form>
 </div>
