@@ -17,12 +17,8 @@ export class ProductsComponent implements OnInit {
   constructor(private productService: ProductService, private router: Router) {}
 
   ngOnInit(): void {
-    this.loadProducts();
-  }
-
-  loadProducts(): void {
-    this.productService.getProducts().subscribe((data) => {
-      this.products = data;
+    this.productService.getProducts().subscribe((products) => {
+      this.products = products;
     });
   }
 
@@ -33,10 +29,7 @@ export class ProductsComponent implements OnInit {
   deleteProduct(id: number): void {
     if (confirm('Are you sure you want to delete this product?')) {
       this.productService.deleteProduct(id).subscribe({
-        next: () => {
-          this.products = this.products.filter((product) => product.id !== id);
-          alert('Product deleted successfully!');
-        },
+        next: () => alert('Product deleted successfully!'),
         error: (err) => alert(`Failed to delete product: ${err.message}`),
       });
     }
