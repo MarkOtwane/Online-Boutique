@@ -7,14 +7,28 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  // Create categories
+  const accessories = await prisma.category.create({
+    data: { name: 'Accessories' },
+  });
+  const clothing = await prisma.category.create({
+    data: { name: 'Clothing' },
+  });
+
+  // Clear existing products to avoid conflicts
+  await prisma.product.deleteMany();
+
+  // Seed products with category assignments
   await prisma.product.createMany({
     data: [
-      { name: 'Silk Scarf', price: 29.99 },
-      { name: 'Leather Handbag', price: 89.99 },
-      { name: 'Wool Coat', price: 149.99 },
+      { name: 'Silk Scarf', price: 29.99, categoryId: accessories.id },
+      { name: 'Leather Handbag', price: 89.99, categoryId: accessories.id },
+      { name: 'Wool Coat', price: 149.99, categoryId: clothing.id },
+      { name: 'Sunglasses', price: 49.99, categoryId: accessories.id },
     ],
   });
-  console.log('Seeded 3 products successfully');
+
+  console.log('Seeded categories and products successfully');
 }
 
 main()
