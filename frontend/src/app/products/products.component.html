@@ -1,9 +1,11 @@
 <div class="products-container">
   <h1>Our Products</h1>
-  <div class="product-list">
+  <div *ngIf="!products.length" class="loading">Loading...</div>
+  <div class="product-list" *ngIf="products.length">
     <div *ngFor="let product of products" class="product-card">
       <h3>{{ product.name }}</h3>
       <p>Price: ${{ product.price }}</p>
+      <p>Category: {{ product.category?.name || 'Uncategorized' }}</p>
       <p>Added: {{ product.createdAt | date:'short' }}</p>
       <button (click)="editProduct(product.id)">Edit</button>
       <button (click)="deleteProduct(product.id)">Delete</button>

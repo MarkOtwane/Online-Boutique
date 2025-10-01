@@ -1,13 +1,14 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
-  ReactiveFormsModule,
   Validators,
+  ReactiveFormsModule,
 } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { ProductService } from '../product.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Category } from '../category';
 
 @Component({
   selector: 'app-product-form',
@@ -22,6 +23,7 @@ export class ProductFormComponent implements OnInit {
   errorMessage: string | null = null;
   isEditMode = false;
   productId: number | null = null;
+  categories: Category[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -32,10 +34,15 @@ export class ProductFormComponent implements OnInit {
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       price: [0, [Validators.required, Validators.min(0.01)]],
+      categoryId: [null, Validators.required],
     });
   }
 
   ngOnInit(): void {
+    this.productService.getCategories().subscribe((categories) => {
+      this.categories = categories;
+    });
+
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
@@ -46,6 +53,7 @@ export class ProductFormComponent implements OnInit {
             this.productForm.patchValue({
               name: product.name,
               price: product.price,
+              categoryId: product.categoryId,
             });
           },
           error: (err) => {
@@ -61,6 +69,7 @@ export class ProductFormComponent implements OnInit {
       const productData = {
         name: this.productForm.value.name,
         price: this.productForm.value.price,
+        categoryId: this.productForm.value.categoryId,
       };
       if (this.isEditMode && this.productId) {
         this.productService
