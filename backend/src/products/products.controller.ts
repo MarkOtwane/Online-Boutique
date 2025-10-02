@@ -1,23 +1,28 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Param,
-  ParseIntPipe,
   Post,
   Put,
+  Delete,
+  Body,
+  Param,
+  ParseIntPipe,
+  Query,
 } from '@nestjs/common';
-import { Prisma, Product } from '../../generated/prisma';
 import { ProductsService } from './products.service';
+import { Prisma, Product } from '@prisma/client';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  async findAll(): Promise<Product[]> {
-    return this.productsService.findAll();
+  async findAll(
+    @Query('categoryId', ParseIntPipe) categoryId?: number,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('pageSize', ParseIntPipe) pageSize?: number,
+  ): Promise<{ products: Product[]; total: number }> {
+    return this.productsService.findAll({ categoryId, page, pageSize });
   }
 
   @Get(':id')

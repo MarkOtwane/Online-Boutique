@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -15,7 +11,7 @@ async function main() {
     data: { name: 'Clothing' },
   });
 
-  // Clear existing products to avoid conflicts
+  // Clear existing products
   await prisma.product.deleteMany();
 
   // Seed products with category assignments
@@ -25,6 +21,9 @@ async function main() {
       { name: 'Leather Handbag', price: 89.99, categoryId: accessories.id },
       { name: 'Wool Coat', price: 149.99, categoryId: clothing.id },
       { name: 'Sunglasses', price: 49.99, categoryId: accessories.id },
+      { name: 'Denim Jacket', price: 79.99, categoryId: clothing.id },
+      { name: 'Gold Necklace', price: 199.99, categoryId: accessories.id },
+      { name: 'Sneakers', price: 99.99, categoryId: clothing.id },
     ],
   });
 
