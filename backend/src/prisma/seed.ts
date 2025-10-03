@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -27,7 +28,24 @@ async function main() {
     ],
   });
 
-  console.log('Seeded categories and products successfully');
+  // Clear existing users
+  await prisma.user.deleteMany();
+
+  // Seed users with hashed passwords
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  const customerPassword = await bcrypt.hash('customer123', 10);
+  await prisma.user.createMany({
+    data: [
+      { email: 'admin@boutique.com', password: adminPassword, role: 'admin' },
+      {
+        email: 'customer@boutique.com',
+        password: customerPassword,
+        role: 'customer',
+      },
+    ],
+  });
+
+  console.log('Seeded categories, products, and users successfully');
 }
 
 main()
