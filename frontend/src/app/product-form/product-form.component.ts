@@ -6,9 +6,9 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../product.service';
+import { ProductService } from '../products/product.service.ts';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Category } from '../category';
+import { Category } from '../category.ts';
 
 @Component({
   selector: 'app-product-form',
@@ -56,7 +56,7 @@ export class ProductFormComponent implements OnInit {
               categoryId: product.categoryId,
             });
           },
-          error: (err) => {
+          error: (err: any) => {
             this.errorMessage = `Failed to load product: ${err.message}`;
           },
         });
@@ -81,7 +81,7 @@ export class ProductFormComponent implements OnInit {
               this.productForm.reset();
               setTimeout(() => this.router.navigate(['/products']), 2000);
             },
-            error: (err) => {
+            error: (err: any) => {
               this.errorMessage = `Failed to update product: ${err.message}`;
               this.successMessage = null;
             },
@@ -94,7 +94,7 @@ export class ProductFormComponent implements OnInit {
             this.productForm.reset();
             setTimeout(() => this.router.navigate(['/products']), 2000);
           },
-          error: (err) => {
+          error: (err: any) => {
             this.errorMessage = `Failed to add product: ${err.message}`;
             this.successMessage = null;
           },

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Product } from './product';
-import { Category } from './category';
+import { Product } from './product.ts';
+import { Category } from '../category.ts';
 
 @Injectable({
   providedIn: 'root',
@@ -41,7 +41,7 @@ export class ProductService {
     return this.categories$;
   }
 
-  createProduct(product: Product): Observable<Product> {
+  createProduct(product: Partial<Product>): Observable<Product> {
     return new Observable<Product>((observer) => {
       this.http.post<Product>(`${this.apiUrl}/products`, product).subscribe({
         next: (newProduct) => {

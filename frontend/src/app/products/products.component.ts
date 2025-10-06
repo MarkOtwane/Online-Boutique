@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../product.service';
-import { Product } from './products';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ProductService } from '../services/product.service.ts';
+import { Product } from './products.ts';
 
 @Component({
   selector: 'app-products',
@@ -29,7 +29,11 @@ export class ProductsComponent implements OnInit {
   deleteProduct(id: number): void {
     if (confirm('Are you sure you want to delete this product?')) {
       this.productService.deleteProduct(id).subscribe({
-        next: () => alert('Product deleted successfully!'),
+        next: () => {
+          alert('Product deleted successfully!');
+          // Remove the deleted product from the local array
+          this.products = this.products.filter(product => product.id !== id);
+        },
         error: (err) => alert(`Failed to delete product: ${err.message}`),
       });
     }

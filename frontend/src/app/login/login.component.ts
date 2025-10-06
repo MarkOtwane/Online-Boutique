@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -14,23 +14,27 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  successMessage: string | null = null;
-  errorMessage: string | null = null;
+   loginForm: FormGroup;
+   successMessage: string | null = null;
+   errorMessage: string | null = null;
+   returnUrl: string;
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-    });
-  }
+   constructor(
+     private fb: FormBuilder,
+     private authService: AuthService,
+     private router: Router,
+     private route: ActivatedRoute
+   ) {
+     this.loginForm = this.fb.group({
+       email: ['', [Validators.required, Validators.email]],
+       password: ['', Validators.required],
+     });
+     this.returnUrl =
+       this.route.snapshot.queryParams['returnUrl'] || '/products';
+   }
 
   onSubmit(): void {
     if (this.loginForm.valid) {
@@ -39,7 +43,7 @@ export class LoginComponent {
         next: () => {
           this.successMessage = 'Login successful! Redirecting...';
           this.errorMessage = null;
-          setTimeout(() => this.router.navigate(['/products']), 2000);
+          setTimeout(() => this.router.navigate([this.returnUrl]), 2000);
         },
         error: (err) => {
           this.errorMessage = `Login failed: ${

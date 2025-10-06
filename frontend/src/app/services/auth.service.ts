@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { User } from './user';
+import { User } from '../interfaces/user.interface.ts';
 
 @Injectable({
   providedIn: 'root',
@@ -73,7 +73,11 @@ export class AuthService {
   private decodeToken(token: string): User | null {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return { id: payload.sub, email: payload.email, role: payload.role };
+      return {
+        id: typeof payload.sub === 'number' ? payload.sub : parseInt(payload.sub) || 0,
+        email: payload.email,
+        role: payload.role
+      };
     } catch (e) {
       return null;
     }

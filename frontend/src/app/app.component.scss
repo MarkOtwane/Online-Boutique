@@ -3,21 +3,20 @@ nav {
   padding: 10px;
 }
 ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+  list-style: none;
   display: flex;
   justify-content: center;
+  margin: 0;
+  padding: 0;
 }
 li {
-  margin: 0 20px;
+  margin: 0 15px;
 }
 a {
   color: white;
   text-decoration: none;
   font-family: Arial, sans-serif;
-  font-size: 1.1em;
 }
 a:hover {
-  color: #ddd;
+  text-decoration: underline;
 }
