@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Product } from './product.ts';
-import { Category } from '../category.ts';
+import { Product } from './product';
+import { Category } from './category';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +16,13 @@ export class ProductService {
 
   constructor(private http: HttpClient) {
     this.loadInitialData();
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('access_token');
+    return new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+    });
   }
 
   private loadInitialData(): void {
@@ -34,31 +41,39 @@ export class ProductService {
   }
 
   getProduct(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/products/${id}`);
+    return this.http.get<Product>(`${this.apiUrl}/products/${id}`, {
+      headers: this.getHeaders(),
+    });
   }
 
   getCategories(): Observable<Category[]> {
     return this.categories$;
   }
 
-  createProduct(product: Partial<Product>): Observable<Product> {
+  createProduct(product: Product): Observable<Product> {
     return new Observable<Product>((observer) => {
-      this.http.post<Product>(`${this.apiUrl}/products`, product).subscribe({
-        next: (newProduct) => {
-          const currentProducts = this.productsSubject.getValue();
-          this.productsSubject.next([...currentProducts, newProduct]);
-          observer.next(newProduct);
-          observer.complete();
-        },
-        error: (err) => observer.error(err),
-      });
+      this.http
+        .post<Product>(`${this.apiUrl}/products`, product, {
+          headers: this.getHeaders(),
+        })
+        .subscribe({
+          next: (newProduct) => {
+            const currentProducts = this.productsSubject.getValue();
+            this.productsSubject.next([...currentProducts, newProduct]);
+            observer.next(newProduct);
+            observer.complete();
+          },
+          error: (err) => observer.error(err),
+        });
     });
   }
 
   updateProduct(id: number, product: Partial<Product>): Observable<Product> {
     return new Observable<Product>((observer) => {
       this.http
-        .put<Product>(`${this.apiUrl}/products/${id}`, product)
+        .put<Product>(`${this.apiUrl}/products/${id}`, product, {
+          headers: this.getHeaders(),
+        })
         .subscribe({
           next: (updatedProduct) => {
             const currentProducts = this.productsSubject.getValue();
@@ -76,15 +91,21 @@ export class ProductService {
 
   deleteProduct(id: number): Observable<Product> {
     return new Observable<Product>((observer) => {
-      this.http.delete<Product>(`${this.apiUrl}/products/${id}`).subscribe({
-        next: (deletedProduct) => {
-          const currentProducts = this.productsSubject.getValue();
-          this.productsSubject.next(currentProducts.filter((p) => p.id !== id));
-          observer.next(deletedProduct);
-          observer.complete();
-        },
-        error: (err) => observer.error(err),
-      });
+      this.http
+        .delete<Product>(`${this.apiUrl}/products/${id}`, {
+          headers: this.getHeaders(),
+        })
+        .subscribe({
+          next: (deletedProduct) => {
+            const currentProducts = this.productsSubject.getValue();
+            this.productsSubject.next(
+              currentProducts.filter((p) => p.id !== id)
+            );
+            observer.next(deletedProduct);
+            observer.complete();
+          },
+          error: (err) => observer.error(err),
+        });
     });
   }
 }
