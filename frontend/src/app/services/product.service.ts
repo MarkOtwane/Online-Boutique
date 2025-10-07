@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../products/products';
+import { Category } from '../category';
 
 export interface CreateProductData {
   name: string;
   price: number;
+  categoryId: number;
 }
 
 @Injectable({
@@ -26,5 +28,17 @@ export class ProductService {
 
   createProduct(productData: CreateProductData): Observable<Product> {
     return this.http.post<Product>(this.apiUrl, productData);
+  }
+
+  getProduct(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+  }
+
+  updateProduct(id: number, productData: Partial<CreateProductData>): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, productData);
+  }
+
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>('http://localhost:3000/categories');
   }
 }

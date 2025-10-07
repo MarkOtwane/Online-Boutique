@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../products/product.service.ts';
+import { ProductService } from '../services/product.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Category } from '../category.ts';
 
