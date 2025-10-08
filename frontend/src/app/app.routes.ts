@@ -6,6 +6,7 @@ import { ProductFormComponent } from './product-form/product-form.component';
 import { ProductsComponent } from './products/products.component';
 import { RegisterComponent } from './register/register.component';
 import { AdminGuard } from './admin.guard';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -13,20 +14,6 @@ export const routes: Routes = [
   {
     path: 'add-product',
     component: ProductFormComponent,
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'add-product/:id',
-    component: ProductFormComponent,
-    canActivate: [AuthGuard],
-  },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: '', component: HomeComponent },
-  { path: 'products', component: ProductsComponent },
-  {
-    path: 'add-product',
-    component: ProductFormComponent,
     canActivate: [AuthGuard, AdminGuard],
   },
   {
@@ -36,4 +23,9 @@ export const routes: Routes = [
   },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [AuthGuard],
+  },
 ];

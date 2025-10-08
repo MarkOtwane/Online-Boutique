@@ -1,24 +1,32 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { User } from '../interfaces/user.interface.ts';
+import { User } from './user';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth';
+  private apiUrl = 'http://localhost:3000';
   private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient) {
     const token = localStorage.getItem('access_token');
     if (token) {
-      // Decode token to initialize user (simplified for this example)
-      const user = this.decodeToken(token);
-      this.userSubject.next(user);
+      this.getCurrentUser().subscribe({
+        next: (user) => this.userSubject.next(user),
+        error: () => localStorage.removeItem('access_token'), // Clear invalid token
+      });
     }
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('access_token');
+    return new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+    });
   }
 
   register(
@@ -27,11 +35,10 @@ export class AuthService {
     role: string = 'customer'
   ): Observable<{ access_token: string; user: User }> {
     return this.http
-      .post<{ access_token: string; user: User }>(`${this.apiUrl}/register`, {
-        email,
-        password,
-        role,
-      })
+      .post<{ access_token: string; user: User }>(
+        `${this.apiUrl}/auth/register`,
+        { email, password, role }
+      )
       .pipe(
         tap((response) => {
           localStorage.setItem('access_token', response.access_token);
@@ -45,7 +52,7 @@ export class AuthService {
     password: string
   ): Observable<{ access_token: string; user: User }> {
     return this.http
-      .post<{ access_token: string; user: User }>(`${this.apiUrl}/login`, {
+      .post<{ access_token: string; user: User }>(`${this.apiUrl}/auth/login`, {
         email,
         password,
       })
@@ -70,16 +77,9 @@ export class AuthService {
     return this.userSubject.getValue();
   }
 
-  private decodeToken(token: string): User | null {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return {
-        id: typeof payload.sub === 'number' ? payload.sub : parseInt(payload.sub) || 0,
-        email: payload.email,
-        role: payload.role
-      };
-    } catch (e) {
-      return null;
-    }
+  getCurrentUser(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/users/me`, {
+      headers: this.getHeaders(),
+    });
   }
 }

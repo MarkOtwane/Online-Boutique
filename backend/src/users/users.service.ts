@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
@@ -12,7 +13,7 @@ export class UsersService {
     password: string;
     role?: string;
   }): Promise<User> {
-    const hashedPassword = await bcrypt.hash(data.password, 10); // Hash with 10 salt rounds
+    const hashedPassword = await bcrypt.hash(data.password, 10);
     try {
       return await this.prisma.user.create({
         data: {
@@ -23,7 +24,6 @@ export class UsersService {
       });
     } catch (error) {
       if (error.code === 'P2002') {
-        // Prisma unique constraint violation
         throw new ConflictException('Email already exists');
       }
       throw error;
@@ -33,6 +33,13 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { email },
+    });
+  }
+
+  async findById(id: number): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true, email: true, role: true, createdAt: true }, // Exclude password
     });
   }
 }

@@ -5,7 +5,9 @@
     <li *ngIf="isAuthenticated"><a routerLink="/add-product">Add Product</a></li>
     <li *ngIf="!isAuthenticated"><a routerLink="/login">Login</a></li>
     <li *ngIf="!isAuthenticated"><a routerLink="/register">Register</a></li>
+    <li *ngIf="isAuthenticated"><a routerLink="/dashboard">Dashboard</a></li>
     <li *ngIf="isAuthenticated"><a (click)="logout()" style="cursor: pointer;">Logout</a></li>
   </ul>
+  <div *ngIf="isAuthenticated" class="welcome">Welcome, {{ authService.getUser()?.email }} ({{ authService.getUser()?.role }})</div>
 </nav>
 <router-outlet></router-outlet>
