@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+
+// Type for user data without password (for security)
+type UserWithoutPassword = Omit<User, 'password'>;
 
 @Injectable()
 export class UsersService {
@@ -36,7 +40,7 @@ export class UsersService {
     });
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: number): Promise<UserWithoutPassword | null> {
     return this.prisma.user.findUnique({
       where: { id },
       select: { id: true, email: true, role: true, createdAt: true }, // Exclude password

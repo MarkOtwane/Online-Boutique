@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
-import { User } from '../';
+import { User } from '../interfaces/user.interface';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +20,6 @@ export class DashboardComponent implements OnInit {
     this.authService.getCurrentUser().subscribe({
       next: (user) => {
         this.user = user;
-        this.authService.user$.next(user); // Update user state
       },
       error: (err) => {
         this.errorMessage = `Failed to load user data: ${err.message}`;

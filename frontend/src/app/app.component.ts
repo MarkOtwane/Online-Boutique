@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from './services/auth.service';
+import { User } from './interfaces/user.interface';
 
 @Component({
   selector: 'app-root',
@@ -15,11 +16,15 @@ export class AppComponent {
   title = 'frontend';
   isAuthenticated: boolean;
 
-  constructor(private authService: AuthService) {
+  constructor(public authService: AuthService) {
     this.isAuthenticated = this.authService.isAuthenticated();
     this.authService.user$.subscribe((user) => {
       this.isAuthenticated = !!user;
     });
+  }
+
+  get currentUser(): User | null {
+    return this.authService.getUser();
   }
 
   logout(): void {

@@ -1,15 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Body,
-  ConflictException,
   Controller,
   Get,
+  NotFoundException,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UsersService } from './users.service';
+
+// Type for user data without password (for security)
+type UserWithoutPassword = Omit<User, 'password'>;
 
 @Controller('users')
 export class UsersController {
@@ -24,11 +28,13 @@ export class UsersController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getCurrentUser(@Request() req): Promise<User> {
-    const userId = req.user.id;
+  async getCurrentUser(
+    @Req() req: Request & { user: { id: string } },
+  ): Promise<UserWithoutPassword> {
+    const userId = parseInt(req.user.id, 10);
     const user = await this.usersService.findById(userId);
     if (!user) {
-      throw new ConflictException('User not found');
+      throw new NotFoundException('User not found');
     }
     return user;
   }
