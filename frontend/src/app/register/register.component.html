@@ -1,23 +1,39 @@
 <div class="form-container">
   <h2>Register</h2>
-  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
-  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  @if (successMessage) {
+    <div class="success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="error">{{ errorMessage }}</div>
+  }
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="email">Email:</label>
       <input id="email" formControlName="email" type="email" placeholder="Enter email">
-      <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error">
-        <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span>
-        <span *ngIf="registerForm.get('email')?.errors?.['email']">Invalid email format.</span>
-      </div>
+      @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+        <div class="error">
+          @if (registerForm.get('email')?.errors?.['required']) {
+            <span>Email is required.</span>
+          }
+          @if (registerForm.get('email')?.errors?.['email']) {
+            <span>Invalid email format.</span>
+          }
+        </div>
+      }
     </div>
     <div class="form-group">
       <label for="password">Password:</label>
       <input id="password" formControlName="password" type="password" placeholder="Enter password">
-      <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error">
-        <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required.</span>
-        <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters.</span>
-      </div>
+      @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+        <div class="error">
+          @if (registerForm.get('password')?.errors?.['required']) {
+            <span>Password is required.</span>
+          }
+          @if (registerForm.get('password')?.errors?.['minlength']) {
+            <span>Password must be at least 6 characters.</span>
+          }
+        </div>
+      }
     </div>
     <div class="form-group">
       <label for="role">Role:</label>

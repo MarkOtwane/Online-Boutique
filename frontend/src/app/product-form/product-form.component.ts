@@ -5,7 +5,7 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { ProductService } from '../services/product.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Category } from '../category.ts';
@@ -13,7 +13,7 @@ import { Category } from '../category.ts';
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss'],
 })

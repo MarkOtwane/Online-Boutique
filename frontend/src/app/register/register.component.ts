@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import {
   FormBuilder,
@@ -12,7 +12,7 @@ import { AuthService } from '../services/auth.service.ts';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
