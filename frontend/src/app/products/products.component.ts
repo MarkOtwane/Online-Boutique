@@ -1,19 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProductService } from '../services/product.service.ts';
-import { Product } from './products.ts';
+import { ProductService } from '../services/product.service';
+import { Product } from './products';
 
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth.service.ts';
-import { CartService } from '../services/cart.service.ts';
+import { AuthService } from '../services/auth.service';
+import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-products',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './products.component.html',
-  styleUrls: ['./products.component.css'],
+  styleUrls: ['./products.component.scss'],
 })
 export class ProductsComponent implements OnInit {
   products: Product[] = [];
@@ -22,7 +22,7 @@ export class ProductsComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private cartService: CartService,
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router
   ) {}
 

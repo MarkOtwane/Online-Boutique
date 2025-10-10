@@ -1,6 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Order } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, Order } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {

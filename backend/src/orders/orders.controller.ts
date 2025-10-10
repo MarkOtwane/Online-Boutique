@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Order } from '@prisma/client';
