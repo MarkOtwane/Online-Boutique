@@ -71,4 +71,11 @@ export class CartService {
       .getValue()
       .reduce((total, item) => total + item.price * item.quantity, 0);
   }
+
+  getOrderItems(): { productId: number; quantity: number }[] {
+    return this.cartItemsSubject.getValue().map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+    }));
+  }
 }
