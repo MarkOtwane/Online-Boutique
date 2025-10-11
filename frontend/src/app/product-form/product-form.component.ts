@@ -1,108 +1,84 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { Category } from '../interfaces/category.ts';
 import { ProductService } from '../services/product.service';
 
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { Product } from '../interfaces/products.ts';
+
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss'],
 })
 export class ProductFormComponent implements OnInit {
-  productForm: FormGroup;
-  successMessage: string | null = null;
-  errorMessage: string | null = null;
-  isEditMode = false;
-  productId: number | null = null;
+  product: Product = {
+    id: 0,
+    name: '',
+    price: 0,
+    categoryId: 0,
+    createdAt: '',
+  };
   categories: Category[] = [];
+  selectedFile: File | null = null;
+  errorMessage: string | null = null;
 
   constructor(
-    private fb: FormBuilder,
     private productService: ProductService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
-    this.productForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      price: [0, [Validators.required, Validators.min(0.01)]],
-      categoryId: [null, Validators.required],
-    });
-  }
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.productService.getCategories().subscribe((categories) => {
       this.categories = categories;
-    });
-
-    this.route.paramMap.subscribe((params) => {
-      const id = params.get('id');
-      if (id) {
-        this.isEditMode = true;
-        this.productId = +id;
-        this.productService.getProduct(this.productId).subscribe({
-          next: (product) => {
-            this.productForm.patchValue({
-              name: product.name,
-              price: product.price,
-              categoryId: product.categoryId,
-            });
-          },
-          error: (err: any) => {
-            this.errorMessage = `Failed to load product: ${err.message}`;
-          },
-        });
+      if (categories.length > 0) {
+        this.product.categoryId = categories[0].id;
       }
     });
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.productService.getProduct(+id).subscribe({
+        next: (product) => (this.product = product),
+        error: () => (this.errorMessage = 'Failed to load product'),
+      });
+    }
+  }
+
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+    }
   }
 
   onSubmit(): void {
-    if (this.productForm.valid) {
-      const productData = {
-        name: this.productForm.value.name,
-        price: this.productForm.value.price,
-        categoryId: this.productForm.value.categoryId,
-      };
-      if (this.isEditMode && this.productId) {
-        this.productService
-          .updateProduct(this.productId, productData)
-          .subscribe({
-            next: (product) => {
-              this.successMessage = `Product "${product.name}" updated successfully!`;
-              this.errorMessage = null;
-              this.productForm.reset();
-              setTimeout(() => this.router.navigate(['/products']), 2000);
-            },
-            error: (err: any) => {
-              this.errorMessage = `Failed to update product: ${err.message}`;
-              this.successMessage = null;
-            },
-          });
-      } else {
-        this.productService.createProduct(productData).subscribe({
-          next: (product) => {
-            this.successMessage = `Product "${product.name}" added successfully!`;
-            this.errorMessage = null;
-            this.productForm.reset();
-            setTimeout(() => this.router.navigate(['/products']), 2000);
-          },
-          error: (err: any) => {
-            this.errorMessage = `Failed to add product: ${err.message}`;
-            this.successMessage = null;
-          },
+    if (this.product.id === 0) {
+      this.productService
+        .createProduct(this.product, this.selectedFile || undefined)
+        .subscribe({
+          next: () => this.router.navigate(['/products']),
+          error: (err) =>
+            (this.errorMessage = `Failed to create product: ${err.message}`),
         });
-      }
     } else {
-      this.errorMessage = 'Please fill out the form correctly.';
-      this.successMessage = null;
+      this.productService
+        .updateProduct(
+          this.product.id,
+          this.product,
+          this.selectedFile || undefined
+        )
+        .subscribe({
+          next: () => this.router.navigate(['/products']),
+          error: (err) =>
+            (this.errorMessage = `Failed to update product: ${err.message}`),
+        });
     }
   }
 }

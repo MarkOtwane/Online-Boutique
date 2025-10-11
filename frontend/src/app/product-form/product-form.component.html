@@ -1,94 +1,29 @@
-<div class="form-container">
-  <h2>{{ isEditMode ? "Edit Product" : "Add a New Product" }}</h2>
-  @if (successMessage) {
-    <div class="success">{{ successMessage }}</div>
-  }
-  @if (errorMessage) {
-    <div class="error">{{ errorMessage }}</div>
-  }
-  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+<div class="product-form-container">
+  <h2>{{ product.id === 0 ? 'Add Product' : 'Edit Product' }}</h2>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  <form (ngSubmit)="onSubmit()">
     <div class="form-group">
-      <label for="name">Product Name:</label>
-      <input
-        id="name"
-        formControlName="name"
-        type="text"
-        placeholder="Enter product name"
-        />
-      @if (
-        productForm.get('name')?.invalid && productForm.get('name')?.touched
-        ) {
-        <div
-          class="error"
-          >
-          @if (productForm.get('name')?.errors?.['required']) {
-            <span
-              >Name is required.</span
-              >
-            }
-            @if (productForm.get('name')?.errors?.['minlength']) {
-              <span
-                >Name must be at least 3 characters.</span
-                >
-              }
-            </div>
-          }
-        </div>
-        <div class="form-group">
-          <label for="price">Price:</label>
-          <input
-            id="price"
-            formControlName="price"
-            type="number"
-            step="0.01"
-            placeholder="Enter price"
-            />
-          @if (
-            productForm.get('price')?.invalid && productForm.get('price')?.touched
-            ) {
-            <div
-              class="error"
-              >
-              @if (productForm.get('price')?.errors?.['required']) {
-                <span
-                  >Price is required.</span
-                  >
-                }
-                @if (productForm.get('price')?.errors?.['min']) {
-                  <span
-                    >Price must be greater than 0.</span
-                    >
-                  }
-                </div>
-              }
-            </div>
-            <div class="form-group">
-              <label for="categoryId">Category:</label>
-              <select id="categoryId" formControlName="categoryId">
-                <option value="" disabled>Select a category</option>
-                @for (category of categories; track category) {
-                  <option [value]="category.id">
-                    {{ category.name }}
-                  </option>
-                }
-              </select>
-              @if (
-                productForm.get('categoryId')?.invalid &&
-                productForm.get('categoryId')?.touched
-                ) {
-                <div
-                  class="error"
-                  >
-                  @if (productForm.get('categoryId')?.errors?.['required']) {
-                    <span
-                      >Category is required.</span
-                      >
-                    }
-                  </div>
-                }
-              </div>
-              <button type="submit" [disabled]="productForm.invalid">
-                {{ isEditMode ? "Update Product" : "Add Product" }}
-              </button>
-            </form>
-          </div>
+      <label for="name">Name:</label>
+      <input id="name" [(ngModel)]="product.name" name="name" required>
+    </div>
+    <div class="form-group">
+      <label for="price">Price:</label>
+      <input id="price" type="number" [(ngModel)]="product.price" name="price" required step="0.01">
+    </div>
+    <div class="form-group">
+      <label for="category">Category:</label>
+      <select id="category" [(ngModel)]="product.categoryId" name="categoryId" required>
+        <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="image">Image:</label>
+      <input id="image" type="file" (change)="onFileChange($event)" accept="image/jpeg,image/png">
+      <div *ngIf="product.imageUrl" class="image-preview">
+        <img [src]="product.imageUrl" alt="Product Image" style="max-width: 200px;">
+      </div>
+    </div>
+    <button type="submit">{{ product.id === 0 ? 'Add Product' : 'Update Product' }}</button>
+    <button type="button" [routerLink]="['/products']">Cancel</button>
+  </form>
+</div>

@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Product } from '../interfaces/products';
 import { ProductService } from '../services/product.service';
-import { Product } from './products';
 
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';

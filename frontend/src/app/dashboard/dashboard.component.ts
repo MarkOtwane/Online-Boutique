@@ -22,7 +22,6 @@ export class DashboardComponent implements OnInit {
     this.authService.getCurrentUser().subscribe({
       next: (user) => {
         this.user = user;
-        this.authService.user$.next(user);
       },
       error: (err) => {
         this.errorMessage = `Failed to load user data: ${err.message}`;

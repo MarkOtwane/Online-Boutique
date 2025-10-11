@@ -1,49 +1,54 @@
-.form-container {
-  max-width: 400px;
+.product-form-container {
+  max-width: 600px;
   margin: 20px auto;
   padding: 20px;
   font-family: Arial, sans-serif;
 }
+
 h2 {
   text-align: center;
   color: #333;
 }
+
+.error {
+  color: red;
+  text-align: center;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
 .form-group {
   margin-bottom: 15px;
 }
-label {
+
+.form-group label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
 }
-input,
-select {
+
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-.error {
-  color: red;
-  font-size: 0.9em;
+
+.image-preview {
+  margin-top: 10px;
 }
-.success {
-  color: green;
-  font-size: 0.9em;
-  margin-bottom: 10px;
-}
+
 button {
   background-color: #333;
   color: white;
-  padding: 10px 15px;
+  padding: 8px 15px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-right: 10px;
 }
-button:disabled {
-  background-color: #999;
-  cursor: not-allowed;
-}
-button:hover:not(:disabled) {
+
+button:hover {
   background-color: #555;
 }

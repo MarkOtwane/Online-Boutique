@@ -4,48 +4,77 @@
   padding: 20px;
   font-family: Arial, sans-serif;
 }
+
 h1 {
   text-align: center;
   color: #333;
 }
+
+.loading,
+.error {
+  text-align: center;
+  font-size: 1.2em;
+  color: #666;
+}
+
+.error {
+  color: red;
+}
+
+.error button {
+  background-color: #333;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.error button:hover {
+  background-color: #555;
+}
+
 .product-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 }
+
 .product-card {
   border: 1px solid #ccc;
   padding: 15px;
-  border-radius: 5px;
-  text-align: center;
-  background-color: #f9f9f9;
+  border-radius: 4px;
+  width: calc(33.33% - 20px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
 .product-card h3 {
   margin: 0 0 10px;
   color: #333;
 }
+
 .product-card p {
   margin: 5px 0;
-  color: #666;
 }
-button {
-  margin: 5px;
-  padding: 8px 12px;
+
+.product-card button {
+  background-color: #333;
+  color: white;
+  padding: 8px 15px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-right: 10px;
 }
-button:first-of-type {
-  background-color: #333;
-  color: white;
-}
-button:first-of-type:hover {
+
+.product-card button:hover {
   background-color: #555;
-}
-button:last-of-type {
-  background-color: #d33;
-  color: white;
-}
-button:last-of-type:hover {
-  background-color: #b22;
 }

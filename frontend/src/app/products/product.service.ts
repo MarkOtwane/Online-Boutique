@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Category } from '../interfaces/category';
-import { Product } from './product';
+import { Product } from '../interfaces/products';
 
 @Injectable({
   providedIn: 'root',
@@ -26,14 +26,22 @@ export class ProductService {
   }
 
   private loadInitialData(): void {
-    this.http.get<Product[]>(`${this.apiUrl}/products`).subscribe({
-      next: (products) => this.productsSubject.next(products),
-      error: (err) => console.error('Failed to load products:', err),
-    });
-    this.http.get<Category[]>(`${this.apiUrl}/categories`).subscribe({
-      next: (categories) => this.categoriesSubject.next(categories),
-      error: (err) => console.error('Failed to load categories:', err),
-    });
+    this.http
+      .get<{ products: Product[]; total: number }>(`${this.apiUrl}/products`, {
+        headers: this.getHeaders(),
+      })
+      .subscribe({
+        next: (response) => this.productsSubject.next(response.products || []),
+        error: (err) => console.error('Failed to load products:', err),
+      });
+    this.http
+      .get<Category[]>(`${this.apiUrl}/categories`, {
+        headers: this.getHeaders(),
+      })
+      .subscribe({
+        next: (categories) => this.categoriesSubject.next(categories),
+        error: (err) => console.error('Failed to load categories:', err),
+      });
   }
 
   getProducts(): Observable<Product[]> {
@@ -50,10 +58,18 @@ export class ProductService {
     return this.categories$;
   }
 
-  createProduct(product: Product): Observable<Product> {
+  createProduct(product: Partial<Product>, image?: File): Observable<Product> {
+    const formData = new FormData();
+    formData.append('name', product.name || '');
+    formData.append('price', product.price?.toString() || '');
+    formData.append('categoryId', product.categoryId?.toString() || '');
+    if (image) {
+      formData.append('image', image);
+    }
+
     return new Observable<Product>((observer) => {
       this.http
-        .post<Product>(`${this.apiUrl}/products`, product, {
+        .post<Product>(`${this.apiUrl}/products`, formData, {
           headers: this.getHeaders(),
         })
         .subscribe({
@@ -68,10 +84,22 @@ export class ProductService {
     });
   }
 
-  updateProduct(id: number, product: Partial<Product>): Observable<Product> {
+  updateProduct(
+    id: number,
+    product: Partial<Product>,
+    image?: File
+  ): Observable<Product> {
+    const formData = new FormData();
+    formData.append('name', product.name || '');
+    formData.append('price', product.price?.toString() || '');
+    formData.append('categoryId', product.categoryId?.toString() || '');
+    if (image) {
+      formData.append('image', image);
+    }
+
     return new Observable<Product>((observer) => {
       this.http
-        .put<Product>(`${this.apiUrl}/products/${id}`, product, {
+        .put<Product>(`${this.apiUrl}/products/${id}`, formData, {
           headers: this.getHeaders(),
         })
         .subscribe({

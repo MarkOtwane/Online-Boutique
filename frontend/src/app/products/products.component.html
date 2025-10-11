@@ -7,6 +7,7 @@
   <div *ngIf="!products.length && !errorMessage" class="loading">Loading...</div>
   <div class="product-list" *ngIf="products.length">
     <div *ngFor="let product of products" class="product-card">
+      <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="{{ product.name }}" class="product-image">
       <h3>{{ product.name }}</h3>
       <p>Price: ${{ product.price }}</p>
       <p>Category: {{ product.category?.name || 'Uncategorized' }}</p>

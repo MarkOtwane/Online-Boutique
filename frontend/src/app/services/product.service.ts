@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Category } from '../interfaces/category';
-import { Product } from '../products/products';
+import { Product } from '../interfaces/products';
 
 export interface CreateProductData {
   name: string;
@@ -26,8 +26,20 @@ export class ProductService {
     return this.http.delete<Product>(`${this.apiUrl}/${id}`);
   }
 
-  createProduct(productData: CreateProductData): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, productData);
+  createProduct(
+    productData: CreateProductData,
+    file?: File
+  ): Observable<Product> {
+    const formData = new FormData();
+    formData.append('name', productData.name);
+    formData.append('price', productData.price.toString());
+    formData.append('categoryId', productData.categoryId.toString());
+
+    if (file) {
+      formData.append('image', file);
+    }
+
+    return this.http.post<Product>(this.apiUrl, formData);
   }
 
   getProduct(id: number): Observable<Product> {
@@ -36,9 +48,26 @@ export class ProductService {
 
   updateProduct(
     id: number,
-    productData: Partial<CreateProductData>
+    productData: Partial<CreateProductData>,
+    file?: File
   ): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, productData);
+    const formData = new FormData();
+
+    if (productData.name !== undefined) {
+      formData.append('name', productData.name);
+    }
+    if (productData.price !== undefined) {
+      formData.append('price', productData.price.toString());
+    }
+    if (productData.categoryId !== undefined) {
+      formData.append('categoryId', productData.categoryId.toString());
+    }
+
+    if (file) {
+      formData.append('image', file);
+    }
+
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, formData);
   }
 
   getCategories(): Observable<Category[]> {
