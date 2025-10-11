@@ -18,10 +18,11 @@ model Product {
   id         Int          @id @default(autoincrement())
   name       String
   price      Float
+  imageUrl   String?      // Optional field for image path
   createdAt  DateTime     @default(now())
   category   Category     @relation(fields: [categoryId], references: [id])
   categoryId Int
-  orderItems OrderItem[] // Relation to OrderItem
+  orderItems OrderItem[]
 }
 
 model User {
