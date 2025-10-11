@@ -1,18 +1,17 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { CartItem } from '../interfaces/cart-item';
-import { CartService } from '../services/cart.service';
 import { AuthService } from '../services/auth.service';
-
+import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.css'],
+  styleUrls: ['./checkout.component.scss'],
 })
 export class CheckoutComponent implements OnInit {
   cartItems: CartItem[] = [];

@@ -3,10 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { User } from '../interfaces/user.interface';
 import { AuthService } from '../services/auth.service';
 
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
@@ -20,10 +22,11 @@ export class DashboardComponent implements OnInit {
     this.authService.getCurrentUser().subscribe({
       next: (user) => {
         this.user = user;
+        this.authService.user$.next(user);
       },
       error: (err) => {
         this.errorMessage = `Failed to load user data: ${err.message}`;
-        this.authService.logout(); // Clear invalid token
+        this.authService.logout();
       },
     });
   }

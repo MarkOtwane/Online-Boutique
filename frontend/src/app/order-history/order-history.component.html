@@ -1,0 +1,21 @@
+<div class="order-history-container">
+  <h2>Order History</h2>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  <div *ngIf="!orders.length && !errorMessage" class="empty">No orders found.</div>
+  <div *ngIf="orders.length" class="orders-list">
+    <div *ngFor="let order of orders" class="order-card">
+      <h3>Order #{{ order.id }} - {{ order.createdAt | date:'medium' }}</h3>
+      <p><strong>Total:</strong> ${{ order.total }}</p>
+      <p *ngIf="isAdmin"><strong>User:</strong> {{ order.user?.email }}</p>
+      <div class="order-items">
+        <h4>Items:</h4>
+        <div *ngFor="let item of order.orderItems" class="order-item">
+          <p><strong>{{ item.name }}</strong></p>
+          <p>Price: ${{ item.price }}</p>
+          <p>Quantity: {{ item.quantity }}</p>
+          <p>Subtotal: ${{ item.price * item.quantity }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,22 +1,32 @@
 <div class="checkout-container">
   <h2>Checkout</h2>
-  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
-  <div *ngIf="!cartItems.length && !errorMessage && !successMessage" class="empty-cart">
-    Your cart is empty. <a routerLink="/products">Shop now</a>.
-  </div>
-  <div *ngIf="cartItems.length" class="order-summary">
-    <h3>Order Summary</h3>
-    <div class="cart-item" *ngFor="let item of cartItems">
-      <p><strong>{{ item.name }}</strong></p>
-      <p>Price: ${{ item.price }}</p>
-      <p>Quantity: {{ item.quantity }}</p>
-      <p>Subtotal: ${{ item.price * item.quantity }}</p>
+  @if (errorMessage) {
+    <div class="error">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+    <div class="success">{{ successMessage }}</div>
+  }
+  @if (!cartItems.length && !errorMessage && !successMessage) {
+    <div class="empty-cart">
+      Your cart is empty. <a routerLink="/products">Shop now</a>.
     </div>
-    <div class="cart-total">
-      <h3>Total: ${{ total }}</h3>
-      <button (click)="placeOrder()">Place Order</button>
-      <button routerLink="/cart">Back to Cart</button>
+  }
+  @if (cartItems.length) {
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      @for (item of cartItems; track item.productId) {
+        <div class="cart-item">
+          <p><strong>{{ item.name }}</strong></p>
+          <p>Price: ${{ item.price }}</p>
+          <p>Quantity: {{ item.quantity }}</p>
+          <p>Subtotal: ${{ item.price * item.quantity }}</p>
+        </div>
+      }
+      <div class="cart-total">
+        <h3>Total: ${{ total }}</h3>
+        <button (click)="placeOrder()">Place Order</button>
+        <button routerLink="/cart">Back to Cart</button>
+      </div>
     </div>
-  </div>
+  }
 </div>

@@ -2,13 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
-  Validators,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 
+import { ActivatedRoute, Router } from '@angular/router';
+import { Category } from '../interfaces/category.ts';
 import { ProductService } from '../services/product.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Category } from '../category.ts';
 
 @Component({
   selector: 'app-product-form',

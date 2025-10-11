@@ -1,4 +1,4 @@
-import { Category } from '../category.ts';
+import { Category } from '../interfaces/category.ts';
 
 export interface Product {
   id: number;

@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Category } from '../interfaces/category';
 import { Product } from '../products/products';
-import { Category } from '../category';
 
 export interface CreateProductData {
   name: string;
@@ -11,12 +11,12 @@ export interface CreateProductData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProductService {
   private apiUrl = 'http://localhost:3000/products'; // Adjust based on your backend API
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl);
@@ -34,7 +34,10 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
-  updateProduct(id: number, productData: Partial<CreateProductData>): Observable<Product> {
+  updateProduct(
+    id: number,
+    productData: Partial<CreateProductData>
+  ): Observable<Product> {
     return this.http.put<Product>(`${this.apiUrl}/${id}`, productData);
   }
 

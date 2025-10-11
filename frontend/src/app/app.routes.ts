@@ -9,6 +9,7 @@ import { LoginComponent } from './login/login.component';
 import { ProductFormComponent } from './product-form/product-form.component';
 import { ProductsComponent } from './products/products.component';
 import { RegisterComponent } from './register/register.component';
+import { OrderHistoryComponent } from './order-history/order-history.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -32,4 +33,9 @@ export const routes: Routes = [
   },
   { path: 'cart', component: CartComponent, canActivate: [AuthGuard] },
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
+  {
+    path: 'order-history',
+    component: OrderHistoryComponent,
+    canActivate: [AuthGuard],
+  },
 ];
