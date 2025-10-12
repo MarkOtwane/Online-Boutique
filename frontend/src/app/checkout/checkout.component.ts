@@ -6,10 +6,14 @@ import { CartItem } from '../interfaces/cart-item';
 import { AuthService } from '../services/auth.service';
 import { CartService } from '../services/cart.service';
 
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatDialogModule],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
 })
@@ -23,7 +27,9 @@ export class CheckoutComponent implements OnInit {
     private cartService: CartService,
     private authService: AuthService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -33,9 +39,27 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
+  openConfirmDialog(): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: { message: 'Are you sure you want to place this order?' },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.placeOrder();
+      }
+    });
+  }
+
   placeOrder(): void {
     if (!this.cartItems.length) {
       this.errorMessage = 'Your cart is empty.';
+      this.snackBar.open(this.errorMessage, 'Close', {
+        duration: 3000,
+        verticalPosition: 'top',
+        panelClass: ['error-snackbar'],
+      });
       return;
     }
 
@@ -51,6 +75,10 @@ export class CheckoutComponent implements OnInit {
           this.successMessage =
             'Order placed successfully! Redirecting to dashboard...';
           this.errorMessage = null;
+          this.snackBar.open(this.successMessage, 'Close', {
+            duration: 3000,
+            verticalPosition: 'top',
+          });
           this.cartService.clearCart();
           setTimeout(() => this.router.navigate(['/dashboard']), 2000);
         },
@@ -58,6 +86,11 @@ export class CheckoutComponent implements OnInit {
           this.errorMessage = `Failed to place order: ${
             err.error.message || err.message
           }`;
+          this.snackBar.open(this.errorMessage, 'Close', {
+            duration: 3000,
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar'],
+          });
           this.successMessage = null;
         },
       });

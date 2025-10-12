@@ -10,10 +10,12 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/cdk": "~20.0.5",
     "@angular/common": "^20.3.4",
     "@angular/compiler": "^20.3.4",
     "@angular/core": "^20.3.4",
     "@angular/forms": "^20.3.4",
+    "@angular/material": "~20.0.5",
     "@angular/platform-browser": "^20.3.4",
     "@angular/platform-browser-dynamic": "^20.3.4",
     "@angular/router": "^20.3.4",
@@ -22,6 +24,7 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^20.3.5",
     "@angular/build": "^20.3.5",
     "@angular/cli": "^20.3.5",
     "@angular/compiler-cli": "^20.3.4",

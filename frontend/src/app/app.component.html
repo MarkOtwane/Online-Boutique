@@ -1,28 +1,16 @@
-<nav>
-  <ul>
-    <li><a routerLink="/">Home</a></li>
-    <li><a routerLink="/products">Products</a></li>
-    @if (isAuthenticated) {
-      <li><a routerLink="/add-product">Add Product</a></li>
-    }
-    @if (!isAuthenticated) {
-      <li><a routerLink="/login">Login</a></li>
-    }
-    @if (!isAuthenticated) {
-      <li><a routerLink="/register">Register</a></li>
-    }
-    @if (isAuthenticated) {
-      <li><a routerLink="/dashboard">Dashboard</a></li>
-    }
-    @if (isAuthenticated) {
-      <li><a routerLink="/cart">Cart</a></li>
-    }
-    @if (isAuthenticated) {
-      <li><a (click)="logout()" style="cursor: pointer;">Logout</a></li>
-    }
-  </ul>
-  @if (isAuthenticated) {
-    <div class="welcome">Welcome, {{ authService.getUser()?.email }} ({{ authService.getUser()?.role }})</div>
-  }
-</nav>
+<mat-toolbar color="primary">
+  <span>Boutique App</span>
+  <span class="spacer"></span>
+  <button mat-button routerLink="/">Home</button>
+  <button mat-button routerLink="/products">Products</button>
+  <button mat-button *ngIf="isAuthenticated && authService.getUser()?.role === 'admin'" routerLink="/add-product">Add Product</button>
+  <button mat-button *ngIf="!isAuthenticated" routerLink="/login">Login</button>
+  <button mat-button *ngIf="!isAuthenticated" routerLink="/register">Register</button>
+  <button mat-button *ngIf="isAuthenticated" routerLink="/dashboard">Dashboard</button>
+  <button mat-button *ngIf="isAuthenticated" routerLink="/cart">Cart ({{ cartItemCount }})</button>
+  <button mat-button *ngIf="isAuthenticated" (click)="logout()">Logout</button>
+  <span *ngIf="isAuthenticated" class="welcome">
+    Welcome, {{ authService.getUser()?.email }} ({{ authService.getUser()?.role }})
+  </span>
+</mat-toolbar>
 <router-outlet></router-outlet>

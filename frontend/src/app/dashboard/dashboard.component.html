@@ -2,15 +2,15 @@
   <h2>User Dashboard</h2>
   <div *ngIf="errorMessage" class="error">
     {{ errorMessage }}
-    <button [routerLink]="['/login']">Log In</button>
+    <a [routerLink]="['/login']">Log In</a>
   </div>
   <div *ngIf="user" class="user-profile">
     <h3>Welcome, {{ user.email }}</h3>
     <p><strong>Email:</strong> {{ user.email }}</p>
     <p><strong>Role:</strong> {{ user.role }}</p>
     <p><strong>Account Created:</strong> {{ user.createdAt | date:'medium' }}</p>
-    <button *ngIf="user.role === 'admin'" [routerLink]="['/add-product']">Manage Products</button>
-    <button [routerLink]="['/order-history']">View Order History</button>
+    <a *ngIf="user.role === 'admin'" [routerLink]="['/add-product']">Manage Products</a>
+    <a [routerLink]="['/order-history']">View Order History</a>
   </div>
   <div *ngIf="!user && !errorMessage" class="loading">Loading user data...</div>
 </div>

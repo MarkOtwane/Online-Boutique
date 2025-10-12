@@ -1,20 +1,42 @@
 <div class="products-container">
   <h1>Our Products</h1>
-  <div *ngIf="errorMessage" class="error">
+  <mat-spinner *ngIf="isLoading" class="spinner"></mat-spinner>
+  <div *ngIf="errorMessage && !isLoading" class="error">
     {{ errorMessage }}
-    <button [routerLink]="['/login']">Log In</button>
+    <button mat-raised-button color="primary" [routerLink]="['/login']">
+      Log In
+    </button>
   </div>
-  <div *ngIf="!products.length && !errorMessage" class="loading">Loading...</div>
-  <div class="product-list" *ngIf="products.length">
+  <div class="product-list" *ngIf="products.length && !isLoading">
     <div *ngFor="let product of products" class="product-card">
-      <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="{{ product.name }}" class="product-image">
+      <img
+        [src]="product.imageUrl || 'assets/placeholder.jpg'"
+        alt="{{ product.name }}"
+        class="product-image"
+      />
       <h3>{{ product.name }}</h3>
       <p>Price: ${{ product.price }}</p>
-      <p>Category: {{ product.category?.name || 'Uncategorized' }}</p>
-      <p>Added: {{ product.createdAt | date:'short' }}</p>
-      <button (click)="addToCart(product)">Add to Cart</button>
-      <button *ngIf="authService.getUser()?.role === 'admin'" (click)="editProduct(product.id)">Edit</button>
-      <button *ngIf="authService.getUser()?.role === 'admin'" (click)="deleteProduct(product.id)">Delete</button>
+      <p>Category: {{ product.category?.name || "Uncategorized" }}</p>
+      <p>Added: {{ product.createdAt | date : "short" }}</p>
+      <button mat-raised-button color="primary" (click)="addToCart(product)">
+        Add to Cart
+      </button>
+      <button
+        mat-raised-button
+        color="accent"
+        *ngIf="authService.getUser()?.role === 'admin'"
+        (click)="editProduct(product.id)"
+      >
+        Edit
+      </button>
+      <button
+        mat-raised-button
+        color="warn"
+        *ngIf="authService.getUser()?.role === 'admin'"
+        (click)="deleteProduct(product.id)"
+      >
+        Delete
+      </button>
     </div>
   </div>
 </div>
