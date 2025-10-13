@@ -9,6 +9,7 @@ import { CartService } from '../services/cart.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-checkout',
