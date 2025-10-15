@@ -1,16 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
+import { CustomLoggerService } from '../auth/logger.service';
 import { PrismaService } from '../prisma/prisma.service';
-
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private logger: CustomLoggerService,
+  ) {}
 
   async createOrder(
     userId: number,
     items: { productId: number; quantity: number }[],
   ): Promise<Order> {
+    this.logger.log(`Creating order for user ${userId}`);
     if (!items || items.length === 0) {
+      this.logger.error('Order must contain at least one item');
       throw new BadRequestException('Order must contain at least one item');
     }
 
@@ -20,6 +26,7 @@ export class OrdersService {
     });
 
     if (products.length !== items.length) {
+      this.logger.error('One or more products not found');
       throw new BadRequestException('One or more products not found');
     }
 
@@ -28,7 +35,7 @@ export class OrdersService {
       return sum + (product ? product.price * item.quantity : 0);
     }, 0);
 
-    return this.prisma.order.create({
+    const order = await this.prisma.order.create({
       data: {
         userId,
         total,
@@ -42,9 +49,13 @@ export class OrdersService {
       },
       include: { orderItems: { include: { product: true } } },
     });
+
+    this.logger.log(`Order ${order.id} created successfully`);
+    return order;
   }
 
   async getUserOrders(userId: number): Promise<Order[]> {
+    this.logger.log(`Fetching orders for user ${userId}`);
     return this.prisma.order.findMany({
       where: { userId },
       include: { orderItems: { include: { product: true } } },
@@ -53,6 +64,7 @@ export class OrdersService {
   }
 
   async getAllOrders(): Promise<Order[]> {
+    this.logger.log('Fetching all orders');
     return this.prisma.order.findMany({
       include: { orderItems: { include: { product: true } }, user: true },
       orderBy: { createdAt: 'desc' },

@@ -1,46 +1,14 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-
-import { HttpClientModule } from '@angular/common/http';
-import { AuthService } from './services/auth.service';
-import { CartService } from './services/cart.service';
-import { User } from './interfaces/user.interface';
-
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
+import { Component } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HttpClientModule, FormsModule, MatToolbarModule, MatButtonModule],
+  imports: [CommonModule, RouterOutlet, RouterLink],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'frontend';
-  isAuthenticated: boolean;
-  cartItemCount: number = 0;
-
-  constructor(public authService: AuthService, private cartService: CartService) {
-    this.isAuthenticated = this.authService.isAuthenticated();
-    this.authService.user$.subscribe((user) => {
-      this.isAuthenticated = !!user;
-    });
-
-    // Subscribe to cart items to track the count
-    this.cartService.cartItems$.subscribe(items => {
-      this.cartItemCount = items.length;
-    });
-  }
-
-  get currentUser(): User | null {
-    return this.authService.getUser();
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.isAuthenticated = false;
-  }
+  title = 'Boutique App';
 }

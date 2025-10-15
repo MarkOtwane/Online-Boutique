@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { User } from '../interfaces/user.interface';
+import { User } from '../interfaces/user';
 
 @Injectable({
   providedIn: 'root',
@@ -15,10 +15,11 @@ export class AuthService {
   constructor(private http: HttpClient) {
     const token = localStorage.getItem('access_token');
     if (token) {
-      this.getCurrentUser().subscribe({
-        next: (user) => this.userSubject.next(user),
-        error: () => localStorage.removeItem('access_token'), // Clear invalid token
-      });
+      // Temporarily disable automatic user fetch to prevent initialization errors
+      // this.getCurrentUser().subscribe({
+      //   next: (user) => this.userSubject.next(user),
+      //   error: () => localStorage.removeItem('access_token'), // Clear invalid token
+      // });
     }
   }
 

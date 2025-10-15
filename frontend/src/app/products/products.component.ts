@@ -1,23 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Product } from '../interfaces/products';
-import { ProductService } from '../services/product.service';
-
-import { RouterModule } from '@angular/router';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router, RouterModule } from '@angular/router';
+import { Product } from '../interfaces/product';
 import { AuthService } from '../services/auth.service';
 import { CartService } from '../services/cart.service';
-
-import { MatSnackBar } from '@angular/material/snack-bar';
-
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ProductService } from '../services/product.service';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatProgressSpinnerModule],
+  imports: [CommonModule, RouterModule, MatProgressSpinnerModule, MatSnackBarModule],
   templateUrl: './products.component.html',
-  styleUrls: ['./products.component.scss'],
+  styleUrls: ['./products.component.css'],
 })
 export class ProductsComponent implements OnInit {
   products: Product[] = [];
@@ -27,10 +23,14 @@ export class ProductsComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private cartService: CartService,
-    public authService: AuthService,
+    private authService: AuthService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {}
+
+  get currentUser() {
+    return this.authService.getUser();
+  }
 
   ngOnInit(): void {
     this.productService.getProducts().subscribe({

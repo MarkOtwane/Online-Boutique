@@ -1,29 +1,54 @@
 <div class="product-form-container">
-  <h2>{{ product.id === 0 ? 'Add Product' : 'Edit Product' }}</h2>
+  <h2>{{ product.id === 0 ? "Add Product" : "Edit Product" }}</h2>
   <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
   <form (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="name">Name:</label>
-      <input id="name" [(ngModel)]="product.name" name="name" required>
+      <input id="name" [(ngModel)]="product.name" name="name" required />
     </div>
     <div class="form-group">
       <label for="price">Price:</label>
-      <input id="price" type="number" [(ngModel)]="product.price" name="price" required step="0.01">
+      <input
+        id="price"
+        type="number"
+        [(ngModel)]="product.price"
+        name="price"
+        required
+        step="0.01"
+      />
     </div>
     <div class="form-group">
       <label for="category">Category:</label>
-      <select id="category" [(ngModel)]="product.categoryId" name="categoryId" required>
-        <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+      <select
+        id="category"
+        [(ngModel)]="product.categoryId"
+        name="categoryId"
+        required
+      >
+        <option *ngFor="let category of categories" [value]="category.id">
+          {{ category.name }}
+        </option>
       </select>
     </div>
     <div class="form-group">
       <label for="image">Image:</label>
-      <input id="image" type="file" (change)="onFileChange($event)" accept="image/jpeg,image/png">
+      <input
+        id="image"
+        type="file"
+        (change)="onFileChange($event)"
+        accept="image/jpeg,image/png"
+      />
       <div *ngIf="product.imageUrl" class="image-preview">
-        <img [src]="product.imageUrl" alt="Product Image" style="max-width: 200px;">
+        <img
+          [src]="product.imageUrl"
+          alt="Product Image"
+          style="max-width: 200px"
+        />
       </div>
     </div>
-    <button type="submit">{{ product.id === 0 ? 'Add Product' : 'Update Product' }}</button>
+    <button type="submit">
+      {{ product.id === 0 ? "Add Product" : "Update Product" }}
+    </button>
     <button type="button" [routerLink]="['/products']">Cancel</button>
   </form>
 </div>

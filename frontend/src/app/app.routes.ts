@@ -1,15 +1,10 @@
 import { Routes } from '@angular/router';
-import { AdminGuard } from './admin.guard';
-import { AuthGuard } from './auth.guard';
-import { CartComponent } from './cart/cart.component';
-import { CheckoutComponent } from './checkout/checkout.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from './auth/auth.guard';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { ProductFormComponent } from './product-form/product-form.component';
 import { ProductsComponent } from './products/products.component';
 import { RegisterComponent } from './register/register.component';
-import { OrderHistoryComponent } from './order-history/order-history.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -17,25 +12,13 @@ export const routes: Routes = [
   {
     path: 'add-product',
     component: ProductFormComponent,
-    canActivate: [AuthGuard, AdminGuard],
+    canActivate: [AuthGuard],
   },
   {
     path: 'add-product/:id',
     component: ProductFormComponent,
-    canActivate: [AuthGuard, AdminGuard],
+    canActivate: [AuthGuard],
   },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  {
-    path: 'dashboard',
-    component: DashboardComponent,
-    canActivate: [AuthGuard],
-  },
-  { path: 'cart', component: CartComponent, canActivate: [AuthGuard] },
-  { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
-  {
-    path: 'order-history',
-    component: OrderHistoryComponent,
-    canActivate: [AuthGuard],
-  },
 ];

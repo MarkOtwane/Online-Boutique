@@ -4,29 +4,24 @@
   padding: 20px;
   font-family: Arial, sans-serif;
 }
-
 h2 {
   text-align: center;
   color: #333;
 }
-
 .error {
   color: red;
   text-align: center;
   font-size: 0.9em;
   margin-bottom: 10px;
 }
-
 .form-group {
   margin-bottom: 15px;
 }
-
 .form-group label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
 }
-
 .form-group input,
 .form-group select {
   width: 100%;
@@ -34,11 +29,9 @@ h2 {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-
 .image-preview {
   margin-top: 10px;
 }
-
 button {
   background-color: #333;
   color: white;
@@ -48,7 +41,6 @@ button {
   cursor: pointer;
   margin-right: 10px;
 }
-
 button:hover {
   background-color: #555;
 }

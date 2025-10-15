@@ -1,20 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-
-import { ActivatedRoute, Router } from '@angular/router';
-import { Category } from '../interfaces/category.ts';
-import { ProductService } from '../services/product.service';
-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { Product } from '../interfaces/products.ts';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Category } from '../interfaces/category';
+import { Product } from '../interfaces/product';
+import { ProductService } from '../services/product.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './product-form.component.html',
-  styleUrls: ['./product-form.component.scss'],
+  styleUrls: ['./product-form.component.css'],
 })
 export class ProductFormComponent implements OnInit {
   product: Product = {
@@ -30,11 +28,21 @@ export class ProductFormComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    // Check if user is authenticated
+    if (!this.authService.isAuthenticated()) {
+      this.errorMessage = 'You must be logged in to manage products';
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/add-product' }
+      });
+      return;
+    }
+
     this.productService.getCategories().subscribe((categories) => {
       this.categories = categories;
       if (categories.length > 0) {
@@ -59,6 +67,13 @@ export class ProductFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // Double-check authentication before submitting
+    if (!this.authService.isAuthenticated()) {
+      this.errorMessage = 'You must be logged in to manage products';
+      this.router.navigate(['/login']);
+      return;
+    }
+
     if (this.product.id === 0) {
       this.productService
         .createProduct(this.product, this.selectedFile || undefined)

@@ -11,7 +11,7 @@ import {
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
-import { Prisma, Product } from '@prisma/client';
+import { Product } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { ProductsService } from './products.service';
@@ -69,11 +69,18 @@ export class ProductsController {
     }),
   )
   async create(
-    @Body() data: Prisma.ProductCreateInput,
+    @Body() data: { name: string; price: string; categoryId: string },
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Product> {
     const imageUrl = file ? `/uploads/${file.filename}` : undefined;
-    return this.productsService.create({ ...data, imageUrl });
+    return this.productsService.create({
+      name: data.name,
+      price: parseFloat(data.price),
+      category: {
+        connect: { id: parseInt(data.categoryId) },
+      },
+      imageUrl,
+    });
   }
 
   @Put(':id')
@@ -104,11 +111,22 @@ export class ProductsController {
   )
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: Prisma.ProductUpdateInput,
+    @Body() data: { name?: string; price?: string; categoryId?: string },
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Product> {
     const imageUrl = file ? `/uploads/${file.filename}` : undefined;
-    return this.productsService.update(id, { ...data, imageUrl });
+
+    const updateData: any = {};
+    if (data.name) updateData.name = data.name;
+    if (data.price) updateData.price = parseFloat(data.price);
+    if (data.categoryId) {
+      updateData.category = {
+        connect: { id: parseInt(data.categoryId) },
+      };
+    }
+    if (imageUrl) updateData.imageUrl = imageUrl;
+
+    return this.productsService.update(id, updateData);
   }
 
   @Delete(':id')

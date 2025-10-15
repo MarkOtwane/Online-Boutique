@@ -1,16 +1,63 @@
-<mat-toolbar color="primary">
-  <span>Boutique App</span>
-  <span class="spacer"></span>
-  <button mat-button routerLink="/">Home</button>
-  <button mat-button routerLink="/products">Products</button>
-  <button mat-button *ngIf="isAuthenticated && authService.getUser()?.role === 'admin'" routerLink="/add-product">Add Product</button>
-  <button mat-button *ngIf="!isAuthenticated" routerLink="/login">Login</button>
-  <button mat-button *ngIf="!isAuthenticated" routerLink="/register">Register</button>
-  <button mat-button *ngIf="isAuthenticated" routerLink="/dashboard">Dashboard</button>
-  <button mat-button *ngIf="isAuthenticated" routerLink="/cart">Cart ({{ cartItemCount }})</button>
-  <button mat-button *ngIf="isAuthenticated" (click)="logout()">Logout</button>
-  <span *ngIf="isAuthenticated" class="welcome">
-    Welcome, {{ authService.getUser()?.email }} ({{ authService.getUser()?.role }})
-  </span>
-</mat-toolbar>
-<router-outlet></router-outlet>
+<div style="padding: 20px; background-color: #f0f0f0; min-height: 100vh">
+  <h1 style="color: #333; text-align: center">Boutique App - Test Page</h1>
+  <p style="text-align: center; color: #666">
+    If you can see this, the app is working!
+  </p>
+
+  <div style="text-align: center; margin: 20px 0">
+    <button
+      style="
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      "
+      routerLink="/"
+    >
+      Home
+    </button>
+    <button
+      style="
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      "
+      routerLink="/products"
+    >
+      Products
+    </button>
+    <button
+      style="
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      "
+      routerLink="/login"
+    >
+      Login
+    </button>
+  </div>
+
+  <div
+    style="
+      border: 2px solid #007bff;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 5px;
+    "
+  >
+    <h2>Router Outlet Test:</h2>
+    <router-outlet></router-outlet>
+  </div>
+</div>

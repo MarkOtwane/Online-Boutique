@@ -1,9 +1,14 @@
-/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { Category } from '@prisma/client';
 
 @Injectable()
 export class CategoriesService {
-  findAll(): { name: string; id: number; createdAt: Date; }[] | PromiseLike<{ name: string; id: number; createdAt: Date; }[]> {
-    throw new Error('Method not implemented.');
+  constructor(private prisma: PrismaService) {}
+
+  async findAll(): Promise<Category[]> {
+    return this.prisma.category.findMany({
+      orderBy: { name: 'asc' }
+    });
   }
 }
