@@ -8,9 +8,10 @@
   <div class="product-list" *ngIf="products.length && !isLoading">
     <div *ngFor="let product of products" class="product-card">
       <img
-        [src]="product.imageUrl || 'assets/placeholder.jpg'"
+        [src]="product.imageUrl || 'assets/placeholder-product.png'"
         alt="{{ product.name }}"
         class="product-image"
+        onerror="this.src='assets/placeholder-product.png'"
       />
       <h3>{{ product.name }}</h3>
       <p>Price: ${{ product.price }}</p>

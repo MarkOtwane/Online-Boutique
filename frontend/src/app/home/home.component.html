@@ -16,7 +16,7 @@
       <div *ngFor="let product of recentProducts" class="product-card">
         <div class="product-image">
           <img
-            [src]="product.imageUrl ? 'http://localhost:3000' + product.imageUrl : '/assets/placeholder-product.png'"
+            [src]="product.imageUrl || '/assets/placeholder-product.png'"
             [alt]="product.name"
             onerror="this.src='/assets/placeholder-product.png'"
           />

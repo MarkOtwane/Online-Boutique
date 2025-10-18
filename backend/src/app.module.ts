@@ -7,8 +7,6 @@ import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { CustomLoggerService } from './auth/logger.service';
 
 @Module({
@@ -18,10 +16,6 @@ import { CustomLoggerService } from './auth/logger.service';
     UsersModule,
     AuthModule,
     OrdersModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-    }),
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, CustomLoggerService],

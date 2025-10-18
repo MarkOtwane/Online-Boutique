@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Body,
   Controller,
@@ -20,6 +22,8 @@ import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import * as fs from 'fs/promises';
+import cloudinary from '../cloudinary.config';
 
 @Controller('products')
 @UseGuards(JwtAuthGuard)
@@ -62,9 +66,9 @@ export class ProductsController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
           return cb(
-            new Error('Only JPG, JPEG, and PNG files are allowed'),
+            new Error('Only JPG, JPEG, PNG, and WEBP files are allowed'),
             false,
           );
         }
@@ -77,7 +81,22 @@ export class ProductsController {
     @Body() data: { name: string; price: string; categoryId: string },
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Product> {
-    const imageUrl = file ? `/uploads/${file.filename}` : undefined;
+    let imageUrl: string | undefined;
+
+    if (file) {
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'boutique-products',
+        public_id: `product-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+        format: 'png',
+      });
+
+      imageUrl = result.secure_url;
+
+      // Delete local file after upload
+      await fs.unlink(file.path);
+    }
+
     return this.productsService.create({
       name: data.name,
       price: parseFloat(data.price),
@@ -103,9 +122,9 @@ export class ProductsController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
           return cb(
-            new Error('Only JPG, JPEG, and PNG files are allowed'),
+            new Error('Only JPG, JPEG, PNG, and WEBP files are allowed'),
             false,
           );
         }
@@ -119,7 +138,21 @@ export class ProductsController {
     @Body() data: { name?: string; price?: string; categoryId?: string },
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Product> {
-    const imageUrl = file ? `/uploads/${file.filename}` : undefined;
+    let imageUrl: string | undefined;
+
+    if (file) {
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'boutique-products',
+        public_id: `product-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+        format: 'png',
+      });
+
+      imageUrl = result.secure_url;
+
+      // Delete local file after upload
+      await fs.unlink(file.path);
+    }
 
     const updateData: any = {};
     if (data.name) updateData.name = data.name;
