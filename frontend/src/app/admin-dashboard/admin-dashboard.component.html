@@ -1,151 +1,220 @@
-<div class="admin-dashboard">
-  <div class="dashboard-header">
-    <h1>Admin Dashboard</h1>
-    <p>Manage your boutique system</p>
-  </div>
-
-  <!-- Navigation Tabs -->
-  <div class="admin-nav">
-    <button
-      class="nav-tab"
-      [class.active]="activeTab === 'overview'"
-      (click)="setActiveTab('overview')">
-      Overview
-    </button>
-    <button
-      class="nav-tab"
-      [class.active]="activeTab === 'products'"
-      (click)="setActiveTab('products')">
-      Products
-    </button>
-    <button
-      class="nav-tab"
-      [class.active]="activeTab === 'users'"
-      (click)="setActiveTab('users')">
-      Users
-    </button>
-    <button
-      class="nav-tab"
-      [class.active]="activeTab === 'orders'"
-      (click)="setActiveTab('orders')">
-      Orders
-    </button>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading">
-    Loading dashboard data...
-  </div>
-
-  <!-- Overview Tab -->
-  <div *ngIf="!loading && activeTab === 'overview'" class="tab-content">
-    <div class="analytics-grid">
-      <div class="analytics-card">
-        <h3>Total Products</h3>
-        <p class="metric">{{ totalProducts }}</p>
-        <button class="btn btn-primary" [routerLink]="['/products']">View Products</button>
-      </div>
-      <div class="analytics-card">
-        <h3>Total Users</h3>
-        <p class="metric">{{ totalUsers }}</p>
-        <button class="btn btn-primary" (click)="setActiveTab('users')">Manage Users</button>
-      </div>
-      <div class="analytics-card">
-        <h3>Total Orders</h3>
-        <p class="metric">{{ totalOrders }}</p>
-        <button class="btn btn-primary" (click)="setActiveTab('orders')">View Orders</button>
-      </div>
-      <div class="analytics-card">
-        <h3>Total Revenue</h3>
-        <p class="metric">${{ totalRevenue.toFixed(2) }}</p>
-        <button class="btn btn-primary" [routerLink]="['/add-product']">Add Product</button>
-      </div>
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>Admin Panel</h2>
+      <p>Boutique Management</p>
     </div>
-  </div>
 
-  <!-- Products Tab -->
-  <div *ngIf="!loading && activeTab === 'products'" class="tab-content">
-    <div class="section-header">
-      <h2>Products Management</h2>
-      <button class="btn btn-primary" [routerLink]="['/add-product']">Add New Product</button>
+    <nav class="sidebar-nav">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'overview'"
+            (click)="setActiveTab('overview')">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">Overview</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'products'"
+            (click)="setActiveTab('products')">
+            <span class="nav-icon">📦</span>
+            <span class="nav-text">Products</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'users'"
+            (click)="setActiveTab('users')">
+            <span class="nav-icon">👥</span>
+            <span class="nav-text">Users</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'orders'"
+            (click)="setActiveTab('orders')">
+            <span class="nav-icon">🛒</span>
+            <span class="nav-text">Orders</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn btn-outline" [routerLink]="['/']">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-text">Back to Site</span>
+      </button>
     </div>
-    <div class="products-grid">
-      <div *ngFor="let product of products" class="product-card">
-        <div class="product-image">
-          <img
-            [src]="product.imageUrl || '/assets/placeholder-product.png'"
-            [alt]="product.name"
-            onerror="this.src='/assets/placeholder-product.png'"
-          />
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="admin-main">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading">
+      <div class="loading-spinner">Loading dashboard data...</div>
+    </div>
+
+    <!-- Overview Tab -->
+    <div *ngIf="!loading && activeTab === 'overview'" class="content-section">
+      <div class="section-header">
+        <h1>Dashboard Overview</h1>
+        <p>Welcome back! Here's what's happening with your boutique.</p>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <div class="card-icon">📦</div>
+          <div class="card-content">
+            <h3>Total Products</h3>
+            <p class="metric">{{ totalProducts }}</p>
+            <button class="btn btn-primary" (click)="setActiveTab('products')">Manage Products</button>
+          </div>
         </div>
-        <div class="product-info">
-          <h3>{{ product.name }}</h3>
-          <p class="product-category">{{ product.category?.name }}</p>
-          <p class="product-price">${{ product.price }}</p>
-          <div class="product-actions">
-            <button class="btn btn-secondary" [routerLink]="['/add-product', product.id]">Edit</button>
-            <button class="btn btn-danger" (click)="deleteProduct(product.id)">Delete</button>
+        <div class="analytics-card">
+          <div class="card-icon">👥</div>
+          <div class="card-content">
+            <h3>Total Users</h3>
+            <p class="metric">{{ totalUsers }}</p>
+            <button class="btn btn-primary" (click)="setActiveTab('users')">Manage Users</button>
+          </div>
+        </div>
+        <div class="analytics-card">
+          <div class="card-icon">🛒</div>
+          <div class="card-content">
+            <h3>Total Orders</h3>
+            <p class="metric">{{ totalOrders }}</p>
+            <button class="btn btn-primary" (click)="setActiveTab('orders')">View Orders</button>
+          </div>
+        </div>
+        <div class="analytics-card">
+          <div class="card-icon">💰</div>
+          <div class="card-content">
+            <h3>Total Revenue</h3>
+            <p class="metric">${{ totalRevenue.toFixed(2) }}</p>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Users Tab -->
-  <div *ngIf="!loading && activeTab === 'users'" class="tab-content">
-    <div class="section-header">
-      <h2>Users Management</h2>
-    </div>
-    <div class="users-table">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Created At</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let user of users">
-            <td>{{ user.id }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.role }}</td>
-            <td>{{ user.createdAt | date:'short' }}</td>
-            <td>
-              <button class="btn btn-danger" (click)="deleteUser(user.id)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <!-- Products Tab -->
+    <div *ngIf="!loading && activeTab === 'products'" class="content-section">
+      <div class="section-header">
+        <h1>Products Management</h1>
+        <button class="btn btn-primary" [routerLink]="['/admin/add-product']">
+          <span class="btn-icon">➕</span>
+          Add New Product
+        </button>
+      </div>
 
-  <!-- Orders Tab -->
-  <div *ngIf="!loading && activeTab === 'orders'" class="tab-content">
-    <div class="section-header">
-      <h2>Orders Management</h2>
+      <div class="products-grid">
+        <div *ngFor="let product of products" class="product-card">
+          <div class="product-image">
+            <img
+              [src]="product.imageUrl || '/assets/placeholder-product.png'"
+              [alt]="product.name"
+              onerror="this.src='/assets/placeholder-product.png'"
+            />
+          </div>
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="product-category">{{ product.category?.name }}</p>
+            <p class="product-price">${{ product.price }}</p>
+            <div class="product-actions">
+              <button class="btn btn-secondary" [routerLink]="['/admin/add-product', product.id]">
+                <span class="btn-icon">✏️</span>
+                Edit
+              </button>
+              <button class="btn btn-danger" (click)="deleteProduct(product.id)">
+                <span class="btn-icon">🗑️</span>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="orders-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>User ID</th>
-            <th>Total</th>
-            <th>Created At</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let order of orders">
-            <td>{{ order.id }}</td>
-            <td>{{ order.userId }}</td>
-            <td>${{ order.total }}</td>
-            <td>{{ order.createdAt | date:'short' }}</td>
-          </tr>
-        </tbody>
-      </table>
+
+    <!-- Users Tab -->
+    <div *ngIf="!loading && activeTab === 'users'" class="content-section">
+      <div class="section-header">
+        <h1>Users Management</h1>
+      </div>
+
+      <div class="users-table-container">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td>{{ user.id }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="role-badge" [class.admin]="user.role === 'admin'">{{ user.role }}</span>
+              </td>
+              <td>{{ user.createdAt | date:'short' }}</td>
+              <td>
+                <button
+                  *ngIf="user.role !== 'admin'"
+                  class="btn btn-danger"
+                  (click)="deleteUser(user.id)">
+                  <span class="btn-icon">🗑️</span>
+                  Delete
+                </button>
+                <span
+                  *ngIf="user.role === 'admin'"
+                  class="admin-protection"
+                  title="Cannot delete admin users">
+                  <span class="btn-icon">🔒</span>
+                  Protected
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+
+    <!-- Orders Tab -->
+    <div *ngIf="!loading && activeTab === 'orders'" class="content-section">
+      <div class="section-header">
+        <h1>Orders Management</h1>
+      </div>
+
+      <div class="orders-table-container">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>User ID</th>
+              <th>Total</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td>{{ order.id }}</td>
+              <td>{{ order.userId }}</td>
+              <td class="order-total">${{ order.total }}</td>
+              <td>{{ order.createdAt | date:'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
 </div>

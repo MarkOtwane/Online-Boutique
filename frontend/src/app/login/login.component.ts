@@ -33,33 +33,42 @@ export class LoginComponent {
       password: ['', Validators.required],
     });
     this.returnUrl =
-      this.route.snapshot.queryParams['returnUrl'] || '/products';
+      this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
   }
 
   onSubmit(): void {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
       this.authService.login(email, password).subscribe({
-        next: () => {
+        next: (response) => {
           console.log('Login successful! Return URL:', this.returnUrl);
           console.log('Current URL:', this.router.url);
+          console.log('User role:', response.user.role);
           this.successMessage = 'Login successful! Redirecting...';
           this.errorMessage = null;
 
-          // Navigate immediately instead of waiting
-          const targetUrl = this.returnUrl || '/products';
+          // Check user role and redirect accordingly
+          let targetUrl: string;
+          if (response.user.role === 'admin') {
+            targetUrl = this.returnUrl && this.returnUrl.startsWith('/admin') ? this.returnUrl : '/admin';
+          } else {
+            targetUrl = this.returnUrl && !this.returnUrl.startsWith('/admin') ? this.returnUrl : '/dashboard';
+          }
+
           console.log('Attempting navigation to:', targetUrl);
 
           this.router.navigate([targetUrl]).then((result) => {
             console.log('Navigation result:', result);
             if (!result) {
               console.error('Navigation failed, trying fallback');
-              this.router.navigate(['/products']);
+              const fallbackUrl = response.user.role === 'admin' ? '/admin' : '/dashboard';
+              this.router.navigate([fallbackUrl]);
             }
           }).catch((error) => {
             console.error('Navigation error:', error);
-            // Fallback navigation
-            this.router.navigate(['/products']);
+            // Fallback navigation based on role
+            const fallbackUrl = response.user.role === 'admin' ? '/admin' : '/dashboard';
+            this.router.navigate([fallbackUrl]);
           });
         },
         error: (err) => {

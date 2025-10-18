@@ -106,15 +106,33 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   deleteUser(userId: number): void {
-    if (confirm('Are you sure you want to delete this user?')) {
+    // Find the user to check their role
+    const user = this.users.find(u => u.id === userId);
+
+    if (!user) {
+      alert('User not found');
+      return;
+    }
+
+    // Prevent deletion of admin users
+    if (user.role === 'admin') {
+      alert('❌ Cannot delete admin users! Admin accounts are protected to prevent accidental lockout.');
+      return;
+    }
+
+    if (confirm(`Are you sure you want to delete the user "${user.email}"? This action cannot be undone.`)) {
       this.http.delete(`http://localhost:3000/users/${userId}`, {
         headers: this.getHeaders()
       }).subscribe({
         next: () => {
           this.users = this.users.filter(u => u.id !== userId);
           this.totalUsers = this.users.length;
+          alert('✅ User deleted successfully');
         },
-        error: (error) => console.error('Error deleting user:', error)
+        error: (error) => {
+          console.error('Error deleting user:', error);
+          alert('❌ Failed to delete user. Please try again.');
+        }
       });
     }
   }

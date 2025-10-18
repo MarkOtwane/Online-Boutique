@@ -15,9 +15,8 @@ export class ProductService {
   categories$: Observable<Category[]> = this.categoriesSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Temporarily disable automatic data loading to prevent initialization errors
-    // this.loadInitialData();
-  }
+     this.loadInitialData();
+   }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('access_token');
@@ -27,23 +26,38 @@ export class ProductService {
   }
 
   private loadInitialData(): void {
-    this.http
-      .get<{ products: Product[]; total: number }>(`${this.apiUrl}/products`, {
-        headers: this.getHeaders(),
-      })
-      .subscribe({
-        next: (response) => this.productsSubject.next(response.products || []),
-        error: (err) => console.error('Failed to load products:', err),
-      });
-    this.http
-      .get<Category[]>(`${this.apiUrl}/categories`, {
-        headers: this.getHeaders(),
-      })
-      .subscribe({
-        next: (categories) => this.categoriesSubject.next(categories),
-        error: (err) => console.error('Failed to load categories:', err),
-      });
-  }
+     // Load categories first (they're needed for product forms)
+     this.http
+       .get<Category[]>(`${this.apiUrl}/categories`, {
+         headers: this.getHeaders(),
+       })
+       .subscribe({
+         next: (categories) => {
+           console.log('Categories loaded successfully:', categories);
+           this.categoriesSubject.next(categories || []);
+         },
+         error: (err) => {
+           console.error('Failed to load categories:', err);
+           this.categoriesSubject.next([]);
+         },
+       });
+
+     // Load products
+     this.http
+       .get<{ products: Product[]; total: number }>(`${this.apiUrl}/products`, {
+         headers: this.getHeaders(),
+       })
+       .subscribe({
+         next: (response) => {
+           console.log('Products loaded successfully:', response.products);
+           this.productsSubject.next(response.products || []);
+         },
+         error: (err) => {
+           console.error('Failed to load products:', err);
+           this.productsSubject.next([]);
+         },
+       });
+   }
 
   getProducts(): Observable<Product[]> {
     return this.products$;

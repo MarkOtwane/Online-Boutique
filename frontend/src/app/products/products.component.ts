@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule } from '@angular/router';
 import { Product } from '../interfaces/product';
 import { AuthService } from '../services/auth.service';
@@ -55,9 +55,6 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  editProduct(id: number): void {
-    this.router.navigate([`/add-product/${id}`]);
-  }
 
   deleteProduct(id: number): void {
     if (confirm('Are you sure you want to delete this product?')) {

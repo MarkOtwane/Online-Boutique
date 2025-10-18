@@ -24,7 +24,7 @@
         mat-raised-button
         color="accent"
         *ngIf="currentUser?.role === 'admin'"
-        (click)="editProduct(product.id)"
+        [routerLink]="['/admin/add-product', product.id]"
       >
         Edit
       </button>
