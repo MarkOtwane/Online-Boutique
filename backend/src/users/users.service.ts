@@ -46,4 +46,34 @@ export class UsersService {
       select: { id: true, email: true, role: true, createdAt: true }, // Exclude password
     });
   }
+
+  async findAll(): Promise<UserWithoutPassword[]> {
+    return this.prisma.user.findMany({
+      select: { id: true, email: true, role: true, createdAt: true }, // Exclude password
+    });
+  }
+
+  async updateUser(
+    id: number,
+    data: { email?: string; role?: string },
+  ): Promise<UserWithoutPassword> {
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data,
+        select: { id: true, email: true, role: true, createdAt: true }, // Exclude password
+      });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new ConflictException('Email already exists');
+      }
+      throw error;
+    }
+  }
+
+  async deleteUser(id: number): Promise<User> {
+    return this.prisma.user.delete({
+      where: { id },
+    });
+  }
 }

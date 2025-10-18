@@ -35,6 +35,11 @@ export class ProductsController {
     return this.productsService.findAll({ categoryId, page, pageSize });
   }
 
+  @Get('recent')
+  async findRecent(): Promise<Product[]> {
+    return this.productsService.findRecent();
+  }
+
   @Get(':id')
   async findOne(
     @Param('id', ParseIntPipe) id: number,

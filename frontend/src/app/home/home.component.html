@@ -1,13 +1,46 @@
 <div class="home-container">
-  <h1>Welcome to Our Boutique!</h1>
-  <p>Explore our exclusive collection of fashion and accessories.</p>
+  <app-header></app-header>
+
+  <div class="hero-section">
+    <h1>Welcome to Our Boutique!</h1>
+    <p>Explore our exclusive collection of fashion and accessories.</p>
+  </div>
+
+  <div class="recent-products">
+    <h2>Recently Added Products</h2>
+    <div *ngIf="loading" class="loading">Loading products...</div>
+    <div *ngIf="!loading && recentProducts.length === 0" class="no-products">
+      No products available at the moment.
+    </div>
+    <div class="products-grid">
+      <div *ngFor="let product of recentProducts" class="product-card">
+        <div class="product-image">
+          <img
+            [src]="product.imageUrl ? 'http://localhost:3000' + product.imageUrl : '/assets/placeholder-product.png'"
+            [alt]="product.name"
+            onerror="this.src='/assets/placeholder-product.png'"
+          />
+        </div>
+        <div class="product-info">
+          <h3>{{ product.name }}</h3>
+          <p class="product-category">{{ product.category?.name }}</p>
+          <p class="product-price">${{ product.price }}</p>
+          <button class="purchase-btn" (click)="onPurchase(product)">
+            Purchase
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="navigation-buttons">
     <button class="nav-button" [routerLink]="['/products']">
-      View Products
+      View All Products
     </button>
     <button class="nav-button" [routerLink]="['/add-product']">
       Add New Product
     </button>
   </div>
+
+  <app-footer></app-footer>
 </div>

@@ -55,6 +55,10 @@ export class ProductService {
     });
   }
 
+  getRecentProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/products/recent`);
+  }
+
   getCategories(): Observable<Category[]> {
     return this.categories$;
   }

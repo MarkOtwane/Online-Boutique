@@ -69,4 +69,12 @@ export class ProductsService {
     }
     return this.prisma.product.delete({ where: { id } });
   }
+
+  async findRecent(limit: number = 8): Promise<Product[]> {
+    return this.prisma.product.findMany({
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: { category: true },
+    });
+  }
 }
