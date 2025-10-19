@@ -14,9 +14,9 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component';
 
 export const routes: Routes = [
-   { path: '', component: HomeComponent },
-   { path: 'products', component: ProductsComponent },
-   { path: 'cart', component: CartComponent },
+    { path: '', component: HomeComponent },
+    { path: 'products', component: ProductsComponent, canActivate: [AuthGuard] },
+    { path: 'cart', component: CartComponent, canActivate: [AuthGuard] },
    { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
    { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
    { path: 'order-history', component: OrderHistoryComponent, canActivate: [AuthGuard] },

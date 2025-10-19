@@ -3,41 +3,66 @@
     <div class="footer-content">
       <div class="footer-section">
         <h3>Boutique</h3>
-        <p>Your premier destination for fashion and accessories. Discover unique pieces that express your style.</p>
+        <p *ngIf="!isLoggedIn">Your premier destination for fashion and accessories. Discover unique pieces that express your style.</p>
+        <p *ngIf="isLoggedIn">Welcome back! Continue your shopping journey and discover amazing products tailored just for you.</p>
       </div>
 
       <div class="footer-section">
         <h4>Quick Links</h4>
         <ul>
-          <li><a [routerLink]="['/']">Home</a></li>
-          <li><a [routerLink]="['/products']">Products</a></li>
-          <li><a [routerLink]="['/login']">Login</a></li>
-          <li><a [routerLink]="['/register']">Sign Up</a></li>
+          <ng-container *ngIf="isLoggedIn; else publicLinks">
+            <!-- <li><a [routerLink]="['/']">Home</a></li> -->
+            <!-- <li><a [routerLink]="['/products']">Products</a></li> -->
+            <li><a [routerLink]="['/dashboard']">Dashboard</a></li>
+            <li><a [routerLink]="['/cart']">Cart</a></li>
+          </ng-container>
+          <ng-template #publicLinks>
+            <li><a [routerLink]="['/']">Home</a></li>
+            <li><a [routerLink]="['/products']">Products</a></li>
+            <li><a [routerLink]="['/login']">Login</a></li>
+            <li><a [routerLink]="['/register']">Sign Up</a></li>
+          </ng-template>
         </ul>
       </div>
 
       <div class="footer-section">
         <h4>Customer Service</h4>
         <ul>
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="#">Shipping Info</a></li>
-          <li><a href="#">Returns</a></li>
-          <li><a href="#">Size Guide</a></li>
+          <ng-container *ngIf="isLoggedIn; else publicServices">
+            <li><a [routerLink]="['/order-history']">Order History</a></li>
+            <li><a [routerLink]="['/dashboard']">My Account</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Support</a></li>
+          </ng-container>
+          <ng-template #publicServices>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Shipping Info</a></li>
+            <li><a href="#">Returns</a></li>
+            <li><a href="#">Size Guide</a></li>
+          </ng-template>
         </ul>
       </div>
 
       <div class="footer-section">
         <h4>Follow Us</h4>
         <div class="social-links">
-          <a href="#" class="social-link">Facebook</a>
-          <a href="#" class="social-link">Instagram</a>
-          <a href="#" class="social-link">Twitter</a>
+          <ng-container *ngIf="isLoggedIn; else socialMedia">
+            <div class="account-actions">
+              <a [routerLink]="['/dashboard']" class="account-link">My Dashboard</a>
+              <button class="logout-btn" (click)="logout()">Logout</button>
+            </div>
+          </ng-container>
+          <ng-template #socialMedia>
+            <a href="#" class="social-link">Facebook</a>
+            <a href="#" class="social-link">Instagram</a>
+            <a href="#" class="social-link">Twitter</a>
+          </ng-template>
         </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; 2024 Boutique. All rights reserved.</p>
+      <p>&copy; 2025 Boutique. All rights reserved.</p>
     </div>
   </div>
 </footer>

@@ -51,6 +51,18 @@ p {
   background-color: #1e7e34;
 }
 
+.nav-button.secondary {
+  background-color: #6c757d;
+}
+
+.nav-button.secondary:hover {
+  background-color: #545b62;
+}
+
+.nav-button.primary:hover {
+  background-color: #1e7e34;
+}
+
 /* Hero Section */
 .hero-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

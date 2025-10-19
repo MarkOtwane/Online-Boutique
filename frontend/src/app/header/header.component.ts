@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+import { User } from '../interfaces/user';
 
 @Component({
   selector: 'app-header',
@@ -9,31 +12,34 @@ import { CommonModule } from '@angular/common';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
-  currentUser: any = null;
+  currentUser: User | null = null;
+  private authSubscription?: Subscription;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.checkAuthStatus();
+    // Subscribe to authentication state changes
+    this.authSubscription = this.authService.user$.subscribe(user => {
+      this.currentUser = user;
+      this.isLoggedIn = !!user;
+    });
+
+    // Also check current state immediately
+    this.isLoggedIn = this.authService.isAuthenticated();
+    this.currentUser = this.authService.getUser();
   }
 
-  checkAuthStatus(): void {
-    const token = localStorage.getItem('access_token');
-    this.isLoggedIn = !!token;
-
-    if (this.isLoggedIn) {
-      // You could fetch user details here if needed
-      this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    }
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
   }
 
   logout(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
-    this.isLoggedIn = false;
-    this.currentUser = null;
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 }

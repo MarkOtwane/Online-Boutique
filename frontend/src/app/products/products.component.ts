@@ -33,6 +33,15 @@ export class ProductsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Check if user is authenticated first
+    if (!this.authService.isAuthenticated()) {
+      this.errorMessage = 'Please log in to view products.';
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/products' }
+      });
+      return;
+    }
+
     this.productService.getProducts().subscribe({
       next: (products) => {
         this.products = products;
@@ -43,6 +52,12 @@ export class ProductsComponent implements OnInit {
         this.errorMessage = 'Please log in to view products.';
         this.products = [];
         this.isLoading = false;
+        // If authentication error, redirect to login
+        if (err.status === 401) {
+          this.router.navigate(['/login'], {
+            queryParams: { returnUrl: '/products' }
+          });
+        }
       },
     });
   }

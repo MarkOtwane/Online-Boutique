@@ -32,8 +32,18 @@
   </div>
 
   <div class="navigation-buttons">
-    <button class="nav-button" [routerLink]="['/products']">
-      View All Products
-    </button>
+    <ng-container *ngIf="isLoggedIn; else loginPrompt">
+      <button class="nav-button" [routerLink]="['/products']">
+        View All Products
+      </button>
+    </ng-container>
+    <ng-template #loginPrompt>
+      <button class="nav-button" [routerLink]="['/login']">
+        Login to Shop
+      </button>
+      <button class="nav-button secondary" [routerLink]="['/register']">
+        Sign Up
+      </button>
+    </ng-template>
   </div>
 </div>

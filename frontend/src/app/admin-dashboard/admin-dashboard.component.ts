@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Product } from '../interfaces/product';
 import { User } from '../interfaces/user';
 import { Order } from '../interfaces/order';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -26,7 +27,11 @@ export class AdminDashboardComponent implements OnInit {
   totalOrders = 0;
   totalRevenue = 0;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -135,5 +140,10 @@ export class AdminDashboardComponent implements OnInit {
         }
       });
     }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

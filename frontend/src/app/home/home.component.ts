@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../services/product.service';
 import { CartService } from '../services/cart.service';
+import { AuthService } from '../services/auth.service';
 import { Product } from '../interfaces/product';
 
 @Component({
@@ -19,8 +20,13 @@ export class HomeComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private cartService: CartService,
+    private authService: AuthService,
     private router: Router
   ) {}
+
+  get isLoggedIn(): boolean {
+    return this.authService.isAuthenticated();
+  }
 
   ngOnInit(): void {
     this.loadRecentProducts();

@@ -43,6 +43,7 @@ export class AuthService {
       .pipe(
         tap((response) => {
           localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('user', JSON.stringify(response.user));
           this.userSubject.next(response.user);
         })
       );
@@ -60,6 +61,7 @@ export class AuthService {
       .pipe(
         tap((response) => {
           localStorage.setItem('access_token', response.access_token);
+          localStorage.setItem('user', JSON.stringify(response.user));
           this.userSubject.next(response.user);
         })
       );
@@ -67,6 +69,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
     this.userSubject.next(null);
   }
 
