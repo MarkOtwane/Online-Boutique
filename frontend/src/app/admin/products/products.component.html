@@ -1,0 +1,277 @@
+<div class="admin-products">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Product Management</h1>
+      <p>Manage your product inventory and listings</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-outline" routerLink="/admin/products/new">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Add Product
+      </button>
+    </div>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
+      <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Search products..." 
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          class="search-input"
+        >
+      </div>
+
+      <div class="filter-group">
+        <select 
+          [(ngModel)]="selectedCategory" 
+          (change)="onCategoryFilter()"
+          class="filter-select"
+        >
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category.name">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="results-info">
+        <span>{{ filteredProducts.length }} products found</span>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div *ngIf="selectedProducts.length > 0" class="bulk-actions">
+      <span class="bulk-count">{{ selectedProducts.length }} selected</span>
+      <button class="btn-danger" (click)="confirmBulkDelete()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Delete Selected
+      </button>
+    </div>
+  </div>
+
+  <!-- Products Table -->
+  <div class="table-container">
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading products...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="table-wrapper">
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th class="checkbox-column">
+              <input 
+                type="checkbox" 
+                [checked]="isAllCurrentPageSelected"
+                (change)="toggleSelectAll()"
+                class="table-checkbox"
+              >
+            </th>
+            <th class="image-column">Image</th>
+            <th class="sortable" (click)="onSort('name')">
+              Product Name
+              <span class="sort-icon">{{ getSortIcon('name') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('price')">
+              Price
+              <span class="sort-icon">{{ getSortIcon('price') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('category')">
+              Category
+              <span class="sort-icon">{{ getSortIcon('category') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('createdAt')">
+              Created
+              <span class="sort-icon">{{ getSortIcon('createdAt') }}</span>
+            </th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of paginatedProducts" class="product-row">
+            <td class="checkbox-column">
+              <input 
+                type="checkbox" 
+                [checked]="selectedProducts.includes(product.id)"
+                (change)="toggleProductSelection(product.id)"
+                class="table-checkbox"
+              >
+            </td>
+            <td class="image-column">
+              <img 
+                [src]="getProductImageUrl(product)" 
+                [alt]="product.name"
+                class="product-image"
+              >
+            </td>
+            <td class="product-name">
+              <div class="name-content">
+                <h4>{{ product.name }}</h4>
+                <p *ngIf="product.description" class="product-description">
+                  {{ product.description }}
+                </p>
+              </div>
+            </td>
+            <td class="price">
+              <span class="price-value">{{ formatCurrency(product.price) }}</span>
+            </td>
+            <td class="category">
+              <span class="category-badge">{{ product.category?.name || 'Uncategorized' }}</span>
+            </td>
+            <td class="created-date">
+              {{ formatDate(product.createdAt) }}
+            </td>
+            <td class="actions">
+              <div class="action-buttons">
+                <button 
+                  class="btn-edit" 
+                  routerLink="/admin/products/edit/{{ product.id }}"
+                  title="Edit Product"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18.5 2.5C18.8978 2.10218 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10218 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10218 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button 
+                  class="btn-delete" 
+                  (click)="confirmDelete(product)"
+                  title="Delete Product"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- No Products State -->
+      <div *ngIf="filteredProducts.length === 0 && !isLoading" class="no-products">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 7L9 18L4 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>No products found</h3>
+        <p>Try adjusting your search or filter criteria</p>
+        <button class="btn-primary" routerLink="/admin/products/new">Add First Product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && filteredProducts.length > 0" class="pagination">
+    <div class="pagination-info">
+      Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to 
+      {{ Math.min(currentPage * itemsPerPage, filteredProducts.length) }} of 
+      {{ filteredProducts.length }} products
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        class="btn-pagination" 
+        [disabled]="currentPage === 1"
+        (click)="goToPage(currentPage - 1)"
+      >
+        Previous
+      </button>
+      
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of pageNumbers" 
+          class="btn-page"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+      </div>
+      
+      <button 
+        class="btn-pagination" 
+        [disabled]="currentPage === totalPages"
+        (click)="goToPage(currentPage + 1)"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="showDeleteModal" class="modal-overlay" (click)="cancelDelete()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Delete Product</h3>
+      <button class="modal-close" (click)="cancelDelete()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/>
+          <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete <strong>{{ productToDelete?.name }}</strong>?</p>
+      <p class="warning-text">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-danger" (click)="deleteProduct()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Delete Confirmation Modal -->
+<div *ngIf="showBulkDeleteModal" class="modal-overlay" (click)="cancelDelete()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Delete Multiple Products</h3>
+      <button class="modal-close" (click)="cancelDelete()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/>
+          <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete <strong>{{ selectedProducts.length }}</strong> products?</p>
+      <p class="warning-text">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-danger" (click)="bulkDeleteProducts()">Delete All</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,260 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Report Analysis</h1>
+    <div class="header-actions">
+      <button class="btn-secondary">Export Report</button>
+      <button class="btn-primary">Generate Report</button>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <h3>Total Sales</h3>
+        <div class="kpi-menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="1" fill="currentColor"/>
+            <circle cx="12" cy="5" r="1" fill="currentColor"/>
+            <circle cx="12" cy="19" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ formatCurrency(totalSales) }}</div>
+      <div class="kpi-change" [class]="getChangeClass(salesChange)">
+        <span class="change-icon">{{ getChangeIcon(salesChange) }}</span>
+        <span>{{ salesChange }}% in the last month</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <h3>Total Order</h3>
+        <div class="kpi-menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="1" fill="currentColor"/>
+            <circle cx="12" cy="5" r="1" fill="currentColor"/>
+            <circle cx="12" cy="19" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ formatNumber(totalOrders) }}</div>
+      <div class="kpi-change" [class]="getChangeClass(ordersChange)">
+        <span class="change-icon">{{ getChangeIcon(ordersChange) }}</span>
+        <span>{{ ordersChange }}% in the last month</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <h3>Total Revenue</h3>
+        <div class="kpi-menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="1" fill="currentColor"/>
+            <circle cx="12" cy="5" r="1" fill="currentColor"/>
+            <circle cx="12" cy="19" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ formatCurrency(totalRevenue) }}</div>
+      <div class="kpi-change" [class]="getChangeClass(revenueChange)">
+        <span class="change-icon">{{ getChangeIcon(revenueChange) }}</span>
+        <span>{{ revenueChange }}% in the last month</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <h3>Total Customer</h3>
+        <div class="kpi-menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="1" fill="currentColor"/>
+            <circle cx="12" cy="5" r="1" fill="currentColor"/>
+            <circle cx="12" cy="19" r="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <div class="kpi-value">{{ formatNumber(totalCustomers) }}</div>
+      <div class="kpi-change" [class]="getChangeClass(customersChange)">
+        <span class="change-icon">{{ getChangeIcon(customersChange) }}</span>
+        <span>{{ customersChange }}% in the last month</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid">
+    <!-- Revenue Chart -->
+    <div class="chart-card large">
+      <div class="chart-header">
+        <h3>Revenue</h3>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-color purple"></div>
+            <span>Current Week {{ formatCurrency(58211) }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color green"></div>
+            <span>Previous Week {{ formatCurrency(68768) }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-content">
+        <div class="simple-chart">
+          <div class="chart-bars">
+            <div *ngFor="let data of revenueData" class="chart-bar-group">
+              <div class="bar-label">{{ data.month }}</div>
+              <div class="bars">
+                <div class="bar previous" [style.height.%]="data.previous"></div>
+                <div class="bar current" [style.height.%]="data.current"></div>
+              </div>
+            </div>
+          </div>
+          <div class="chart-axis">
+            <span>0</span>
+            <span>10M</span>
+            <span>20M</span>
+            <span>30M</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales by Location -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Sales By Location</h3>
+      </div>
+      <div class="chart-content">
+        <div class="location-list">
+          <div *ngFor="let location of locationData" class="location-item">
+            <div class="location-info">
+              <div class="location-dot"></div>
+              <span class="location-name">{{ location.city }}</span>
+            </div>
+            <span class="location-sales">{{ formatNumber(location.sales) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Sales Donut -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Total Sales</h3>
+      </div>
+      <div class="chart-content">
+        <div class="donut-chart">
+          <div class="donut-center">
+            <div class="donut-percentage">38.6%</div>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-color blue"></div>
+            <span>Direct</span>
+            <span class="legend-value">{{ formatCurrency(300.56) }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color orange"></div>
+            <span>Affiliate</span>
+            <span class="legend-value">{{ formatCurrency(135.18) }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color purple"></div>
+            <span>Sponsored</span>
+            <span class="legend-value">{{ formatCurrency(154.02) }}</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color green"></div>
+            <span>E-mail</span>
+            <span class="legend-value">{{ formatCurrency(48.96) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Target -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Monthly Target</h3>
+      </div>
+      <div class="chart-content">
+        <div class="gauge-chart">
+          <div class="gauge-center">
+            <div class="gauge-percentage">{{ monthlyTarget }}%</div>
+            <div class="gauge-increase">+{{ targetIncrease }}%</div>
+          </div>
+        </div>
+        <div class="gauge-info">
+          <p>You earn {{ formatCurrency(todayEarnings) }} today, its higher than last month keep up your good trends!</p>
+          <div class="gauge-stats">
+            <div class="stat-item">
+              <span class="stat-label">Target</span>
+              <span class="stat-value">{{ formatCurrency(targetAmount) }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Revenue</span>
+              <span class="stat-value">{{ formatCurrency(currentRevenue) }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Today</span>
+              <span class="stat-value">{{ formatCurrency(todayRevenue) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Selling Products Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <h3>Top Selling Products</h3>
+      <div class="table-actions">
+        <button class="btn-outline">Filter</button>
+        <button class="btn-outline">See All</button>
+      </div>
+    </div>
+    <div class="table-content">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" class="table-checkbox">
+            </th>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of topProducts">
+            <td>
+              <input type="checkbox" class="table-checkbox">
+            </td>
+            <td class="product-name">{{ product.name }}</td>
+            <td>{{ formatCurrency(product.price) }}</td>
+            <td>
+              <span class="category-badge">{{ product.category }}</span>
+            </td>
+            <td>{{ product.quantity }}</td>
+            <td>{{ formatCurrency(product.amount) }}</td>
+            <td>
+              <button class="action-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="1" fill="currentColor"/>
+                  <circle cx="12" cy="5" r="1" fill="currentColor"/>
+                  <circle cx="12" cy="19" r="1" fill="currentColor"/>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

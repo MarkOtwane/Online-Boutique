@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
-  ActivatedRouteSnapshot,
   CanActivate,
-  Router,
+  ActivatedRouteSnapshot,
   RouterStateSnapshot,
+  Router,
 } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
@@ -17,12 +17,19 @@ export class AdminGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    const user = this.authService.getUser();
-    if (user && user.role === 'admin') {
-      return true; // Allow access if user is admin
+    if (this.authService.isAuthenticated()) {
+      const user = this.authService.getUser();
+      if (user && user.role === 'admin') {
+        return true; // Allow access if authenticated and is admin
+      } else {
+        this.router.navigate(['/']);
+        return false; // Redirect to home if not admin
+      }
     } else {
-      this.router.navigate(['/products']);
-      return false; // Redirect to products if not admin
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: state.url },
+      });
+      return false; // Redirect to login if not authenticated
     }
   }
 }

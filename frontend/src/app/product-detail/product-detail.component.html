@@ -1,0 +1,181 @@
+<div class="product-detail-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading product details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-state">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+      <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
+      <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    <h2>Product Not Found</h2>
+    <p>{{ errorMessage }}</p>
+    <button class="btn-primary" routerLink="/products">Back to Products</button>
+  </div>
+
+  <!-- Product Detail Content -->
+  <div *ngIf="product && !isLoading" class="product-detail">
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      {{ successMessage }}
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <button class="btn-back" (click)="goBack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Products
+      </button>
+      <span class="breadcrumb-separator">›</span>
+      <span>{{ product.category?.name || 'Products' }}</span>
+      <span class="breadcrumb-separator">›</span>
+      <span>{{ product.name }}</span>
+    </nav>
+
+    <!-- Product Main Content -->
+    <div class="product-main">
+      <!-- Product Images -->
+      <div class="product-images">
+        <div class="main-image">
+          <img 
+            [src]="productImages[selectedImageIndex]" 
+            [alt]="product.name"
+            class="main-image-img"
+          >
+          <div *ngIf="product.price < 100" class="sale-badge">
+            Sale
+          </div>
+        </div>
+        
+        <div class="thumbnail-images" *ngIf="productImages.length > 1">
+          <button 
+            *ngFor="let image of productImages; let i = index"
+            class="thumbnail-btn"
+            [class.active]="i === selectedImageIndex"
+            (click)="selectImage(i)"
+          >
+            <img [src]="image" [alt]="product.name + ' ' + (i + 1)" class="thumbnail-img">
+          </button>
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        <div class="product-header">
+          <h1 class="product-title">{{ product.name }}</h1>
+          <div class="product-category">
+            <span class="category-badge">{{ product.category?.name || 'Uncategorized' }}</span>
+          </div>
+        </div>
+
+        <div class="product-price">
+          <span class="current-price">{{ formatCurrency(product.price) }}</span>
+          <span *ngIf="product.price < 100" class="original-price">{{ formatCurrency(product.price * 1.5) }}</span>
+          <span *ngIf="product.price < 100" class="discount">{{ getDiscountPercentage(product.price * 1.5, product.price) }}% OFF</span>
+        </div>
+
+        <div class="product-description">
+          <h3>Description</h3>
+          <p>{{ product.description || 'No description available for this product.' }}</p>
+        </div>
+
+        <!-- Product Features -->
+        <div class="product-features">
+          <h3>Features</h3>
+          <ul>
+            <li>Premium quality materials</li>
+            <li>Free shipping on orders over $50</li>
+            <li>30-day return policy</li>
+            <li>1-year warranty included</li>
+          </ul>
+        </div>
+
+        <!-- Quantity and Actions -->
+        <div class="product-actions">
+          <div class="quantity-selector">
+            <label for="quantity">Quantity:</label>
+            <div class="quantity-controls">
+              <button class="qty-btn" (click)="decreaseQuantity()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <input 
+                id="quantity"
+                type="number" 
+                [value]="quantity"
+                (change)="onQuantityChange($event)"
+                min="1" 
+                class="qty-input"
+              >
+              <button class="qty-btn" (click)="increaseQuantity()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-primary btn-large" (click)="addToCart()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="9" cy="21" r="1" stroke="currentColor" stroke-width="2"/>
+                <circle cx="20" cy="21" r="1" stroke="currentColor" stroke-width="2"/>
+                <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Add to Cart
+            </button>
+            <button class="btn-secondary btn-large" (click)="buyNow()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11M5 9H19L20 21H4L5 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Buy Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="product-details">
+          <div class="detail-item">
+            <strong>SKU:</strong> {{ product.id }}
+          </div>
+          <div class="detail-item">
+            <strong>Availability:</strong> 
+            <span class="in-stock">In Stock</span>
+          </div>
+          <div class="detail-item">
+            <strong>Shipping:</strong> Free shipping on orders over $50
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div *ngIf="relatedProducts.length > 0" class="related-products">
+      <h2>Related Products</h2>
+      <div class="related-products-grid">
+        <div *ngFor="let relatedProduct of relatedProducts" class="related-product-card">
+          <img 
+            [src]="relatedProduct.imageUrl || 'https://via.placeholder.com/200x200/cccccc/666666?text=' + relatedProduct.name.substring(0, 2)" 
+            [alt]="relatedProduct.name"
+            class="related-product-image"
+            (click)="router.navigate(['/product', relatedProduct.id])"
+          >
+          <div class="related-product-info">
+            <h4>{{ relatedProduct.name }}</h4>
+            <p class="related-product-price">{{ formatCurrency(relatedProduct.price) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

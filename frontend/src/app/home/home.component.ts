@@ -62,4 +62,9 @@ export class HomeComponent implements OnInit {
       this.router.navigate(['/cart']);
     }
   }
+
+  getProductImageUrl(product: Product): string {
+    // Return a placeholder image URL or the actual product image
+    return product.imageUrl || `https://via.placeholder.com/300x400/cccccc/666666?text=${encodeURIComponent(product.name)}`;
+  }
 }

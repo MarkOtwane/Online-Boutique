@@ -1,49 +1,110 @@
-<div class="home-container">
-  <div class="hero-section">
-    <h1>Welcome to Our Boutique!</h1>
-    <p>Explore our exclusive collection of fashion and accessories.</p>
-  </div>
-
-  <div class="recent-products">
-    <h2>Recently Added Products</h2>
-    <div *ngIf="loading" class="loading">Loading products...</div>
-    <div *ngIf="!loading && recentProducts.length === 0" class="no-products">
-      No products available at the moment.
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1>Discover Your Style</h1>
+      <p>Explore our exclusive collection of fashion and accessories. From elegant dresses to casual wear, find the perfect pieces to express your unique style.</p>
+      <div class="hero-buttons">
+        <button class="btn-primary" routerLink="/products">Shop Now</button>
+        <button class="btn-secondary" routerLink="/about">Learn More</button>
+      </div>
     </div>
-    <div class="products-grid">
+    <div class="hero-image">
+      <div class="hero-placeholder">
+        <svg width="400" height="500" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="500" fill="#f8f9fa"/>
+          <path d="M100 150L300 150L300 350L100 350Z" stroke="#dee2e6" stroke-width="2" fill="none"/>
+          <circle cx="200" cy="250" r="30" fill="#dee2e6"/>
+          <text x="200" y="420" text-anchor="middle" fill="#6c757d" font-size="16">Fashion Collection</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recent Products Section -->
+<section class="products-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Recent Arrivals</h2>
+      <p>Discover our latest collection of carefully curated fashion pieces</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading products...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loading" class="products-grid">
       <div *ngFor="let product of recentProducts" class="product-card">
         <div class="product-image">
-          <img
-            [src]="product.imageUrl || '/assets/placeholder-product.png'"
-            [alt]="product.name"
-            onerror="this.src='/assets/placeholder-product.png'"
-          />
+          <img [src]="getProductImageUrl(product)" [alt]="product.name" loading="lazy">
+          <div class="product-overlay">
+            <button class="quick-view-btn" (click)="onPurchase(product)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Quick Purchase
+            </button>
+          </div>
         </div>
         <div class="product-info">
-          <h3>{{ product.name }}</h3>
-          <p class="product-category">{{ product.category?.name }}</p>
-          <p class="product-price">${{ product.price }}</p>
+          <h3 class="product-name">{{ product.name }}</h3>
+          <div class="product-category" *ngIf="product.category">
+            <span>{{ product.category.name }}</span>
+          </div>
+          <div class="product-price">
+            <span class="price">${{ product.price | number:'1.2-2' }}</span>
+          </div>
           <button class="purchase-btn" (click)="onPurchase(product)">
-            Purchase
+            {{ isLoggedIn ? 'Add to Cart' : 'Sign In to Purchase' }}
           </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="navigation-buttons">
-    <ng-container *ngIf="isLoggedIn; else loginPrompt">
-      <button class="nav-button" [routerLink]="['/products']">
-        View All Products
-      </button>
-    </ng-container>
-    <ng-template #loginPrompt>
-      <button class="nav-button" [routerLink]="['/login']">
-        Login to Shop
-      </button>
-      <button class="nav-button secondary" [routerLink]="['/register']">
-        Sign Up
-      </button>
-    </ng-template>
+    <!-- View All Products -->
+    <div class="view-all-section">
+      <button class="btn-outline" routerLink="/products">View All Products</button>
+    </div>
   </div>
-</div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 7L9 18L4 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Quality Guaranteed</h3>
+        <p>Premium materials and craftsmanship in every piece</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16.5 5.1 16.5H17M17 13V19C17 20.1 16.1 21 15 21H9C7.9 21 7 20.1 7 19V13M17 13H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Fast Shipping</h3>
+        <p>Free shipping on orders over $50</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Easy Returns</h3>
+        <p>30-day return policy for your peace of mind</p>
+      </div>
+    </div>
+  </div>
+</section>

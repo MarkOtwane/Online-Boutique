@@ -3,20 +3,21 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Category } from '../interfaces/category';
 import { Product } from '../interfaces/product';
+import { API_CONFIG } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = API_CONFIG.BASE_URL;
   private productsSubject = new BehaviorSubject<Product[]>([]);
   products$: Observable<Product[]> = this.productsSubject.asObservable();
   private categoriesSubject = new BehaviorSubject<Category[]>([]);
   categories$: Observable<Category[]> = this.categoriesSubject.asObservable();
 
   constructor(private http: HttpClient) {
-     this.loadInitialData();
-   }
+    this.loadInitialData();
+  }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('access_token');
@@ -26,51 +27,51 @@ export class ProductService {
   }
 
   private loadInitialData(): void {
-     // Load categories first (they're needed for product forms)
-     this.http
-       .get<Category[]>(`${this.apiUrl}/categories`, {
-         headers: this.getHeaders(),
-       })
-       .subscribe({
-         next: (categories) => {
-           console.log('Categories loaded successfully:', categories);
-           this.categoriesSubject.next(categories || []);
-         },
-         error: (err) => {
-           console.error('Failed to load categories:', err);
-           this.categoriesSubject.next([]);
-         },
-       });
+    // Load categories first (they're needed for product forms)
+    this.http
+      .get<Category[]>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.CATEGORIES.BASE}`, {
+        headers: this.getHeaders(),
+      })
+      .subscribe({
+        next: (categories) => {
+          console.log('Categories loaded successfully:', categories);
+          this.categoriesSubject.next(categories || []);
+        },
+        error: (err) => {
+          console.error('Failed to load categories:', err);
+          this.categoriesSubject.next([]);
+        },
+      });
 
-     // Load products
-     this.http
-       .get<{ products: Product[]; total: number }>(`${this.apiUrl}/products`, {
-         headers: this.getHeaders(),
-       })
-       .subscribe({
-         next: (response) => {
-           console.log('Products loaded successfully:', response.products);
-           this.productsSubject.next(response.products || []);
-         },
-         error: (err) => {
-           console.error('Failed to load products:', err);
-           this.productsSubject.next([]);
-         },
-       });
-   }
+    // Load products
+    this.http
+      .get<{ products: Product[]; total: number }>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.PRODUCTS.BASE}`, {
+        headers: this.getHeaders(),
+      })
+      .subscribe({
+        next: (response) => {
+          console.log('Products loaded successfully:', response.products);
+          this.productsSubject.next(response.products || []);
+        },
+        error: (err) => {
+          console.error('Failed to load products:', err);
+          this.productsSubject.next([]);
+        },
+      });
+  }
 
   getProducts(): Observable<Product[]> {
     return this.products$;
   }
 
-  getProduct(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/products/${id}`, {
-      headers: this.getHeaders(),
-    });
+  getRecentProducts(): Observable<Product[]> {
+    return this.products$;
   }
 
-  getRecentProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}/products/recent`);
+  getProduct(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.PRODUCTS.BY_ID(id)}`, {
+      headers: this.getHeaders(),
+    });
   }
 
   getCategories(): Observable<Category[]> {
@@ -87,12 +88,19 @@ export class ProductService {
     }
 
     const headers = this.getHeaders();
-    console.log('Creating product with token:', headers.get('Authorization') ? 'Present' : 'Missing');
-    console.log('Product data:', { name: product.name, price: product.price, categoryId: product.categoryId });
+    console.log(
+      'Creating product with token:',
+      headers.get('Authorization') ? 'Present' : 'Missing'
+    );
+    console.log('Product data:', {
+      name: product.name,
+      price: product.price,
+      categoryId: product.categoryId,
+    });
 
     return new Observable<Product>((observer) => {
       this.http
-        .post<Product>(`${this.apiUrl}/products`, formData, {
+        .post<Product>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.PRODUCTS.BASE}`, formData, {
           headers: this.getHeaders(),
         })
         .subscribe({
@@ -126,7 +134,7 @@ export class ProductService {
 
     return new Observable<Product>((observer) => {
       this.http
-        .put<Product>(`${this.apiUrl}/products/${id}`, formData, {
+        .put<Product>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.PRODUCTS.BY_ID(id)}`, formData, {
           headers: this.getHeaders(),
         })
         .subscribe({
@@ -147,7 +155,7 @@ export class ProductService {
   deleteProduct(id: number): Observable<Product> {
     return new Observable<Product>((observer) => {
       this.http
-        .delete<Product>(`${this.apiUrl}/products/${id}`, {
+        .delete<Product>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.PRODUCTS.BY_ID(id)}`, {
           headers: this.getHeaders(),
         })
         .subscribe({
