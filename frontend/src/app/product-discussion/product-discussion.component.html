@@ -1,0 +1,186 @@
+<div class="product-discussion">
+  <div class="discussion-header">
+    <h3>Product Discussion</h3>
+    <span class="comment-count">{{ getCommentCount() }} {{ getCommentCount() === 1 ? 'comment' : 'comments' }}</span>
+  </div>
+
+  <!-- Add Comment Form -->
+  <div class="add-comment-section" *ngIf="currentUser">
+    <div class="comment-form">
+      <textarea
+        [(ngModel)]="newComment"
+        placeholder="Share your thoughts about this product..."
+        class="comment-textarea"
+        rows="3"
+        maxlength="500"
+      ></textarea>
+      <div class="comment-actions">
+        <span class="char-count">{{ newComment.length }}/500</span>
+        <button
+          (click)="submitComment()"
+          [disabled]="!newComment.trim() || submitting"
+          class="btn-submit-comment"
+        >
+          <span *ngIf="!submitting">Post Comment</span>
+          <span *ngIf="submitting">Posting...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Prompt for Non-authenticated Users -->
+  <div class="login-prompt" *ngIf="!currentUser">
+    <div class="prompt-content">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h4>Join the Discussion</h4>
+      <p>Sign in to share your thoughts about this product and connect with other customers.</p>
+      <a routerLink="/login" class="btn-login">Sign In</a>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading comments...</p>
+  </div>
+
+  <!-- Comments List -->
+  <div class="comments-list" *ngIf="!loading && comments.length > 0">
+    <div class="comment-item" *ngFor="let comment of comments">
+      <!-- Main Comment -->
+      <div class="comment-main">
+        <div class="comment-header">
+          <div class="user-info">
+            <div class="user-avatar">
+              {{ comment.user.email.charAt(0).toUpperCase() }}
+            </div>
+            <div class="user-details">
+              <span class="user-name">{{ comment.user.email }}</span>
+              <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+              <span class="user-role" [class.admin]="comment.user.role === 'admin'">
+                {{ comment.user.role === 'admin' ? 'Admin' : 'Customer' }}
+              </span>
+              <span *ngIf="comment.isAdminResponse" class="admin-response-badge">
+                <i class="fas fa-shield-alt"></i> Admin Response
+              </span>
+              <span *ngIf="comment.isOfficialResponse" class="official-response-badge">
+                <i class="fas fa-star"></i> Official
+              </span>
+            </div>
+          </div>
+          <div class="comment-actions" *ngIf="canDeleteComment(comment)">
+            <button
+              (click)="deleteComment(comment.id)"
+              class="btn-delete-comment"
+              title="Delete comment"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="comment-content">
+          {{ comment.content }}
+        </div>
+        <div class="comment-footer">
+          <button
+            (click)="startReply(comment)"
+            class="btn-reply"
+            *ngIf="currentUser"
+          >
+            Reply
+          </button>
+        </div>
+      </div>
+
+      <!-- Replies -->
+      <div class="replies" *ngIf="comment.replies && comment.replies.length > 0">
+        <div class="reply-item" *ngFor="let reply of comment.replies">
+          <div class="reply-main">
+            <div class="reply-header">
+              <div class="user-info">
+                <div class="user-avatar">
+                  {{ reply.user.email.charAt(0).toUpperCase() }}
+                </div>
+                <div class="user-details">
+                  <span class="user-name">{{ reply.user.email }}</span>
+                  <span class="comment-date">{{ formatDate(reply.createdAt) }}</span>
+                  <span class="user-role" [class.admin]="reply.user.role === 'admin'">
+                    {{ reply.user.role === 'admin' ? 'Admin' : 'Customer' }}
+                  </span>
+                  <span *ngIf="reply.isAdminResponse" class="admin-response-badge">
+                    <i class="fas fa-shield-alt"></i> Admin Response
+                  </span>
+                  <span *ngIf="reply.isOfficialResponse" class="official-response-badge">
+                    <i class="fas fa-star"></i> Official
+                  </span>
+                </div>
+              </div>
+              <div class="comment-actions" *ngIf="canDeleteComment(reply)">
+                <button
+                  (click)="deleteComment(reply.id)"
+                  class="btn-delete-comment"
+                  title="Delete reply"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="comment-content">
+              {{ reply.content }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reply Form -->
+      <div class="reply-form" *ngIf="showReplyForm && replyToComment && replyToComment.id === comment.id">
+        <div class="reply-form-content">
+          <textarea
+            [(ngModel)]="replyContent"
+            placeholder="Write a reply..."
+            class="reply-textarea"
+            rows="2"
+            maxlength="300"
+          ></textarea>
+          <div class="reply-actions">
+            <span class="char-count">{{ replyContent.length }}/300</span>
+            <button
+              (click)="cancelReply()"
+              class="btn-cancel"
+            >
+              Cancel
+            </button>
+            <button
+              (click)="submitReply()"
+              [disabled]="!replyContent.trim() || submitting"
+              class="btn-submit-reply"
+            >
+              <span *ngIf="!submitting">Reply</span>
+              <span *ngIf="submitting">Replying...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Comments State -->
+  <div class="no-comments" *ngIf="!loading && comments.length === 0">
+    <div class="no-comments-content">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h4>No comments yet</h4>
+      <p>Be the first to share your thoughts about this product!</p>
+    </div>
+  </div>
+</div>

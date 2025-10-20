@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Injectable, ConflictException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Prisma, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 // Type for user data without password (for security)
@@ -43,13 +43,27 @@ export class UsersService {
   async findById(id: number): Promise<UserWithoutPassword | null> {
     return this.prisma.user.findUnique({
       where: { id },
-      select: { id: true, email: true, role: true, createdAt: true }, // Exclude password
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        isOnline: true,
+        lastSeen: true,
+      }, // Exclude password
     });
   }
 
   async findAll(): Promise<UserWithoutPassword[]> {
     return this.prisma.user.findMany({
-      select: { id: true, email: true, role: true, createdAt: true }, // Exclude password
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        isOnline: true,
+        lastSeen: true,
+      }, // Exclude password
     });
   }
 
@@ -61,7 +75,14 @@ export class UsersService {
       return await this.prisma.user.update({
         where: { id },
         data,
-        select: { id: true, email: true, role: true, createdAt: true }, // Exclude password
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          createdAt: true,
+          isOnline: true,
+          lastSeen: true,
+        }, // Exclude password
       });
     } catch (error) {
       if (error.code === 'P2002') {

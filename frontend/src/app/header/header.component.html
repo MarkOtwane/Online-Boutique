@@ -8,6 +8,7 @@
       <ul class="nav-links">
         <li><a [routerLink]="['/']" routerLinkActive="active">Home</a></li>
         <li><a [routerLink]="['/products']" routerLinkActive="active">Products</a></li>
+        <li><a [routerLink]="['/community']" routerLinkActive="active">Community</a></li>
         <li *ngIf="isLoggedIn"><a [routerLink]="['/dashboard']" routerLinkActive="active">Dashboard</a></li>
         <li *ngIf="isLoggedIn && currentUser?.role === 'admin'"><a [routerLink]="['/admin']" routerLinkActive="active">Admin</a></li>
       </ul>

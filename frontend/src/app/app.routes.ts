@@ -13,13 +13,17 @@ import { AdminUsersComponent } from './admin/users/users.component';
 import { UserDashboardComponent } from './user/dashboard/dashboard.component';
 import { CartComponent } from './cart/cart.component';
 import { ProductDetailComponent } from './product-detail/product-detail.component';
+import { ChatComponent } from './chat/chat.component';
+import { CommunityComponent } from './community/community.component';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent },
-    { path: 'products', component: ProductsComponent },
-    { path: 'product/:id', component: ProductDetailComponent },
-    { path: 'cart', component: CartComponent },
-    { path: 'dashboard', component: UserDashboardComponent, canActivate: [AuthGuard] },
+     { path: '', component: HomeComponent },
+     { path: 'products', component: ProductsComponent },
+     { path: 'product/:id', component: ProductDetailComponent },
+     { path: 'cart', component: CartComponent },
+     { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },
+     { path: 'community', component: CommunityComponent },
+     { path: 'dashboard', component: UserDashboardComponent, canActivate: [AuthGuard] },
     {
       path: 'add-product',
       component: ProductFormComponent,

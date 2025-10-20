@@ -1,0 +1,174 @@
+<div class="chat-container" *ngIf="canAccessChat()">
+  <div class="chat-sidebar">
+    <div class="sidebar-header">
+      <h3>Messages</h3>
+      <button class="btn-new-chat" (click)="openNewChatModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="conversations-list">
+      <div
+        *ngFor="let conversation of conversations"
+        class="conversation-item"
+        [class.active]="activeConversation?.id === conversation.id"
+        (click)="selectConversation(conversation)"
+      >
+        <div class="conversation-avatar">
+          <div class="avatar-circle">
+            {{ (getReceiverInfo()?.email || '').charAt(0).toUpperCase() || 'U' }}
+          </div>
+          <div class="online-indicator" *ngIf="getReceiverInfo()?.isOnline"></div>
+        </div>
+        <div class="conversation-details">
+          <div class="conversation-header">
+            <span class="conversation-name">
+              {{ getReceiverInfo()?.email || 'User' }}
+            </span>
+            <span class="conversation-time">
+              {{ formatDate(conversation.lastMessage?.createdAt || conversation.updatedAt) }}
+            </span>
+          </div>
+          <div class="conversation-preview">
+            <span class="last-message">
+              {{ conversation.lastMessage?.content || 'No messages yet' }}
+            </span>
+            <span class="unread-count" *ngIf="getUnreadCount(conversation) > 0">
+              {{ getUnreadCount(conversation) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-conversations" *ngIf="!loading && conversations.length === 0">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p>No conversations yet</p>
+      <button class="btn-start-chat" (click)="openNewChatModal()">Start a conversation</button>
+    </div>
+  </div>
+
+  <div class="chat-main">
+    <div class="chat-header" *ngIf="activeConversation">
+      <div class="chat-user-info">
+        <div class="user-avatar">
+          {{ (getReceiverInfo()?.email || '').charAt(0).toUpperCase() || 'U' }}
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ getReceiverInfo()?.email || 'User' }}</span>
+          <span class="user-status" [class.online]="getReceiverInfo()?.isOnline">
+            {{ getReceiverInfo()?.isOnline ? 'Online' : 'Offline' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-messages" *ngIf="activeConversation">
+      <div class="messages-container">
+        <div
+          *ngFor="let message of messages"
+          class="message-item"
+          [class.sent]="isCurrentUserMessage(message)"
+          [class.received]="!isCurrentUserMessage(message)"
+        >
+          <div class="message-content">
+            <span class="message-text">{{ message.content }}</span>
+            <span class="message-time">{{ formatDate(message.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input">
+        <textarea
+          [(ngModel)]="newMessage"
+          placeholder="Type a message..."
+          class="message-input"
+          (keydown.enter)="sendMessage()"
+          rows="1"
+        ></textarea>
+        <button
+          (click)="sendMessage()"
+          [disabled]="!newMessage.trim()"
+          class="btn-send"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="no-chat-selected" *ngIf="!activeConversation">
+      <div class="no-chat-content">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Select a conversation</h3>
+        <p>Choose a conversation from the sidebar to start messaging</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Access Denied for Non-Customers -->
+<div class="access-denied" *ngIf="!canAccessChat()">
+  <div class="access-denied-content">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 22S8 18 8 14V7L12 5L16 7V14C16 18 12 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h3>Access Restricted</h3>
+    <p>Chat is only available for customers. Admins can respond to product discussions instead.</p>
+    <a routerLink="/products" class="btn-browse-products">Browse Products</a>
+  </div>
+</div>
+
+<!-- New Chat Modal -->
+<div class="modal-overlay" *ngIf="showNewChatModal" (click)="closeNewChatModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Start New Conversation</h3>
+      <button class="modal-close" (click)="closeNewChatModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/>
+          <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="online-users">
+        <h4>Online Users</h4>
+        <div class="users-list">
+          <div
+            *ngFor="let user of onlineUsers"
+            class="user-item"
+            [class.selected]="selectedUser?.id === user.id"
+            (click)="selectUser(user)"
+          >
+            <div class="user-avatar">
+              {{ user.email.charAt(0).toUpperCase() }}
+            </div>
+            <div class="user-info">
+              <span class="user-name">{{ user.email }}</span>
+              <span class="user-status online">Online</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeNewChatModal()">Cancel</button>
+      <button
+        class="btn-start"
+        [disabled]="!selectedUser"
+        (click)="startConversation()"
+      >
+        Start Conversation
+      </button>
+    </div>
+  </div>
+</div>

@@ -5,11 +5,12 @@ import { Product } from '../interfaces/product';
 import { AuthService } from '../services/auth.service';
 import { CartService } from '../services/cart.service';
 import { ProductService } from '../services/product.service';
+import { ProductDiscussionComponent } from '../product-discussion/product-discussion.component';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ProductDiscussionComponent],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css'],
 })

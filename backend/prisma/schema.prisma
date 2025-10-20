@@ -15,24 +15,31 @@ model Category {
 }
 
 model Product {
-  id         Int          @id @default(autoincrement())
-  name       String
-  price      Float
-  imageUrl   String?      // Optional field for image path
-  createdAt  DateTime     @default(now())
-  category   Category     @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  orderItems OrderItem[]
-}
+   id         Int          @id @default(autoincrement())
+   name       String
+   price      Float
+   imageUrl   String?      // Optional field for image path
+   createdAt  DateTime     @default(now())
+   category   Category     @relation(fields: [categoryId], references: [id])
+   categoryId Int
+   orderItems OrderItem[]
+   comments   Comment[]
+ }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  role      String   @default("customer")
-  createdAt DateTime @default(now())
-  orders    Order[]  // Relation to Order
-}
+   id        Int      @id @default(autoincrement())
+   email     String   @unique
+   password  String
+   role      String   @default("customer")
+   createdAt DateTime @default(now())
+   orders    Order[]  // Relation to Order
+   sentMessages      ChatMessage[] @relation("MessageSender")
+   receivedMessages  ChatMessage[] @relation("MessageReceiver")
+   conversations     ChatConversationParticipant[]
+   comments   Comment[]
+   isOnline   Boolean  @default(false)
+   lastSeen   DateTime @default(now())
+ }
 
 model Order {
   id        Int         @id @default(autoincrement())
@@ -44,11 +51,70 @@ model Order {
 }
 
 model OrderItem {
-  id        Int      @id @default(autoincrement())
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId   Int
-  product   Product  @relation(fields: [productId], references: [id])
-  productId Int
-  quantity  Int
-  price     Float    // Price at the time of purchase
-}
+   id        Int      @id @default(autoincrement())
+   order     Order    @relation(fields: [orderId], references: [id])
+   orderId   Int
+   product   Product  @relation(fields: [productId], references: [id])
+   productId Int
+   quantity  Int
+   price     Float    // Price at the time of purchase
+ }
+
+model Comment {
+   id               Int      @id @default(autoincrement())
+   productId        Int
+   userId           Int
+   content          String
+   parentId         Int?     // For nested replies
+   isAdminResponse  Boolean  @default(false)
+   isOfficialResponse Boolean @default(false)
+   createdAt        DateTime @default(now())
+   updatedAt        DateTime @updatedAt
+   product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+   parent           Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+   replies          Comment[] @relation("CommentReplies")
+
+   @@index([productId])
+   @@index([userId])
+   @@index([isAdminResponse])
+   @@index([isOfficialResponse])
+ }
+
+model ChatConversation {
+   id           Int                        @id @default(autoincrement())
+   createdAt    DateTime                   @default(now())
+   updatedAt    DateTime                   @updatedAt
+   participants ChatConversationParticipant[]
+   messages     ChatMessage[]
+ }
+
+model ChatConversationParticipant {
+   id             Int             @id @default(autoincrement())
+   conversationId Int
+   userId         Int
+   joinedAt       DateTime        @default(now())
+   conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+   @@unique([conversationId, userId])
+   @@index([userId])
+ }
+
+model ChatMessage {
+   id             Int              @id @default(autoincrement())
+   conversationId Int
+   senderId       Int
+   receiverId     Int?             // For direct messages, null for group chats
+   content        String
+   isRead         Boolean          @default(false)
+   readAt         DateTime?
+   createdAt      DateTime         @default(now())
+   conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+   sender         User             @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+   receiver       User?            @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+   @@index([conversationId])
+   @@index([senderId])
+   @@index([receiverId])
+ }

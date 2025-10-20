@@ -159,6 +159,11 @@
       </div>
     </div>
 
+    <!-- Product Discussion -->
+    <div class="product-discussion-section">
+      <app-product-discussion [productId]="product.id"></app-product-discussion>
+    </div>
+
     <!-- Related Products -->
     <div *ngIf="relatedProducts.length > 0" class="related-products">
       <h2>Related Products</h2>

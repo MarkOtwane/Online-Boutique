@@ -1,0 +1,109 @@
+<div class="community-container">
+  <div class="community-header">
+    <h1>Community Discussions</h1>
+    <p>Join the conversation and share your thoughts about our products</p>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-filter-section">
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search discussions..."
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="searchDiscussions()"
+        class="form-control"
+      />
+      <button (click)="searchDiscussions()" class="btn btn-primary">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </div>
+
+    <div class="filter-controls">
+      <select
+        [(ngModel)]="selectedProductId"
+        (change)="onProductFilterChange()"
+        class="form-control"
+      >
+        <option value="">All Products</option>
+        <option *ngFor="let product of products" [value]="product.id">
+          {{ product.name }}
+        </option>
+      </select>
+
+      <button (click)="loadAllDiscussions()" class="btn btn-secondary">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading discussions...</p>
+  </div>
+
+  <!-- Discussions List -->
+  <div *ngIf="!loading" class="discussions-list">
+    <div *ngIf="discussions.length === 0" class="no-discussions">
+      <i class="fas fa-comments"></i>
+      <h3>No discussions found</h3>
+      <p>Be the first to start a discussion!</p>
+    </div>
+
+    <div *ngFor="let discussion of discussions" class="discussion-card">
+      <div class="discussion-header">
+        <div class="product-info">
+          <img
+            *ngIf="discussion.product.imageUrl"
+            [src]="discussion.product.imageUrl"
+            [alt]="discussion.product.name"
+            class="product-image"
+          />
+          <div class="product-details">
+            <h3>
+              <a [routerLink]="['/products', discussion.product.id]">
+                {{ discussion.product.name }}
+              </a>
+            </h3>
+            <p class="product-price">${{ discussion.product.price }}</p>
+          </div>
+        </div>
+
+        <div class="discussion-meta">
+          <span class="author">{{ discussion.user.email }}</span>
+          <span class="date">{{ formatDate(discussion.createdAt) }}</span>
+        </div>
+      </div>
+
+      <div class="discussion-content">
+        <p>{{ discussion.content }}</p>
+      </div>
+
+      <div class="discussion-actions">
+        <div class="discussion-stats">
+          <span class="replies-count">
+            <i class="fas fa-reply"></i>
+            {{ getTotalReplies(discussion) }} replies
+          </span>
+        </div>
+
+        <div class="action-buttons">
+          <a
+            [routerLink]="['/products', discussion.product.id]"
+            class="btn btn-outline-primary btn-sm"
+          >
+            <i class="fas fa-eye"></i> View Discussion
+          </a>
+
+          <button
+            *ngIf="canAccessAdminFeatures()"
+            class="btn btn-outline-danger btn-sm"
+          >
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
