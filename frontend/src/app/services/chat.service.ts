@@ -10,7 +10,7 @@ import { API_CONFIG } from '../config/api.config';
  })
 export class ChatService {
    private apiUrl = API_CONFIG.BASE_URL;
-   private socket: Socket;
+   private socket: Socket | null = null;
    private conversationsSubject = new BehaviorSubject<ChatConversation[]>([]);
    private activeConversationSubject = new BehaviorSubject<ChatConversation | null>(null);
    private messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
@@ -223,19 +223,27 @@ export class ChatService {
 
   // Socket.IO methods for real-time functionality
   joinConversation(conversationId: number): void {
-    this.socket.emit('joinChat', { conversationId });
+    if (this.socket) {
+      this.socket.emit('joinChat', { conversationId });
+    }
   }
 
   leaveConversation(conversationId: number): void {
-    this.socket.emit('leaveChat', { conversationId });
+    if (this.socket) {
+      this.socket.emit('leaveChat', { conversationId });
+    }
   }
 
   sendMessageRealTime(conversationId: number, content: string, receiverId: number): void {
-    this.socket.emit('sendMessage', { conversationId, content, receiverId });
+    if (this.socket) {
+      this.socket.emit('sendMessage', { conversationId, content, receiverId });
+    }
   }
 
   sendTypingStatus(conversationId: number, isTyping: boolean): void {
-    this.socket.emit('typing', { conversationId, isTyping });
+    if (this.socket) {
+      this.socket.emit('typing', { conversationId, isTyping });
+    }
   }
 
   disconnect(): void {

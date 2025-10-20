@@ -1,24 +1,31 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
-  WebSocketGateway,
-  SubscribeMessage,
-  MessageBody,
-  WebSocketServer,
   ConnectedSocket,
-  OnGatewayInit,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UseGuards } from '@nestjs/common';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
-export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -33,7 +40,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleConnection(client: Socket, ...args: any[]) {
     try {
       // Extract token from handshake auth
-      const token = client.handshake.auth?.token || client.handshake.headers?.authorization?.split(' ')[1];
+      const token =
+        client.handshake.auth?.token ||
+        client.handshake.headers?.authorization?.split(' ')[1];
 
       if (!token) {
         client.disconnect();
@@ -68,13 +77,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage('joinChat')
-  handleJoinChat(@ConnectedSocket() client: Socket, @MessageBody() data: { conversationId: number }) {
+  handleJoinChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { conversationId: number },
+  ) {
     client.join(`conversation_${data.conversationId}`);
-    return { event: 'joinedChat', data: { conversationId: data.conversationId } };
+    return {
+      event: 'joinedChat',
+      data: { conversationId: data.conversationId },
+    };
   }
 
   @SubscribeMessage('leaveChat')
-  handleLeaveChat(@ConnectedSocket() client: Socket, @MessageBody() data: { conversationId: number }) {
+  handleLeaveChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { conversationId: number },
+  ) {
     client.leave(`conversation_${data.conversationId}`);
     return { event: 'leftChat', data: { conversationId: data.conversationId } };
   }
@@ -82,7 +100,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: number; content: string; receiverId: number }
+    @MessageBody()
+    data: { conversationId: number; content: string; receiverId: number },
   ) {
     try {
       const userId = this.connectedUsers.get(client.id);
@@ -97,7 +116,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       });
 
       // Emit to conversation room
-      this.server.to(`conversation_${data.conversationId}`).emit('newMessage', message);
+      this.server
+        .to(`conversation_${data.conversationId}`)
+        .emit('newMessage', message);
 
       return { event: 'messageSent', data: message };
     } catch (error) {
@@ -109,7 +130,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('typing')
   handleTyping(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: number; isTyping: boolean }
+    @MessageBody() data: { conversationId: number; isTyping: boolean },
   ) {
     const userId = this.connectedUsers.get(client.id);
     if (userId) {
@@ -122,13 +143,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   // Method to emit real-time updates when messages are read
   async emitMessageRead(messageId: number, conversationId: number) {
-    this.server.to(`conversation_${conversationId}`).emit('messageRead', { messageId });
+    this.server
+      .to(`conversation_${conversationId}`)
+      .emit('messageRead', { messageId });
   }
 
   // Method to emit real-time updates when new conversations are created
   async emitNewConversation(conversation: any, userId: number) {
     // Notify the other participant about the new conversation
-    const otherParticipants = conversation.participants.filter((p: any) => p.userId !== userId);
+    const otherParticipants = conversation.participants.filter(
+      (p: any) => p.userId !== userId,
+    );
     otherParticipants.forEach((participant: any) => {
       this.server.emit('newConversation', {
         conversation,

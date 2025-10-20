@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 

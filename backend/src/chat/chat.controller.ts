@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
+  Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Put,
-  Param,
-  Body,
-  UseGuards,
   Request,
-  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { ChatService } from './chat.service';
-import { CreateMessageDto, CreateConversationDto } from './chat.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateConversationDto, CreateMessageDto } from './chat.dto';
+import { ChatService } from './chat.service';
 
 @Controller('chat')
 export class ChatController {
@@ -29,15 +32,15 @@ export class ChatController {
     @Request() req,
     @Param('id', ParseIntPipe) conversationId: number,
   ) {
-    return this.chatService.getConversationMessages(conversationId, req.user.id);
+    return this.chatService.getConversationMessages(
+      conversationId,
+      req.user.id,
+    );
   }
 
   @Post('conversations')
   @UseGuards(JwtAuthGuard)
-  async createConversation(
-    @Request() req,
-    @Body() dto: CreateConversationDto,
-  ) {
+  async createConversation(@Request() req, @Body() dto: CreateConversationDto) {
     const conversation = await this.chatService.createConversation(
       req.user.id,
       dto,
@@ -62,10 +65,7 @@ export class ChatController {
 
   @Post('messages')
   @UseGuards(JwtAuthGuard)
-  async sendMessage(
-    @Request() req,
-    @Body() dto: CreateMessageDto,
-  ) {
+  async sendMessage(@Request() req, @Body() dto: CreateMessageDto) {
     return this.chatService.sendMessage(req.user.id, dto);
   }
 
