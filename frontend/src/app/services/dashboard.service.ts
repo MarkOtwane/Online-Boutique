@@ -8,6 +8,9 @@ export interface DashboardStats {
   totalOrders: number;
   totalRevenue: number;
   totalCustomers: number;
+  totalProducts: number;
+  recentOrders: number;
+  activeUsers: number;
   salesChange: number;
   ordersChange: number;
   revenueChange: number;

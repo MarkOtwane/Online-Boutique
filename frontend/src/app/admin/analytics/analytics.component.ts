@@ -1,29 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DashboardService } from '../../services/dashboard.service';
+import { DashboardService, DashboardStats } from '../../services/dashboard.service';
 
-interface DashboardStats {
-  totalUsers: number;
-  totalOrders: number;
-  totalProducts: number;
-  totalRevenue: number;
-  recentOrders: number;
-  activeUsers: number;
-}
-
-interface TopProduct {
-  id: number;
-  name: string;
-  sales: number;
-  revenue: number;
-}
-
-interface RevenueData {
-  date: string;
-  revenue: number;
-  orders: number;
-}
+import { TopProduct, RevenueData, LocationData } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-admin-analytics',
@@ -117,13 +97,13 @@ export class AdminAnalyticsComponent implements OnInit {
   getChartData(): any[] {
     if (this.chartType === 'revenue') {
       return this.revenueData.map(item => ({
-        name: this.formatDate(item.date),
-        value: item.revenue
+        name: item.month,
+        value: item.current
       }));
     } else {
       return this.revenueData.map(item => ({
-        name: this.formatDate(item.date),
-        value: item.orders
+        name: item.month,
+        value: item.previous
       }));
     }
   }
@@ -154,7 +134,7 @@ export class AdminAnalyticsComponent implements OnInit {
   private generateCSV(): string {
     const headers = ['Metric', 'Value', 'Date'];
     const rows = [
-      ['Total Users', this.stats?.totalUsers || 0, new Date().toLocaleDateString()],
+      ['Total Customers', this.stats?.totalCustomers || 0, new Date().toLocaleDateString()],
       ['Total Orders', this.stats?.totalOrders || 0, new Date().toLocaleDateString()],
       ['Total Products', this.stats?.totalProducts || 0, new Date().toLocaleDateString()],
       ['Total Revenue', this.stats?.totalRevenue || 0, new Date().toLocaleDateString()],

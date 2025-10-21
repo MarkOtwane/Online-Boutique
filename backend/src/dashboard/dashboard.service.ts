@@ -13,6 +13,9 @@ export interface DashboardStats {
   totalOrders: number;
   totalRevenue: number;
   totalCustomers: number;
+  totalProducts: number;
+  recentOrders: number;
+  activeUsers: number;
   salesChange: number;
   ordersChange: number;
   revenueChange: number;
@@ -142,11 +145,43 @@ export class DashboardService {
       where: { role: 'customer' },
     });
 
+    // Get total products
+    const totalProducts = await this.prisma.product.count();
+
+    // Get recent orders (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const recentOrdersCount = await this.prisma.order.count({
+      where: {
+        createdAt: {
+          gte: thirtyDaysAgo,
+        },
+      },
+    });
+
+    // Get active users (users who placed orders in the last 30 days)
+    const activeUsersCount = await this.prisma.order
+      .findMany({
+        where: {
+          createdAt: {
+            gte: thirtyDaysAgo,
+          },
+        },
+        select: {
+          userId: true,
+        },
+        distinct: ['userId'],
+      })
+      .then((orders) => orders.length);
+
     return {
       totalSales,
       totalOrders: currentTotalOrders,
       totalRevenue: currentTotalRevenue,
       totalCustomers,
+      totalProducts,
+      recentOrders: recentOrdersCount,
+      activeUsers: activeUsersCount,
       salesChange: 0, // Would need historical data for this
       ordersChange: Math.round(ordersChange * 100) / 100,
       revenueChange: Math.round(revenueChange * 100) / 100,
