@@ -6,6 +6,7 @@ import { CustomLoggerService } from './auth/logger.service';
 import { CategoriesModule } from './categories/categories.module';
 import { ChatModule } from './chat/chat.module';
 import { CommentsModule } from './comments/comments.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { OrdersModule } from './orders/orders.module';
 import { PrismaService } from './prisma/prisma.service';
 import { ProductsModule } from './products/products.module';
@@ -20,6 +21,7 @@ import { UsersModule } from './users/users.module';
     OrdersModule,
     CommentsModule,
     ChatModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, CustomLoggerService],

@@ -16,7 +16,7 @@
       </div>
       <div class="stat-info">
         <h3>Total Orders</h3>
-        <p class="stat-value">{{ recentOrders.length }}</p>
+        <p class="stat-value">{{ dashboardData.totalOrders }}</p>
       </div>
     </div>
 
@@ -29,7 +29,7 @@
       </div>
       <div class="stat-info">
         <h3>Member Since</h3>
-        <p class="stat-value">Jan 2025</p>
+        <p class="stat-value">{{ getMemberSince() }}</p>
       </div>
     </div>
 
@@ -55,7 +55,7 @@
       </div>
       <div class="stat-info">
         <h3>Account Status</h3>
-        <p class="stat-value active">Active</p>
+        <p class="stat-value active">{{ dashboardData.accountStatus }}</p>
       </div>
     </div>
   </div>
@@ -95,8 +95,8 @@
       <button class="btn-outline" routerLink="/orders">View All</button>
     </div>
 
-    <div class="orders-list" *ngIf="recentOrders.length > 0; else noOrders">
-      <div *ngFor="let order of recentOrders" class="order-card">
+    <div class="orders-list" *ngIf="getRecentOrders().length > 0; else noOrders">
+      <div *ngFor="let order of getRecentOrders()" class="order-card">
         <div class="order-header">
           <div class="order-info">
             <h3>Order #{{ order.id }}</h3>

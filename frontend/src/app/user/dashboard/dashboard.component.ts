@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { DashboardService, UserDashboardData } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -12,55 +13,42 @@ import { AuthService } from '../../services/auth.service';
 })
 export class UserDashboardComponent implements OnInit {
   user: any = null;
-  recentOrders: any[] = [];
+  dashboardData: UserDashboardData = {
+    totalOrders: 0,
+    totalSpent: 0,
+    recentOrders: [],
+    memberSince: '',
+    accountStatus: 'Active'
+  };
   isLoading = true;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private dashboardService: DashboardService
+  ) {}
 
   ngOnInit(): void {
     this.loadUserData();
-    this.loadRecentOrders();
+    this.loadDashboardData();
   }
 
   loadUserData(): void {
     this.user = this.authService.getUser();
-    this.isLoading = false;
   }
 
-  loadRecentOrders(): void {
-    // Mock data - in real app, this would come from API
-    this.recentOrders = [
-      {
-        id: 'ORD-001',
-        date: '2025-01-15',
-        status: 'Delivered',
-        total: 149.99,
-        items: [
-          { name: 'Elegant Dress', quantity: 1, price: 89.99 },
-          { name: 'Classic Shoes', quantity: 1, price: 60.00 }
-        ]
+  loadDashboardData(): void {
+    this.isLoading = true;
+    
+    this.dashboardService.getUserDashboard().subscribe({
+      next: (data) => {
+        this.dashboardData = data;
+        this.isLoading = false;
       },
-      {
-        id: 'ORD-002',
-        date: '2025-01-10',
-        status: 'Shipped',
-        total: 89.99,
-        items: [
-          { name: 'Casual Shirt', quantity: 1, price: 49.99 },
-          { name: 'Denim Jeans', quantity: 1, price: 40.00 }
-        ]
-      },
-      {
-        id: 'ORD-003',
-        date: '2025-01-05',
-        status: 'Processing',
-        total: 199.99,
-        items: [
-          { name: 'Winter Jacket', quantity: 1, price: 149.99 },
-          { name: 'Wool Scarf', quantity: 1, price: 50.00 }
-        ]
+      error: (error) => {
+        console.error('Error loading dashboard data:', error);
+        this.isLoading = false;
       }
-    ];
+    });
   }
 
   getStatusClass(status: string): string {
@@ -92,6 +80,14 @@ export class UserDashboardComponent implements OnInit {
   }
 
   getTotalSpent(): number {
-    return this.recentOrders.reduce((total, order) => total + order.total, 0);
+    return this.dashboardData.totalSpent;
+  }
+
+  getRecentOrders(): any[] {
+    return this.dashboardData.recentOrders;
+  }
+
+  getMemberSince(): string {
+    return this.dashboardService.formatDate(this.dashboardData.memberSince);
   }
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { ProductService } from '../../services/product.service';
+import { DashboardService, DashboardStats, TopProduct, RevenueData, LocationData, ReportData } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,79 +13,21 @@ import { ProductService } from '../../services/product.service';
 })
 export class DashboardComponent implements OnInit {
   // KPI Data
-  totalSales = 34456.0;
-  totalOrders = 3456;
-  totalRevenue = 1456.0;
-  totalCustomers = 42456;
-
-  salesChange = 14;
-  ordersChange = -17;
-  revenueChange = 14;
-  customersChange = -11;
+  stats: DashboardStats = {
+    totalSales: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    totalCustomers: 0,
+    salesChange: 0,
+    ordersChange: 0,
+    revenueChange: 0,
+    customersChange: 0,
+  };
 
   // Chart Data
-  revenueData = [
-    { month: 'Jan', current: 15, previous: 20 },
-    { month: 'Feb', current: 25, previous: 18 },
-    { month: 'Mar', current: 35, previous: 25 },
-    { month: 'Apr', current: 28, previous: 35 },
-    { month: 'May', current: 32, previous: 30 },
-    { month: 'Jun', current: 38, previous: 32 },
-  ];
-
-  // Top Selling Products
-  topProducts = [
-    {
-      name: 'Elegant Dress',
-      price: 89.99,
-      category: 'Women',
-      quantity: 156,
-      amount: 14035.44,
-    },
-    {
-      name: 'Classic Suit',
-      price: 199.99,
-      category: 'Men',
-      quantity: 89,
-      amount: 17799.11,
-    },
-    {
-      name: 'Casual Shirt',
-      price: 49.99,
-      category: 'Men',
-      quantity: 234,
-      amount: 11697.66,
-    },
-    {
-      name: 'Summer Blouse',
-      price: 39.99,
-      category: 'Women',
-      quantity: 198,
-      amount: 7918.02,
-    },
-    {
-      name: 'Denim Jeans',
-      price: 69.99,
-      category: 'Unisex',
-      quantity: 167,
-      amount: 11688.33,
-    },
-    {
-      name: 'Winter Jacket',
-      price: 149.99,
-      category: 'Unisex',
-      quantity: 78,
-      amount: 11699.22,
-    },
-  ];
-
-  // Sales by Location
-  locationData = [
-    { city: 'New York', sales: 72000 },
-    { city: 'San Francisco', sales: 39000 },
-    { city: 'Sydney', sales: 25000 },
-    { city: 'Singapore', sales: 61000 },
-  ];
+  revenueData: RevenueData[] = [];
+  topProducts: TopProduct[] = [];
+  locationData: LocationData[] = [];
 
   // Monthly Target
   monthlyTarget = 75.34;
@@ -94,9 +37,14 @@ export class DashboardComponent implements OnInit {
   currentRevenue = 18000;
   todayRevenue = 1800;
 
+  // Loading states
+  loading = true;
+  reportLoading = false;
+
   constructor(
     private productService: ProductService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -105,8 +53,39 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
-    // In a real application, this would fetch data from the API
-    console.log('Loading dashboard data...');
+    this.loading = true;
+    
+    // Load all dashboard data in parallel
+    const stats$ = this.dashboardService.getAdminStats();
+    const products$ = this.dashboardService.getTopProducts(6);
+    const revenue$ = this.dashboardService.getRevenueData();
+    const location$ = this.dashboardService.getLocationData();
+
+    stats$.subscribe({
+      next: (stats) => this.stats = stats,
+      error: (error) => console.error('Error loading stats:', error)
+    });
+
+    products$.subscribe({
+      next: (products) => this.topProducts = products,
+      error: (error) => console.error('Error loading products:', error)
+    });
+
+    revenue$.subscribe({
+      next: (revenue) => this.revenueData = revenue,
+      error: (error) => console.error('Error loading revenue:', error)
+    });
+
+    location$.subscribe({
+      next: (location) => {
+        this.locationData = location;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading location:', error);
+        this.loading = false;
+      }
+    });
   }
 
   getChangeClass(change: number): string {
@@ -126,5 +105,25 @@ export class DashboardComponent implements OnInit {
 
   formatNumber(num: number): string {
     return new Intl.NumberFormat('en-US').format(num);
+  }
+
+  generateReport(type: 'sales' | 'products' | 'customers'): void {
+    this.reportLoading = true;
+    
+    this.dashboardService.generateReport(type).subscribe({
+      next: (reportData) => {
+        this.dashboardService.exportReportAsCSV(reportData);
+        this.reportLoading = false;
+      },
+      error: (error) => {
+        console.error('Error generating report:', error);
+        this.reportLoading = false;
+      }
+    });
+  }
+
+  exportReport(): void {
+    // Generate a comprehensive report with all data
+    this.generateReport('sales');
   }
 }
