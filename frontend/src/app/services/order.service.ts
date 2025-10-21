@@ -61,4 +61,10 @@ export class OrderService {
       headers: this.getHeaders(),
     });
   }
+
+  updateOrderStatus(orderId: number, status: string): Observable<Order> {
+    return this.http.put<Order>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.ORDERS.BASE}/${orderId}/status`, { status }, {
+      headers: this.getHeaders(),
+    });
+  }
 }
