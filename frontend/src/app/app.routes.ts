@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './auth/auth.guard';
+import { AuthGuard, CustomerGuard } from './auth/auth.guard';
 import { AdminGuard } from './auth/admin.guard';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
@@ -10,6 +10,7 @@ import { AdminLayoutComponent } from './admin/admin-layout/admin-layout.componen
 import { DashboardComponent as AdminDashboardComponent } from './admin/dashboard/dashboard.component';
 import { AdminProductsComponent } from './admin/products/products.component';
 import { AdminUsersComponent } from './admin/users/users.component';
+import { UserLayoutComponent } from './user/user-layout/user-layout.component';
 import { UserDashboardComponent } from './user/dashboard/dashboard.component';
 import { CartComponent } from './cart/cart.component';
 import { ProductDetailComponent } from './product-detail/product-detail.component';
@@ -17,22 +18,32 @@ import { ChatComponent } from './chat/chat.component';
 import { CommunityComponent } from './community/community.component';
 
 export const routes: Routes = [
-     { path: '', component: HomeComponent },
-     { path: 'products', component: ProductsComponent },
-     { path: 'product/:id', component: ProductDetailComponent },
-     { path: 'cart', component: CartComponent },
-     { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },
-     { path: 'community', component: CommunityComponent },
-     { path: 'dashboard', component: UserDashboardComponent, canActivate: [AuthGuard] },
+      { path: '', component: HomeComponent },
+      { path: 'products', component: ProductsComponent },
+      { path: 'product/:id', component: ProductDetailComponent },
+      { path: 'cart', component: CartComponent },
+      { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },
+      { path: 'community', component: CommunityComponent },
+      {
+        path: 'user',
+        component: UserLayoutComponent,
+        canActivate: [CustomerGuard],
+        children: [
+          { path: 'dashboard', component: UserDashboardComponent },
+          { path: 'profile', component: UserDashboardComponent }, // Using dashboard as profile for now
+          { path: 'orders', component: UserDashboardComponent }, // Using dashboard for orders for now
+        ]
+      },
+      { path: 'dashboard', redirectTo: '/user/dashboard', pathMatch: 'full' },
     {
       path: 'add-product',
       component: ProductFormComponent,
-      canActivate: [AuthGuard],
+      canActivate: [AdminGuard],
     },
     {
       path: 'add-product/:id',
       component: ProductFormComponent,
-      canActivate: [AuthGuard],
+      canActivate: [AdminGuard],
     },
         {
           path: 'admin',
@@ -42,6 +53,8 @@ export const routes: Routes = [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
             { path: 'dashboard', component: AdminDashboardComponent },
             { path: 'products', component: AdminProductsComponent },
+            { path: 'products/new', component: ProductFormComponent },
+            { path: 'products/edit/:id', component: ProductFormComponent },
             { path: 'users', component: AdminUsersComponent },
           ]
         },

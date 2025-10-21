@@ -38,7 +38,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authService.user$.subscribe((user) => {
       this.currentUser = user;
-      if (user && user.role === 'customer') {
+      if (user && (user.role === 'customer' || user.role === 'admin')) {
+        // Initialize socket connection when user is authenticated
+        this.chatService.initializeSocketConnection();
         this.loadConversations();
         this.loadOnlineUsers();
       }
@@ -167,6 +169,16 @@ export class ChatComponent implements OnInit, OnDestroy {
     );
   }
 
+  getConversationReceiverInfo(conversation: ChatConversation): ChatUser | null {
+    if (!conversation || !this.currentUser) return null;
+
+    return (
+      conversation.participants.find(
+        (participant) => participant.id !== this.currentUser!.id
+      ) || null
+    );
+  }
+
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
@@ -207,6 +219,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   canAccessChat(): boolean {
-    return this.currentUser?.role === 'customer';
+    return (
+      this.currentUser?.role === 'customer' ||
+      this.currentUser?.role === 'admin'
+    );
   }
 }

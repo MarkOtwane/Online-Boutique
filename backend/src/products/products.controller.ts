@@ -20,21 +20,21 @@ import { ProductsService } from './products.service';
 
 import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs/promises';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import * as fs from 'fs/promises';
 import cloudinary from '../cloudinary.config';
 
 @Controller('products')
-@UseGuards(JwtAuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
   async findAll(
-    @Query('categoryId', ParseIntPipe) categoryId?: number,
-    @Query('page', ParseIntPipe) page?: number,
-    @Query('pageSize', ParseIntPipe) pageSize?: number,
+    @Query('categoryId', new ParseIntPipe({ optional: true }))
+    categoryId?: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
   ): Promise<{ products: Product[]; total: number }> {
     return this.productsService.findAll({ categoryId, page, pageSize });
   }
@@ -52,7 +52,7 @@ export class ProductsController {
   }
 
   @Post()
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @SetMetadata('roles', ['admin'])
   @UseInterceptors(
     FileInterceptor('image', {
@@ -108,7 +108,7 @@ export class ProductsController {
   }
 
   @Put(':id')
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @SetMetadata('roles', ['admin'])
   @UseInterceptors(
     FileInterceptor('image', {

@@ -21,7 +21,7 @@ export interface TopProduct {
   category: string;
   quantity: number;
   amount: number;
-  imageUrl?: string;
+  imageUrl: string | null;
 }
 
 export interface RevenueData {
@@ -185,7 +185,7 @@ export class DashboardService {
   private getReportRows(reportData: ReportData): string[][] {
     switch (reportData.type) {
       case 'sales':
-        return reportData.orders?.map((order: any) => [
+        return reportData['orders']?.map((order: any) => [
           order.id.toString(),
           new Date(order.createdAt).toLocaleDateString(),
           order.user?.email || 'N/A',
@@ -194,7 +194,7 @@ export class DashboardService {
         ]) || [];
       
       case 'products':
-        return reportData.products?.map((product: any) => [
+        return reportData['products']?.map((product: any) => [
           product.id?.toString() || 'N/A',
           product.name || 'N/A',
           product.category || 'N/A',
@@ -203,7 +203,7 @@ export class DashboardService {
         ]) || [];
       
       case 'customers':
-        return reportData.customers?.map((customer: any) => [
+        return reportData['customers']?.map((customer: any) => [
           customer.user?.id?.toString() || 'N/A',
           customer.user?.email || 'N/A',
           customer.totalOrders?.toString() || '0',

@@ -24,11 +24,23 @@ export class ChatService {
    typingUsers$ = this.typingUsersSubject.asObservable();
 
    constructor(private http: HttpClient) {
+     // Don't initialize socket immediately - wait for authentication
+   }
+
+   public initializeSocketConnection(): void {
+     if (this.socket) {
+       this.socket.disconnect();
+     }
      this.initializeSocket();
    }
 
    private initializeSocket(): void {
      const token = localStorage.getItem('access_token');
+     if (!token) {
+       console.warn('No access token found for socket connection');
+       return;
+     }
+     
      this.socket = io(this.apiUrl, {
        auth: {
          token,

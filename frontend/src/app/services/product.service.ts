@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Category } from '../interfaces/category';
 import { Product } from '../interfaces/product';
 import { API_CONFIG } from '../config/api.config';
@@ -61,7 +62,11 @@ export class ProductService {
   }
 
   getProducts(): Observable<Product[]> {
-    return this.products$;
+    return this.http.get<{ products: Product[]; total: number }>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.PRODUCTS.BASE}`, {
+      headers: this.getHeaders(),
+    }).pipe(
+      map((response: { products: Product[]; total: number }) => response.products || [])
+    );
   }
 
   getRecentProducts(): Observable<Product[]> {

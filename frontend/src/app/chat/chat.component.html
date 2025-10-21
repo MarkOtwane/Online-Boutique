@@ -18,14 +18,14 @@
       >
         <div class="conversation-avatar">
           <div class="avatar-circle">
-            {{ (getReceiverInfo()?.email || '').charAt(0).toUpperCase() || 'U' }}
+            {{ (getConversationReceiverInfo(conversation)?.email || '').charAt(0).toUpperCase() || 'U' }}
           </div>
-          <div class="online-indicator" *ngIf="getReceiverInfo()?.isOnline"></div>
+          <div class="online-indicator" *ngIf="getConversationReceiverInfo(conversation)?.isOnline"></div>
         </div>
         <div class="conversation-details">
           <div class="conversation-header">
             <span class="conversation-name">
-              {{ getReceiverInfo()?.email || 'User' }}
+              {{ getConversationReceiverInfo(conversation)?.email || 'User' }}
             </span>
             <span class="conversation-time">
               {{ formatDate(conversation.lastMessage?.createdAt || conversation.updatedAt) }}
@@ -122,7 +122,7 @@
       <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <h3>Access Restricted</h3>
-    <p>Chat is only available for customers. Admins can respond to product discussions instead.</p>
+    <p>Chat is only available for customers and admins. Please log in to access the chat feature.</p>
     <a routerLink="/products" class="btn-browse-products">Browse Products</a>
   </div>
 </div>

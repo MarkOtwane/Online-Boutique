@@ -24,7 +24,7 @@
       <a routerLink="/chat" *ngIf="authService.isAuthenticated() && authService.getUser()?.role === 'customer'">CHAT</a>
       <a routerLink="/about">ABOUT</a>
       <a routerLink="/contact">CONTACT</a>
-      <a routerLink="/orders" *ngIf="authService.isAuthenticated()">ORDERS</a>
+      <a routerLink="/user/orders" *ngIf="authService.isAuthenticated()">ORDERS</a>
     </nav>
 
     <!-- User Actions -->
@@ -38,10 +38,10 @@
           </svg>
         </div>
         <div class="dropdown-content">
-          <a routerLink="/dashboard">Dashboard</a>
-          <a routerLink="/profile">Profile</a>
-          <a (click)="logout()" style="cursor: pointer;">Logout</a>
-        </div>
+        <a routerLink="/user/dashboard">Dashboard</a>
+        <a routerLink="/user/profile">Profile</a>
+        <a (click)="logout()" style="cursor: pointer;">Logout</a>
+      </div>
       </div>
 
       <!-- Login/Register -->
