@@ -218,8 +218,12 @@ export class AdminProductsComponent implements OnInit {
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (error) => {
-        this.errorMessage = `Failed to delete product: ${error.message}`;
-        setTimeout(() => this.errorMessage = '', 3000);
+        console.error('Delete product error:', error);
+        const errorMsg = error?.error?.message || error?.message || 'Unknown error occurred';
+        this.errorMessage = `Failed to delete product: ${errorMsg}`;
+        this.showDeleteModal = false;
+        this.productToDelete = null;
+        setTimeout(() => this.errorMessage = '', 5000);
       }
     });
   }
@@ -241,8 +245,11 @@ export class AdminProductsComponent implements OnInit {
       this.showBulkDeleteModal = false;
       setTimeout(() => this.successMessage = '', 3000);
     }).catch(error => {
-      this.errorMessage = `Failed to delete some products: ${error.message}`;
-      setTimeout(() => this.errorMessage = '', 3000);
+      console.error('Bulk delete products error:', error);
+      const errorMsg = error?.error?.message || error?.message || 'Unknown error occurred';
+      this.errorMessage = `Failed to delete some products: ${errorMsg}`;
+      this.showBulkDeleteModal = false;
+      setTimeout(() => this.errorMessage = '', 5000);
     });
   }
 

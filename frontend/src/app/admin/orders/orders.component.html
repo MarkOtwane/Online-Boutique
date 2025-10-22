@@ -61,6 +61,12 @@
     </div>
   </div>
 
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error && !loading" style="margin-bottom: 20px; padding: 15px; background-color: #fee; border: 1px solid #fcc; border-radius: 8px; color: #c33;">
+    <p style="margin: 0;">{{ error }}</p>
+    <button class="btn-primary" (click)="loadOrders()" style="margin-top: 10px;">Retry</button>
+  </div>
+
   <!-- Filters and Search -->
   <div class="filters-section">
     <div class="search-box">

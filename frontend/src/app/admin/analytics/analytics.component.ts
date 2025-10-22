@@ -16,7 +16,8 @@ export class AdminAnalyticsComponent implements OnInit {
   stats: DashboardStats | null = null;
   topProducts: TopProduct[] = [];
   revenueData: RevenueData[] = [];
-  locationData: any[] = [];
+  locationData: LocationData[] = [];
+  error: string | null = null;
 
   loading = false;
   selectedPeriod = '30'; // days
@@ -30,6 +31,7 @@ export class AdminAnalyticsComponent implements OnInit {
 
   loadAnalyticsData(): void {
     this.loading = true;
+    this.error = null;
 
     // Load all analytics data
     this.dashboardService.getAdminStats().subscribe({
@@ -39,6 +41,7 @@ export class AdminAnalyticsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading stats:', error);
+        this.error = 'Failed to load dashboard statistics. Please check your connection and try again.';
         this.loading = false;
       }
     });
@@ -49,6 +52,7 @@ export class AdminAnalyticsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading top products:', error);
+        this.error = 'Failed to load top products data.';
       }
     });
 
@@ -58,6 +62,7 @@ export class AdminAnalyticsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading revenue data:', error);
+        this.error = 'Failed to load revenue data.';
       }
     });
 
@@ -67,6 +72,7 @@ export class AdminAnalyticsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading location data:', error);
+        this.error = 'Failed to load location data.';
       }
     });
   }

@@ -92,6 +92,48 @@ export class UsersService {
   }
 
   async deleteUser(id: number): Promise<User> {
+    // First, delete all related records to avoid foreign key constraint errors
+    
+    // Delete user's chat messages (as sender and receiver)
+    await this.prisma.chatMessage.deleteMany({
+      where: {
+        OR: [
+          { senderId: id },
+          { receiverId: id }
+        ]
+      }
+    });
+
+    // Delete user's conversation participations
+    await this.prisma.chatConversationParticipant.deleteMany({
+      where: { userId: id }
+    });
+
+    // Delete user's comments (cascade is already set in schema, but being explicit)
+    await this.prisma.comment.deleteMany({
+      where: { userId: id }
+    });
+
+    // Delete order items for user's orders
+    const userOrders = await this.prisma.order.findMany({
+      where: { userId: id },
+      select: { id: true }
+    });
+    
+    if (userOrders.length > 0) {
+      await this.prisma.orderItem.deleteMany({
+        where: {
+          orderId: { in: userOrders.map(order => order.id) }
+        }
+      });
+    }
+
+    // Delete user's orders
+    await this.prisma.order.deleteMany({
+      where: { userId: id }
+    });
+
+    // Finally, delete the user
     return this.prisma.user.delete({
       where: { id },
     });

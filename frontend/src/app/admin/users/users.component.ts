@@ -263,8 +263,12 @@ export class AdminUsersComponent implements OnInit {
         setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (error) => {
-        this.errorMessage = `Failed to delete user: ${error.message}`;
-        setTimeout(() => (this.errorMessage = ''), 3000);
+        console.error('Delete user error:', error);
+        const errorMsg = error?.error?.message || error?.message || 'Unknown error occurred';
+        this.errorMessage = `Failed to delete user: ${errorMsg}`;
+        this.showDeleteModal = false;
+        this.userToDelete = null;
+        setTimeout(() => (this.errorMessage = ''), 5000);
       },
     });
   }
@@ -288,8 +292,11 @@ export class AdminUsersComponent implements OnInit {
         setTimeout(() => (this.successMessage = ''), 3000);
       })
       .catch((error) => {
-        this.errorMessage = `Failed to delete some users: ${error.message}`;
-        setTimeout(() => (this.errorMessage = ''), 3000);
+        console.error('Bulk delete users error:', error);
+        const errorMsg = error?.error?.message || error?.message || 'Unknown error occurred';
+        this.errorMessage = `Failed to delete some users: ${errorMsg}`;
+        this.showBulkDeleteModal = false;
+        setTimeout(() => (this.errorMessage = ''), 5000);
       });
   }
 

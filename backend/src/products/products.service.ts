@@ -67,6 +67,20 @@ export class ProductsService {
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+
+    // Delete all related records to avoid foreign key constraint errors
+    
+    // Delete comments for this product (cascade is already set in schema, but being explicit)
+    await this.prisma.comment.deleteMany({
+      where: { productId: id }
+    });
+
+    // Delete order items for this product
+    await this.prisma.orderItem.deleteMany({
+      where: { productId: id }
+    });
+
+    // Finally, delete the product
     return this.prisma.product.delete({ where: { id } });
   }
 

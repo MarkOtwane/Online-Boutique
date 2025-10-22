@@ -1,6 +1,13 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h1>Admin Dashboard</h1>
+    
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="error && !loading" style="margin: 20px 0; padding: 15px; background-color: #fee; border: 1px solid #fcc; border-radius: 8px; color: #c33;">
+      <p style="margin: 0;">{{ error }}</p>
+      <button class="btn-primary" (click)="loadDashboardData()" style="margin-top: 10px;">Retry</button>
+    </div>
+    
     <div class="header-actions">
       <button class="btn-secondary" (click)="exportReport()" [disabled]="reportLoading">
         {{ reportLoading ? 'Generating...' : 'Export Report' }}

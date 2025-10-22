@@ -43,6 +43,7 @@ export class DashboardComponent implements OnInit {
   // Loading states
   loading = true;
   reportLoading = false;
+  error: string | null = null;
 
   constructor(
     private productService: ProductService,
@@ -57,6 +58,7 @@ export class DashboardComponent implements OnInit {
 
   loadDashboardData(): void {
     this.loading = true;
+    this.error = null;
     
     // Load all dashboard data in parallel
     const stats$ = this.dashboardService.getAdminStats();
@@ -65,18 +67,29 @@ export class DashboardComponent implements OnInit {
     const location$ = this.dashboardService.getLocationData();
 
     stats$.subscribe({
-      next: (stats) => this.stats = stats,
-      error: (error) => console.error('Error loading stats:', error)
+      next: (stats) => {
+        this.stats = stats;
+      },
+      error: (error) => {
+        console.error('Error loading stats:', error);
+        this.error = 'Failed to load dashboard statistics. Please check your connection and try again.';
+      }
     });
 
     products$.subscribe({
       next: (products) => this.topProducts = products,
-      error: (error) => console.error('Error loading products:', error)
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.error = 'Failed to load top products data.';
+      }
     });
 
     revenue$.subscribe({
       next: (revenue) => this.revenueData = revenue,
-      error: (error) => console.error('Error loading revenue:', error)
+      error: (error) => {
+        console.error('Error loading revenue:', error);
+        this.error = 'Failed to load revenue data.';
+      }
     });
 
     location$.subscribe({
@@ -86,6 +99,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading location:', error);
+        this.error = 'Failed to load location data.';
         this.loading = false;
       }
     });
@@ -120,6 +134,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error generating report:', error);
+        this.error = 'Failed to generate report. Please try again.';
         this.reportLoading = false;
       }
     });

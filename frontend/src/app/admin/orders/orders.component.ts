@@ -14,6 +14,7 @@ export class AdminOrdersComponent implements OnInit {
   orders: Order[] = [];
   filteredOrders: Order[] = [];
   loading = false;
+  error: string | null = null;
   searchTerm = '';
   statusFilter = 'all';
 
@@ -36,6 +37,7 @@ export class AdminOrdersComponent implements OnInit {
 
   loadOrders(): void {
     this.loading = true;
+    this.error = null;
     this.orderService.getAllOrders().subscribe({
       next: (orders) => {
         this.orders = orders;
@@ -46,6 +48,7 @@ export class AdminOrdersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading orders:', error);
+        this.error = 'Failed to load orders. Please check your connection and try again.';
         this.loading = false;
       }
     });
@@ -165,6 +168,7 @@ export class AdminOrdersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating order status:', error);
+        this.error = 'Failed to update order status. Please try again.';
       }
     });
   }

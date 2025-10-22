@@ -364,6 +364,42 @@
   font-weight: 600;
 }
 
+/* Error Message */
+.error-message {
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.error-message svg {
+  color: #c33;
+  margin-bottom: 1rem;
+}
+
+.error-message p {
+  color: #c33;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+}
+
+.error-message button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.error-message button:hover {
+  background: #5568d3;
+}
+
 /* Loading State */
 .loading {
   text-align: center;

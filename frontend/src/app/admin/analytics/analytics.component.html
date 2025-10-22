@@ -46,8 +46,19 @@
     </button>
   </div>
 
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="error && !loading">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 8V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="loadAnalyticsData()">Retry</button>
+  </div>
+
   <!-- Key Metrics -->
-  <div class="metrics-grid" *ngIf="stats">
+  <div class="metrics-grid" *ngIf="stats && !error">
     <div class="metric-card">
       <div class="metric-icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,9 +67,11 @@
         </svg>
       </div>
       <div class="metric-content">
-        <h3>Total Users</h3>
-        <p class="metric-value">{{ stats.totalUsers }}</p>
-        <span class="metric-change positive">+12%</span>
+        <h3>Total Customers</h3>
+        <p class="metric-value">{{ stats.totalCustomers }}</p>
+        <span class="metric-change" [class.positive]="stats.customersChange >= 0" [class.negative]="stats.customersChange < 0">
+          {{ stats.customersChange >= 0 ? '+' : '' }}{{ stats.customersChange }}%
+        </span>
       </div>
     </div>
 
@@ -73,7 +86,9 @@
       <div class="metric-content">
         <h3>Total Orders</h3>
         <p class="metric-value">{{ stats.totalOrders }}</p>
-        <span class="metric-change positive">+8%</span>
+        <span class="metric-change" [class.positive]="stats.ordersChange >= 0" [class.negative]="stats.ordersChange < 0">
+          {{ stats.ordersChange >= 0 ? '+' : '' }}{{ stats.ordersChange }}%
+        </span>
       </div>
     </div>
 
@@ -86,7 +101,7 @@
       <div class="metric-content">
         <h3>Total Products</h3>
         <p class="metric-value">{{ stats.totalProducts }}</p>
-        <span class="metric-change neutral">0%</span>
+        <span class="metric-change neutral">Active</span>
       </div>
     </div>
 
@@ -100,7 +115,9 @@
       <div class="metric-content">
         <h3>Total Revenue</h3>
         <p class="metric-value">{{ formatCurrency(stats.totalRevenue) }}</p>
-        <span class="metric-change positive">+15%</span>
+        <span class="metric-change" [class.positive]="stats.revenueChange >= 0" [class.negative]="stats.revenueChange < 0">
+          {{ stats.revenueChange >= 0 ? '+' : '' }}{{ stats.revenueChange }}%
+        </span>
       </div>
     </div>
   </div>
@@ -144,10 +161,10 @@
           <div class="product-rank">{{ i + 1 }}</div>
           <div class="product-info">
             <h4>{{ product.name }}</h4>
-            <p>{{ product.sales }} sales</p>
+            <p>{{ product.quantity }} sold</p>
           </div>
           <div class="product-revenue">
-            {{ formatCurrency(product.revenue) }}
+            {{ formatCurrency(product.amount) }}
           </div>
         </div>
         <div class="no-products" *ngIf="topProducts.length === 0">
@@ -164,10 +181,9 @@
     </div>
     <div class="location-grid">
       <div class="location-card" *ngFor="let location of locationData">
-        <div class="location-name">{{ location.name }}</div>
+        <div class="location-name">{{ location.city }}</div>
         <div class="location-stats">
-          <span class="location-orders">{{ location.orders }} orders</span>
-          <span class="location-revenue">{{ formatCurrency(location.revenue) }}</span>
+          <span class="location-revenue">{{ formatCurrency(location.sales) }}</span>
         </div>
       </div>
     </div>
