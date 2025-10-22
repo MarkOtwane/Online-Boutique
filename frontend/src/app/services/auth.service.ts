@@ -14,11 +14,32 @@ export class AuthService {
   user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient) {
+    // Try to load user from localStorage first for immediate availability
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.userSubject.next(user);
+      } catch (e) {
+        console.error('Failed to parse stored user:', e);
+        localStorage.removeItem('user');
+      }
+    }
+
+    // Then fetch fresh user data from server
     const token = localStorage.getItem('access_token');
     if (token) {
       this.getCurrentUser().subscribe({
-        next: (user) => this.userSubject.next(user),
-        error: () => localStorage.removeItem('access_token'), // Clear invalid token
+        next: (user) => {
+          localStorage.setItem('user', JSON.stringify(user));
+          this.userSubject.next(user);
+        },
+        error: () => {
+          // Clear invalid token and user data
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          this.userSubject.next(null);
+        }
       });
     }
   }
@@ -78,7 +99,24 @@ export class AuthService {
   }
 
   getUser(): User | null {
-    return this.userSubject.getValue();
+    // First try to get from BehaviorSubject
+    let user = this.userSubject.getValue();
+    
+    // If not available, try to get from localStorage as fallback
+    if (!user) {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          user = JSON.parse(storedUser);
+          this.userSubject.next(user); // Update the subject
+        } catch (e) {
+          console.error('Failed to parse stored user:', e);
+          localStorage.removeItem('user');
+        }
+      }
+    }
+    
+    return user;
   }
 
   getCurrentUser(): Observable<User> {

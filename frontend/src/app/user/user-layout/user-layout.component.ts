@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { Router, NavigationEnd, RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
@@ -10,7 +10,7 @@ import { CartService } from '../../services/cart.service';
   selector: 'app-user-layout',
   templateUrl: './user-layout.component.html',
   styleUrls: ['./user-layout.component.css'],
-  imports: [CommonModule, RouterOutlet]
+  imports: [CommonModule, RouterOutlet, RouterLink]
 })
 export class UserLayoutComponent implements OnInit, OnDestroy {
   currentUser: any;

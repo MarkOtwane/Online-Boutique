@@ -5,6 +5,8 @@ import {
   RouterStateSnapshot,
   Router,
 } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
@@ -16,23 +18,48 @@ export class AdminGuard implements CanActivate {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean {
-    if (this.authService.isAuthenticated()) {
-      const user = this.authService.getUser();
-      if (user && user.role === 'admin') {
-        return true; // Allow access if authenticated and is admin
-      } else if (user && user.role === 'customer') {
-        this.router.navigate(['/dashboard']); // Redirect customers to their dashboard
-        return false;
-      } else {
-        this.router.navigate(['/']);
-        return false; // Redirect to home if role is not recognized
-      }
-    } else {
+  ): Observable<boolean> | boolean {
+    if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: state.url },
       });
-      return false; // Redirect to login if not authenticated
+      return false;
     }
+
+    const user = this.authService.getUser();
+    
+    // If user is already loaded, check immediately
+    if (user) {
+      if (user.role === 'admin') {
+        return true;
+      } else if (user.role === 'customer') {
+        this.router.navigate(['/dashboard']);
+        return false;
+      } else {
+        this.router.navigate(['/']);
+        return false;
+      }
+    }
+
+    // If user is not loaded yet, wait for it
+    return this.authService.getCurrentUser().pipe(
+      map((user) => {
+        if (user.role === 'admin') {
+          return true;
+        } else if (user.role === 'customer') {
+          this.router.navigate(['/dashboard']);
+          return false;
+        } else {
+          this.router.navigate(['/']);
+          return false;
+        }
+      }),
+      catchError(() => {
+        this.router.navigate(['/login'], {
+          queryParams: { returnUrl: state.url },
+        });
+        return of(false);
+      })
+    );
   }
 }

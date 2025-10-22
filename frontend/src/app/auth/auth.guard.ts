@@ -38,22 +38,29 @@ export class CustomerGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    if (this.authService.isAuthenticated()) {
-      const user = this.authService.getUser();
-      if (user && user.role === 'customer') {
-        return true; // Allow access if authenticated and is customer
-      } else if (user && user.role === 'admin') {
-        this.router.navigate(['/admin']); // Redirect admin to admin panel
-        return false;
-      } else {
-        this.router.navigate(['/']);
-        return false; // Redirect to home if role is not recognized
-      }
-    } else {
+    if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: state.url },
       });
-      return false; // Redirect to login if not authenticated
+      return false;
     }
+
+    const user = this.authService.getUser();
+    
+    if (user) {
+      if (user.role === 'customer') {
+        return true;
+      } else if (user.role === 'admin') {
+        this.router.navigate(['/admin']);
+        return false;
+      } else {
+        this.router.navigate(['/']);
+        return false;
+      }
+    }
+
+    // If user data is not available yet, allow access
+    // (the user will be redirected if needed once data loads)
+    return true;
   }
 }
