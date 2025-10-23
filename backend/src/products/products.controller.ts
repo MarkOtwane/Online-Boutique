@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -78,30 +79,63 @@ export class ProductsController {
     }),
   )
   async create(
-    @Body() data: { name: string; price: string; categoryId: string },
+    @Body() data: { [key: string]: string },
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Product> {
+    // Manually parse and validate FormData fields
+    const name = data.name?.trim();
+    const priceStr = data.price;
+    const categoryIdStr = data.categoryId;
+
+    if (!name || !priceStr || !categoryIdStr) {
+      throw new BadRequestException(
+        'Name, price, and categoryId are required.',
+      );
+    }
+
+    const price = parseFloat(priceStr);
+    const categoryId = parseInt(categoryIdStr);
+
+    if (isNaN(price) || price <= 0) {
+      throw new BadRequestException('Price must be a positive number.');
+    }
+
+    if (isNaN(categoryId) || categoryId <= 0) {
+      throw new BadRequestException('CategoryId must be a positive integer.');
+    }
+
     let imageUrl: string | undefined;
 
     if (file) {
-      // Upload to Cloudinary
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: 'boutique-products',
-        public_id: `product-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
-        format: 'png',
-      });
+      try {
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: 'boutique-products',
+          public_id: `product-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+          format: 'png',
+        });
 
-      imageUrl = result.secure_url;
+        imageUrl = result.secure_url;
 
-      // Delete local file after upload
-      await fs.unlink(file.path);
+        // Delete local file after upload
+        await fs.unlink(file.path);
+      } catch (error) {
+        console.error('Cloudinary upload failed:', error);
+        // If Cloudinary fails, we'll create the product without an image
+        // Delete the local file anyway
+        try {
+          await fs.unlink(file.path);
+        } catch (unlinkError) {
+          console.error('Failed to delete local file:', unlinkError);
+        }
+      }
     }
 
     return this.productsService.create({
-      name: data.name,
-      price: parseFloat(data.price),
+      name,
+      price,
       category: {
-        connect: { id: parseInt(data.categoryId) },
+        connect: { id: categoryId },
       },
       imageUrl,
     });
@@ -135,7 +169,7 @@ export class ProductsController {
   )
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: { name?: string; price?: string; categoryId?: string },
+    @Body() data: { [key: string]: string },
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Product> {
     let imageUrl: string | undefined;
@@ -155,11 +189,21 @@ export class ProductsController {
     }
 
     const updateData: any = {};
-    if (data.name) updateData.name = data.name;
-    if (data.price) updateData.price = parseFloat(data.price);
+    if (data.name) updateData.name = data.name.trim();
+    if (data.price) {
+      const price = parseFloat(data.price);
+      if (isNaN(price) || price <= 0) {
+        throw new BadRequestException('Price must be a positive number.');
+      }
+      updateData.price = price;
+    }
     if (data.categoryId) {
+      const categoryId = parseInt(data.categoryId);
+      if (isNaN(categoryId) || categoryId <= 0) {
+        throw new BadRequestException('CategoryId must be a positive integer.');
+      }
       updateData.category = {
-        connect: { id: parseInt(data.categoryId) },
+        connect: { id: categoryId },
       };
     }
     if (imageUrl) updateData.imageUrl = imageUrl;

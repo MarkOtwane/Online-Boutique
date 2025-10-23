@@ -10,20 +10,25 @@ import { AdminLayoutComponent } from './admin/admin-layout/admin-layout.componen
 import { DashboardComponent as AdminDashboardComponent } from './admin/dashboard/dashboard.component';
 import { AdminProductsComponent } from './admin/products/products.component';
 import { AdminUsersComponent } from './admin/users/users.component';
+import { AdminOrdersComponent } from './admin/orders/orders.component';
+import { AdminAnalyticsComponent } from './admin/analytics/analytics.component';
+import { AdminSettingsComponent } from './admin/settings/settings.component';
 import { UserLayoutComponent } from './user/user-layout/user-layout.component';
 import { UserDashboardComponent } from './user/dashboard/dashboard.component';
 import { CartComponent } from './cart/cart.component';
 import { ProductDetailComponent } from './product-detail/product-detail.component';
 import { ChatComponent } from './chat/chat.component';
 import { CommunityComponent } from './community/community.component';
+import { ProductFeedComponent } from './product-feed/product-feed.component';
 
 export const routes: Routes = [
-      { path: '', component: HomeComponent },
-      { path: 'products', component: ProductsComponent },
-      { path: 'product/:id', component: ProductDetailComponent },
-      { path: 'cart', component: CartComponent },
-      { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },
-      { path: 'community', component: CommunityComponent },
+       { path: '', component: HomeComponent },
+       { path: 'products', component: ProductsComponent },
+       { path: 'feed', component: ProductFeedComponent },
+       { path: 'product/:id', component: ProductDetailComponent },
+       { path: 'cart', component: CartComponent },
+       { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },
+       { path: 'community', component: CommunityComponent },
       {
         path: 'user',
         component: UserLayoutComponent,
@@ -56,6 +61,9 @@ export const routes: Routes = [
             { path: 'products/new', component: ProductFormComponent },
             { path: 'products/edit/:id', component: ProductFormComponent },
             { path: 'users', component: AdminUsersComponent },
+            { path: 'orders', component: AdminOrdersComponent },
+            { path: 'analytics', component: AdminAnalyticsComponent },
+            { path: 'settings', component: AdminSettingsComponent },
           ]
         },
     { path: 'login', component: LoginComponent },

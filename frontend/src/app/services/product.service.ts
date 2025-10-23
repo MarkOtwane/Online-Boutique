@@ -62,11 +62,7 @@ export class ProductService {
   }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<{ products: Product[]; total: number }>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.PRODUCTS.BASE}`, {
-      headers: this.getHeaders(),
-    }).pipe(
-      map((response: { products: Product[]; total: number }) => response.products || [])
-    );
+    return this.products$;
   }
 
   getRecentProducts(): Observable<Product[]> {
@@ -174,6 +170,32 @@ export class ProductService {
           },
           error: (err) => observer.error(err),
         });
+    });
+  }
+
+  createComment(productId: number, content: string, parentId?: number): Observable<any> {
+    const body = { productId, content, parentId };
+    return this.http.post(`${this.apiUrl}/comments`, body, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  createRepost(productId: number, content?: string): Observable<any> {
+    const body = { productId, content };
+    return this.http.post(`${this.apiUrl}/reposts`, body, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  deleteComment(commentId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/comments/${commentId}`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  deleteRepost(repostId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/reposts/${repostId}`, {
+      headers: this.getHeaders(),
     });
   }
 }

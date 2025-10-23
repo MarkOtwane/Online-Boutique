@@ -1,0 +1,105 @@
+<div class="product-feed-container">
+  <h2>Product Feed</h2>
+
+  <div *ngIf="isLoading" class="loading">Loading products...</div>
+
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <div class="products-grid">
+    <div *ngFor="let product of products" class="product-card" (click)="openProductDetail(product)">
+      <img [src]="product.imageUrl || 'https://via.placeholder.com/200x200'" [alt]="product.name" class="product-image">
+      <div class="product-info">
+        <h3>{{ product.name }}</h3>
+        <p class="price">${{ product.price }}</p>
+        <div class="product-stats">
+          <span>{{ product.commentCount }} comments</span>
+          <span>{{ product.repostCount }} reposts</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Detail Modal -->
+  <div *ngIf="selectedProduct" class="modal-overlay" (click)="closeProductDetail()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="closeProductDetail()">×</button>
+
+      <div class="product-detail">
+        <img [src]="selectedProduct.imageUrl || 'https://via.placeholder.com/300x300'" [alt]="selectedProduct.name" class="detail-image">
+        <div class="detail-info">
+          <h3>{{ selectedProduct.name }}</h3>
+          <p class="price">${{ selectedProduct.price }}</p>
+          <p class="category" *ngIf="selectedProduct.category">{{ selectedProduct.category.name }}</p>
+
+          <!-- Comments Section -->
+          <div class="comments-section">
+            <h4>Comments ({{ selectedProduct.commentCount }})</h4>
+
+            <!-- Add Comment Form -->
+            <div *ngIf="isAuthenticated()" class="comment-form">
+              <textarea [(ngModel)]="newComment" placeholder="Add a comment..." rows="3"></textarea>
+              <button (click)="submitComment()" [disabled]="!newComment.trim()">Comment</button>
+            </div>
+
+            <!-- Comments List -->
+            <div class="comments-list">
+              <div *ngFor="let comment of selectedProduct.comments" class="comment">
+                <div class="comment-header">
+                  <strong>{{ comment.user.email }}</strong>
+                  <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
+                  <button *ngIf="getCurrentUserId() === comment.userId" (click)="deleteComment(comment.id)" class="delete-btn">Delete</button>
+                </div>
+                <p>{{ comment.content }}</p>
+
+                <!-- Replies -->
+                <div *ngFor="let reply of comment.replies" class="reply">
+                  <div class="reply-header">
+                    <strong>{{ reply.user.email }}</strong>
+                    <span class="reply-date">{{ reply.createdAt | date:'short' }}</span>
+                    <button *ngIf="getCurrentUserId() === reply.userId" (click)="deleteComment(reply.id)" class="delete-btn">Delete</button>
+                  </div>
+                  <p>{{ reply.content }}</p>
+                </div>
+
+                <!-- Reply Form -->
+                <div *ngIf="isAuthenticated() && replyToCommentId === comment.id" class="reply-form">
+                  <textarea [(ngModel)]="newReply" placeholder="Add a reply..." rows="2"></textarea>
+                  <button (click)="submitReply()">Reply</button>
+                  <button (click)="cancelReply()">Cancel</button>
+                </div>
+
+                <button *ngIf="isAuthenticated() && !replyToCommentId" (click)="startReply(comment.id)" class="reply-btn">Reply</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reposts Section -->
+          <div class="reposts-section">
+            <h4>Reposts ({{ selectedProduct.repostCount }})</h4>
+
+            <!-- Add Repost Form -->
+            <div *ngIf="isAuthenticated()" class="repost-form">
+              <textarea [(ngModel)]="newRepostContent" placeholder="Add a quote or comment..." rows="2"></textarea>
+              <button (click)="submitRepost()">Repost</button>
+            </div>
+
+            <!-- Reposts List -->
+            <div class="reposts-list">
+              <div *ngFor="let repost of selectedProduct.reposts" class="repost">
+                <div class="repost-header">
+                  <strong>{{ repost.user.email }}</strong>
+                  <span class="repost-date">{{ repost.createdAt | date:'short' }}</span>
+                  <button *ngIf="getCurrentUserId() === repost.userId" (click)="deleteRepost(repost.id)" class="delete-btn">Delete</button>
+                </div>
+                <p *ngIf="repost.content">{{ repost.content }}</p>
+                <div class="reposted-product">
+                  <strong>Reposted:</strong> {{ repost.product.name }} - ${{ repost.product.price }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

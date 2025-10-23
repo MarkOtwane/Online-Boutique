@@ -16,24 +16,37 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateCommentDto, UpdateCommentDto } from './comments.dto';
 import { CommentsService } from './comments.service';
 
-@Controller()
+@Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Get('products/:productId/comments')
+  @Get('products/:productId')
   async getProductComments(
     @Param('productId', ParseIntPipe) productId: number,
   ) {
     return this.commentsService.getProductComments(productId);
   }
 
-  @Post('comments')
+  @Post()
   @UseGuards(JwtAuthGuard)
   async createComment(@Request() req, @Body() dto: CreateCommentDto) {
     return this.commentsService.createComment(req.user.id, dto);
   }
 
-  @Put('comments/:id')
+  @Post(':id/replies')
+  @UseGuards(JwtAuthGuard)
+  async createReply(
+    @Request() req,
+    @Param('id', ParseIntPipe) commentId: number,
+    @Body() dto: CreateCommentDto,
+  ) {
+    return this.commentsService.createComment(req.user.id, {
+      ...dto,
+      parentId: commentId,
+    });
+  }
+
+  @Put(':id')
   @UseGuards(JwtAuthGuard)
   async updateComment(
     @Request() req,
@@ -43,7 +56,7 @@ export class CommentsController {
     return this.commentsService.updateComment(req.user.id, commentId, dto);
   }
 
-  @Delete('comments/:id')
+  @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async deleteComment(
     @Request() req,
@@ -52,7 +65,7 @@ export class CommentsController {
     return this.commentsService.deleteComment(req.user.id, commentId);
   }
 
-  @Put('comments/:id/admin-response')
+  @Put(':id/admin-response')
   @UseGuards(JwtAuthGuard)
   async markAsAdminResponse(
     @Request() req,

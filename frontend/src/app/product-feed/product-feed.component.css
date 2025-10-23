@@ -1,0 +1,212 @@
+.product-feed-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2em;
+}
+
+.error {
+  color: red;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 15px;
+}
+
+.product-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2em;
+}
+
+.price {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.product-stats {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #7f8c8d;
+}
+
+.product-stats span {
+  margin-right: 15px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+.product-detail {
+  display: flex;
+  padding: 20px;
+}
+
+.detail-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px;
+}
+
+.detail-info {
+  flex: 1;
+}
+
+.detail-info h3 {
+  margin: 0 0 10px 0;
+}
+
+.detail-info .price {
+  font-size: 1.3em;
+  margin-bottom: 10px;
+}
+
+.category {
+  color: #7f8c8d;
+  margin-bottom: 20px;
+}
+
+/* Comments and Reposts Styles */
+.comments-section, .reposts-section {
+  margin-top: 30px;
+}
+
+.comments-section h4, .reposts-section h4 {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.comment-form, .reply-form, .repost-form {
+  margin-bottom: 20px;
+}
+
+.comment-form textarea, .reply-form textarea, .repost-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  resize: vertical;
+}
+
+.comment-form button, .reply-form button, .repost-form button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.comment-form button:disabled, .reply-form button:disabled, .repost-form button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.comments-list, .reposts-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment, .reply, .repost {
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.comment-header, .reply-header, .repost-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.comment-date, .reply-date, .repost-date {
+  font-size: 0.8em;
+  color: #7f8c8d;
+}
+
+.delete-btn, .reply-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+
+.reply-btn {
+  background: #95a5a6;
+  margin-top: 5px;
+}
+
+.reposted-product {
+  font-size: 0.9em;
+  color: #7f8c8d;
+  margin-top: 5px;
+}

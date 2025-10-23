@@ -83,7 +83,8 @@ export class CommentsService {
       }
     }
 
-    return this.prisma.comment.create({
+    // Create the comment
+    const comment = await this.prisma.comment.create({
       data: {
         productId: dto.productId,
         userId,
@@ -100,6 +101,20 @@ export class CommentsService {
         },
       },
     });
+
+    // Increment commentCount if it's a root comment (no parentId)
+    if (!dto.parentId) {
+      await this.prisma.product.update({
+        where: { id: dto.productId },
+        data: {
+          commentCount: {
+            increment: 1,
+          },
+        },
+      });
+    }
+
+    return comment;
   }
 
   async updateComment(
@@ -160,9 +175,23 @@ export class CommentsService {
     });
 
     // Delete the comment
-    return this.prisma.comment.delete({
+    await this.prisma.comment.delete({
       where: { id: commentId },
     });
+
+    // Decrement commentCount if it's a root comment (no parentId)
+    if (!comment.parentId) {
+      await this.prisma.product.update({
+        where: { id: comment.productId },
+        data: {
+          commentCount: {
+            decrement: 1,
+          },
+        },
+      });
+    }
+
+    return comment;
   }
 
   async markAsAdminResponse(

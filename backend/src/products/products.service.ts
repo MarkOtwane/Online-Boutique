@@ -1,17 +1,47 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, Product } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    data: Prisma.ProductCreateInput & { imageUrl?: string },
-  ): Promise<Product> {
-    return this.prisma.product.create({
-      data,
+  async create(data: {
+    name: string;
+    price: number;
+    category: { connect: { id: number } };
+    imageUrl?: string;
+  }): Promise<Product> {
+    // Check if category exists
+    const category = await this.prisma.category.findUnique({
+      where: { id: data.category.connect.id },
     });
+    if (!category) {
+      throw new BadRequestException(
+        `Category with ID ${data.category.connect.id} does not exist.`,
+      );
+    }
+
+    try {
+      return await this.prisma.product.create({
+        data,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2003') {
+          throw new BadRequestException(
+            'Invalid category ID. The specified category does not exist.',
+          );
+        }
+      }
+      throw new BadRequestException(
+        'Failed to create product. Please check your input.',
+      );
+    }
   }
 
   async findAll({
@@ -40,7 +70,46 @@ export class ProductsService {
   async findOne(id: number): Promise<Product | null> {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { category: true },
+      include: {
+        category: true,
+        comments: {
+          where: { parentId: null },
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+              },
+            },
+            replies: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    email: true,
+                    role: true,
+                  },
+                },
+              },
+              orderBy: { createdAt: 'asc' },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        reposts: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -69,15 +138,15 @@ export class ProductsService {
     }
 
     // Delete all related records to avoid foreign key constraint errors
-    
+
     // Delete comments for this product (cascade is already set in schema, but being explicit)
     await this.prisma.comment.deleteMany({
-      where: { productId: id }
+      where: { productId: id },
     });
 
     // Delete order items for this product
     await this.prisma.orderItem.deleteMany({
-      where: { productId: id }
+      where: { productId: id },
     });
 
     // Finally, delete the product

@@ -10,6 +10,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { OrdersModule } from './orders/orders.module';
 import { PrismaService } from './prisma/prisma.service';
 import { ProductsModule } from './products/products.module';
+import { RepostsModule } from './reposts/reposts.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -20,6 +21,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     OrdersModule,
     CommentsModule,
+    RepostsModule,
     ChatModule,
     DashboardModule,
   ],

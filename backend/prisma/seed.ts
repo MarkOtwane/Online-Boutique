@@ -21,28 +21,28 @@ async function main() {
     data: { name: 'Clothing' },
   });
 
-  // ✅ Create products individually to capture IDs
-  const silkScarf = await prisma.product.create({
-    data: { name: 'Silk Scarf', price: 29.99, categoryId: accessories.id },
-  });
-  const leatherHandbag = await prisma.product.create({
-    data: { name: 'Leather Handbag', price: 89.99, categoryId: accessories.id },
-  });
-  const woolCoat = await prisma.product.create({
-    data: { name: 'Wool Coat', price: 149.99, categoryId: clothing.id },
-  });
-  const sunglasses = await prisma.product.create({
-    data: { name: 'Sunglasses', price: 49.99, categoryId: accessories.id },
-  });
-  const denimJacket = await prisma.product.create({
-    data: { name: 'Denim Jacket', price: 79.99, categoryId: clothing.id },
-  });
-  const goldNecklace = await prisma.product.create({
-    data: { name: 'Gold Necklace', price: 199.99, categoryId: accessories.id },
-  });
-  const sneakers = await prisma.product.create({
-    data: { name: 'Sneakers', price: 99.99, categoryId: clothing.id },
-  });
+  // // ✅ Create products individually to capture IDs
+  // const silkScarf = await prisma.product.create({
+  //   data: { name: 'Silk Scarf', price: 29.99, categoryId: accessories.id },
+  // });
+  // const leatherHandbag = await prisma.product.create({
+  //   data: { name: 'Leather Handbag', price: 89.99, categoryId: accessories.id },
+  // });
+  // const woolCoat = await prisma.product.create({
+  //   data: { name: 'Wool Coat', price: 149.99, categoryId: clothing.id },
+  // });
+  // const sunglasses = await prisma.product.create({
+  //   data: { name: 'Sunglasses', price: 49.99, categoryId: accessories.id },
+  // });
+  // const denimJacket = await prisma.product.create({
+  //   data: { name: 'Denim Jacket', price: 79.99, categoryId: clothing.id },
+  // });
+  // const goldNecklace = await prisma.product.create({
+  //   data: { name: 'Gold Necklace', price: 199.99, categoryId: accessories.id },
+  // });
+  // const sneakers = await prisma.product.create({
+  //   data: { name: 'Sneakers', price: 99.99, categoryId: clothing.id },
+  // });
 
   // Seed users
   const adminPassword = await bcrypt.hash('admin123', 10);
@@ -65,22 +65,22 @@ async function main() {
   });
 
   // ✅ Seed orders with valid product references
-  await prisma.order.create({
-    data: {
-      userId: customer.id,
-      total: 119.98,
-      orderItems: {
-        create: [
-          { productId: silkScarf.id, quantity: 2, price: silkScarf.price },
-          {
-            productId: leatherHandbag.id,
-            quantity: 1,
-            price: leatherHandbag.price,
-          },
-        ],
-      },
-    },
-  });
+  // await prisma.order.create({
+  //   data: {
+  //     userId: customer.id,
+  //     total: 119.98,
+  //     orderItems: {
+  //       create: [
+  //         { productId: silkScarf.id, quantity: 2, price: silkScarf.price },
+  //         {
+  //           productId: leatherHandbag.id,
+  //           quantity: 1,
+  //           price: leatherHandbag.price,
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
 
   console.log('✅ Seeded categories, products, users, and orders successfully');
 }
