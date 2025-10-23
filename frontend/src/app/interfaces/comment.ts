@@ -15,3 +15,13 @@ export interface Comment {
   };
   replies: Comment[];
 }
+
+export interface CreateCommentRequest {
+  productId: number;
+  content: string;
+  parentId?: number;
+}
+
+export interface UpdateCommentRequest {
+  content: string;
+}

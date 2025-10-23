@@ -21,6 +21,8 @@ export class ProductFormComponent implements OnInit {
     price: 0,
     categoryId: 0,
     createdAt: '',
+    commentCount: 0,
+    repostCount: 0,
   };
   categories: Category[] = [];
   selectedFile: File | null = null;
