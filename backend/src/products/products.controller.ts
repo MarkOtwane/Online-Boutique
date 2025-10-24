@@ -11,6 +11,8 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  Request,
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
@@ -79,10 +81,11 @@ export class ProductsController {
     }),
   )
   async create(
-    @Body() data: { [key: string]: string },
+    @Req() req: Request,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Product> {
     // Manually parse and validate FormData fields
+    const data = req.body as unknown as { [key: string]: string };
     const name = data.name?.trim();
     const priceStr = data.price;
     const categoryIdStr = data.categoryId;
@@ -169,9 +172,10 @@ export class ProductsController {
   )
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: { [key: string]: string },
+    @Req() req: Request,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Product> {
+    const data = req.body as unknown as { [key: string]: string };
     let imageUrl: string | undefined;
 
     if (file) {

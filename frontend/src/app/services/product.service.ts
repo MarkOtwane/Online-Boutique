@@ -79,6 +79,23 @@ export class ProductService {
     return this.categories$;
   }
 
+  reloadCategories(): void {
+    this.http
+      .get<Category[]>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.CATEGORIES.BASE}`, {
+        headers: this.getHeaders(),
+      })
+      .subscribe({
+        next: (categories) => {
+          console.log('Categories reloaded successfully:', categories);
+          this.categoriesSubject.next(categories || []);
+        },
+        error: (err) => {
+          console.error('Failed to reload categories:', err);
+          this.categoriesSubject.next([]);
+        },
+      });
+  }
+
   createProduct(product: Partial<Product>, image?: File): Observable<Product> {
     const formData = new FormData();
     formData.append('name', product.name || '');

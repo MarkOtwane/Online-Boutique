@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -14,7 +15,7 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.css'],
 })
-export class ProductFormComponent implements OnInit {
+export class ProductFormComponent implements OnInit, OnDestroy {
   product: Product = {
     id: 0,
     name: '',
@@ -27,6 +28,7 @@ export class ProductFormComponent implements OnInit {
   categories: Category[] = [];
   selectedFile: File | null = null;
   errorMessage: string | null = null;
+  private categoriesSubscription: Subscription | null = null;
 
   constructor(
     private productService: ProductService,
@@ -45,10 +47,13 @@ export class ProductFormComponent implements OnInit {
       return;
     }
 
-    this.productService.getCategories().subscribe((categories) => {
+    this.categoriesSubscription = this.productService.getCategories().subscribe((categories) => {
       this.categories = categories;
       if (categories.length > 0) {
         this.product.categoryId = categories[0].id;
+      } else {
+        // If no categories, try to reload
+        this.productService.reloadCategories();
       }
     });
 
@@ -82,7 +87,7 @@ export class ProductFormComponent implements OnInit {
         .subscribe({
           next: () => this.router.navigate(['/products']),
           error: (err) =>
-            (this.errorMessage = `Failed to create product: ${err.message}`),
+            (this.errorMessage = `Failed to create product: ${err.error?.message || err.message}`),
         });
     } else {
       this.productService
@@ -94,8 +99,14 @@ export class ProductFormComponent implements OnInit {
         .subscribe({
           next: () => this.router.navigate(['/products']),
           error: (err) =>
-            (this.errorMessage = `Failed to update product: ${err.message}`),
+            (this.errorMessage = `Failed to update product: ${err.error?.message || err.message}`),
         });
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.categoriesSubscription) {
+      this.categoriesSubscription.unsubscribe();
     }
   }
 }
