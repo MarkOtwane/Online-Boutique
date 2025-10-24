@@ -12,6 +12,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { ProductsModule } from './products/products.module';
 import { RepostsModule } from './reposts/reposts.module';
 import { UsersModule } from './users/users.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UsersModule } from './users/users.module';
     RepostsModule,
     ChatModule,
     DashboardModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, CustomLoggerService],

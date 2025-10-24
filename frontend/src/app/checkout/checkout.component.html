@@ -18,6 +18,33 @@
       <p>Quantity: {{ item.quantity }}</p>
       <p>Subtotal: ${{ item.price * item.quantity }}</p>
     </div>
+    <div class="payment-section">
+      <h3>Payment Method</h3>
+      <div class="payment-methods">
+        <label *ngFor="let method of paymentMethods">
+          <input
+            type="radio"
+            name="paymentMethod"
+            [value]="method.value"
+            [(ngModel)]="selectedPaymentMethod"
+          />
+          {{ method.label }}
+        </label>
+      </div>
+
+      <div *ngIf="selectedPaymentMethod === 'MPESA'" class="phone-input">
+        <label for="phoneNumber">Phone Number (for M-Pesa):</label>
+        <input
+          id="phoneNumber"
+          type="tel"
+          placeholder="e.g., 0712345678"
+          [(ngModel)]="phoneNumber"
+          required
+        />
+        <small>Enter your M-Pesa registered phone number</small>
+      </div>
+    </div>
+
     <div class="cart-total">
       <h3>Total: ${{ total }}</h3>
       <button mat-raised-button color="primary" (click)="openConfirmDialog()">
