@@ -64,20 +64,20 @@
   <div class="quick-actions">
     <h2>Quick Actions</h2>
     <div class="action-buttons">
-      <button class="action-btn" routerLink="/products">
+      <button class="action-btn" routerLink="../products">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11M5 9H19L18 21H6L5 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Shop Now
       </button>
-      <button class="action-btn" routerLink="/profile">
+      <button class="action-btn" routerLink="../profile">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Edit Profile
       </button>
-      <button class="action-btn" routerLink="/orders">
+      <button class="action-btn" routerLink="../orders">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -92,7 +92,7 @@
   <div class="recent-orders">
     <div class="section-header">
       <h2>Recent Orders</h2>
-      <button class="btn-outline" routerLink="/orders">View All</button>
+      <button class="btn-outline" routerLink="../orders">View All</button>
     </div>
 
     <div class="orders-list" *ngIf="getRecentOrders().length > 0; else noOrders">
@@ -141,4 +141,7 @@
       </div>
     </ng-template>
   </div>
+
+  <!-- Router outlet for child routes -->
+  <router-outlet></router-outlet>
 </div>

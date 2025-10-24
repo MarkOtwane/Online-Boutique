@@ -27,14 +27,16 @@ export const routes: Routes = [
        { path: 'feed', component: ProductFeedComponent },
        { path: 'product/:id', component: ProductDetailComponent },
        { path: 'cart', component: CartComponent },
-       { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },
        { path: 'community', component: CommunityComponent },
       {
         path: 'user',
         component: UserLayoutComponent,
         canActivate: [CustomerGuard],
         children: [
-          { path: 'dashboard', component: UserDashboardComponent },
+          { path: 'dashboard', component: UserDashboardComponent, children: [
+            { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] }
+          ] },
+          { path: 'products', component: ProductsComponent },
           { path: 'profile', component: UserDashboardComponent }, // Using dashboard as profile for now
           { path: 'orders', component: UserDashboardComponent }, // Using dashboard for orders for now
         ]
