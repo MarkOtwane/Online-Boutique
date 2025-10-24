@@ -1,7 +1,22 @@
-import { Controller, Get, UseGuards, SetMetadata, Request, Query, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  SetMetadata,
+  Request,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../roles.guard';
-import { DashboardService, DashboardStats, TopProduct, RevenueData, LocationData, UserDashboardData } from './dashboard.service';
+import {
+  DashboardService,
+  DashboardStats,
+  TopProduct,
+  RevenueData,
+  LocationData,
+  UserDashboardData,
+} from './dashboard.service';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -17,7 +32,9 @@ export class DashboardController {
   @Get('admin/top-products')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SetMetadata('roles', ['admin'])
-  async getTopProducts(@Query('limit', ParseIntPipe) limit: number = 6): Promise<TopProduct[]> {
+  async getTopProducts(
+    @Query('limit', ParseIntPipe) limit: number = 6,
+  ): Promise<TopProduct[]> {
     return this.dashboardService.getTopProducts(limit);
   }
 

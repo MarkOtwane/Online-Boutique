@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
 import { CustomLoggerService } from '../auth/logger.service';
