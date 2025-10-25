@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Order } from '@prisma/client';
+import { PaymentStatus } from '@prisma/client';
 import { CustomLoggerService } from '../auth/logger.service';
 import { PrismaService } from '../prisma/prisma.service';
 @Injectable()
@@ -12,7 +12,7 @@ export class OrdersService {
   async createOrder(
     userId: number,
     items: { productId: number; quantity: number }[],
-  ): Promise<Order> {
+  ): Promise<any> {
     this.logger.log(`Creating order for user ${userId}`);
     if (!items || items.length === 0) {
       this.logger.error('Order must contain at least one item');
@@ -50,23 +50,45 @@ export class OrdersService {
     });
 
     this.logger.log(`Order ${order.id} created successfully`);
-    return order;
+    // Map paymentStatus to status for frontend compatibility
+    return { ...order, status: order.paymentStatus } as any;
   }
 
-  async getUserOrders(userId: number): Promise<Order[]> {
+  async getUserOrders(userId: number): Promise<any[]> {
     this.logger.log(`Fetching orders for user ${userId}`);
-    return this.prisma.order.findMany({
+    const orders = await this.prisma.order.findMany({
       where: { userId },
       include: { orderItems: { include: { product: true } } },
       orderBy: { createdAt: 'desc' },
     });
+    // Map paymentStatus to status for frontend compatibility
+    return orders.map((order) => ({ ...order, status: order.paymentStatus }));
   }
 
-  async getAllOrders(): Promise<Order[]> {
+  async getAllOrders(): Promise<any[]> {
     this.logger.log('Fetching all orders');
-    return this.prisma.order.findMany({
+    const orders = await this.prisma.order.findMany({
       include: { orderItems: { include: { product: true } }, user: true },
       orderBy: { createdAt: 'desc' },
     });
+    // Map paymentStatus to status for frontend compatibility
+    return orders.map((order) => ({ ...order, status: order.paymentStatus }));
+  }
+
+  async updateOrderStatus(orderId: number, status: string): Promise<any> {
+    this.logger.log(`Updating order ${orderId} status to ${status}`);
+
+    // Map status to PaymentStatus enum
+    const paymentStatus = status.toUpperCase() as PaymentStatus;
+
+    const order = await this.prisma.order.update({
+      where: { id: orderId },
+      data: { paymentStatus },
+      include: { orderItems: { include: { product: true } }, user: true },
+    });
+
+    this.logger.log(`Order ${orderId} status updated successfully`);
+    // Map paymentStatus to status for frontend compatibility
+    return { ...order, status: order.paymentStatus };
   }
 }
