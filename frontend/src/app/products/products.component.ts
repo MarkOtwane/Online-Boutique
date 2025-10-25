@@ -146,9 +146,9 @@ import { ProductService } from '../services/product.service';
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-KE', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'KES'
     }).format(amount);
   }
 

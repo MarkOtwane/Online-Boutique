@@ -47,7 +47,7 @@ export class AdminSettingsComponent implements OnInit {
     cacheEnabled: true,
     backupFrequency: 'daily',
     timezone: 'UTC',
-    currency: 'USD'
+    currency: 'KES'
   };
 
   loading = false;

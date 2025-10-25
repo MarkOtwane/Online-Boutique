@@ -63,12 +63,12 @@ export class OrderHistoryComponent implements OnInit {
     this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
-        message: `Order #${this.selectedOrder?.id}\nTotal: $${
+        message: `Order #${this.selectedOrder?.id}\nTotal: KSh ${
           this.selectedOrder?.total
         }\nUser: ${
           this.selectedOrder?.user?.email || 'N/A'
         }\nItems:\n${this.selectedOrder?.orderItems
-          .map((item) => `${item.name} - ${item.quantity} x $${item.price}`)
+          .map((item) => `${item.name} - ${item.quantity} x KSh ${item.price}`)
           .join('\n')}`,
       },
     });

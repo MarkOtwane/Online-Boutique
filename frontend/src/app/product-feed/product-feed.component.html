@@ -10,7 +10,7 @@
       <img [src]="product.imageUrl || 'https://via.placeholder.com/200x200'" [alt]="product.name" class="product-image">
       <div class="product-info">
         <h3>{{ product.name }}</h3>
-        <p class="price">${{ product.price }}</p>
+        <p class="price">KSh {{ product.price }}</p>
         <div class="product-stats">
           <span>{{ product.commentCount }} comments</span>
           <span>{{ product.repostCount }} reposts</span>
@@ -28,7 +28,7 @@
         <img [src]="selectedProduct.imageUrl || 'https://via.placeholder.com/300x300'" [alt]="selectedProduct.name" class="detail-image">
         <div class="detail-info">
           <h3>{{ selectedProduct.name }}</h3>
-          <p class="price">${{ selectedProduct.price }}</p>
+          <p class="price">KSh {{ selectedProduct.price }}</p>
           <p class="category" *ngIf="selectedProduct.category">{{ selectedProduct.category.name }}</p>
 
           <!-- Comments Section -->
@@ -93,7 +93,7 @@
                 </div>
                 <p *ngIf="repost.content">{{ repost.content }}</p>
                 <div class="reposted-product">
-                  <strong>Reposted:</strong> {{ repost.product.name }} - ${{ repost.product.price }}
+                  <strong>Reposted:</strong> {{ repost.product.name }} - KSh {{ repost.product.price }}
                 </div>
               </div>
             </div>

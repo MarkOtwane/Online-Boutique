@@ -1,14 +1,23 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import axios from 'axios';
 import { PrismaService } from '../prisma/prisma.service';
 import { InitiatePaymentDto, PaymentMethod } from './initiate-payment.dto';
 import { PaymentCallbackDto } from './payment-callback.dto';
-import axios from 'axios';
 
 @Injectable()
 export class PaymentsService {
   constructor(private prisma: PrismaService) {}
 
-  async initiatePayment(initiatePaymentDto: InitiatePaymentDto, userId: number) {
+  async initiatePayment(
+    initiatePaymentDto: InitiatePaymentDto,
+    userId: number,
+  ) {
     // Find the order
     const order = await this.prisma.order.findFirst({
       where: {
@@ -35,13 +44,21 @@ export class PaymentsService {
     const amount = initiatePaymentDto.amount || order.total;
 
     if (initiatePaymentDto.paymentMethod === PaymentMethod.MPESA) {
-      return await this.initiateMpesaPayment(order, initiatePaymentDto.phoneNumber, amount);
+      return await this.initiateMpesaPayment(
+        order,
+        initiatePaymentDto.phoneNumber,
+        amount,
+      );
     }
 
     throw new BadRequestException('Unsupported payment method');
   }
 
-  private async initiateMpesaPayment(order: any, phoneNumber: string, amount: number) {
+  private async initiateMpesaPayment(
+    order: any,
+    phoneNumber: string,
+    amount: number,
+  ) {
     // M-Pesa API integration
     const mpesaConfig = {
       consumerKey: process.env.MPESA_CONSUMER_KEY,
@@ -52,14 +69,16 @@ export class PaymentsService {
     };
 
     // Get access token
-    const auth = Buffer.from(`${mpesaConfig.consumerKey}:${mpesaConfig.consumerSecret}`).toString('base64');
+    const auth = Buffer.from(
+      `${mpesaConfig.consumerKey}:${mpesaConfig.consumerSecret}`,
+    ).toString('base64');
     const tokenResponse = await axios.get(
       `${mpesaConfig.baseUrl}/oauth/v1/generate?grant_type=client_credentials`,
       {
         headers: {
           Authorization: `Basic ${auth}`,
         },
-      }
+      },
     );
 
     const accessToken = tokenResponse.data.access_token;
@@ -68,13 +87,16 @@ export class PaymentsService {
     const formattedPhone = phoneNumber.startsWith('0')
       ? `254${phoneNumber.slice(1)}`
       : phoneNumber.startsWith('+254')
-      ? phoneNumber.slice(1)
-      : phoneNumber;
+        ? phoneNumber.slice(1)
+        : phoneNumber;
 
     // Generate timestamp and password
-    const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, -3);
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[^0-9]/g, '')
+      .slice(0, -3);
     const password = Buffer.from(
-      `${mpesaConfig.shortcode}${mpesaConfig.passkey}${timestamp}`
+      `${mpesaConfig.shortcode}${mpesaConfig.passkey}${timestamp}`,
     ).toString('base64');
 
     // STK Push request
@@ -100,7 +122,7 @@ export class PaymentsService {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     if (response.data.ResponseCode === '0') {
@@ -123,7 +145,9 @@ export class PaymentsService {
       };
     }
 
-    throw new BadRequestException(response.data.CustomerMessage || 'Failed to initiate payment');
+    throw new BadRequestException(
+      response.data.CustomerMessage || 'Failed to initiate payment',
+    );
   }
 
   async handlePaymentCallback(callbackDto: PaymentCallbackDto) {

@@ -7,15 +7,15 @@
       <mat-card-title>Order #{{ order.id }} - {{ order.createdAt | date: 'medium' }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <p><strong>Total:</strong> ${{ order.total }}</p>
+      <p><strong>Total:</strong> KSh {{ order.total }}</p>
       <p *ngIf="isAdmin"><strong>User:</strong> {{ order.user?.email }}</p>
       <div class="order-items">
         <h4>Items:</h4>
         <div *ngFor="let item of order.orderItems" class="order-item">
           <p><strong>{{ item.name }}</strong></p>
-          <p>Price: ${{ item.price }}</p>
+          <p>Price: KSh {{ item.price }}</p>
           <p>Quantity: {{ item.quantity }}</p>
-          <p>Subtotal: ${{ item.price * item.quantity }}</p>
+          <p>Subtotal: KSh {{ item.price * item.quantity }}</p>
         </div>
       </div>
     </mat-card-content>

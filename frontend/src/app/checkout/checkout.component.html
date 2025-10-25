@@ -14,9 +14,9 @@
       <p>
         <strong>{{ item.name }}</strong>
       </p>
-      <p>Price: ${{ item.price }}</p>
+      <p>Price: KSh {{ item.price }}</p>
       <p>Quantity: {{ item.quantity }}</p>
-      <p>Subtotal: ${{ item.price * item.quantity }}</p>
+      <p>Subtotal: KSh {{ item.price * item.quantity }}</p>
     </div>
     <div class="payment-section">
       <h3>Payment Method</h3>
@@ -46,7 +46,7 @@
     </div>
 
     <div class="cart-total">
-      <h3>Total: ${{ total }}</h3>
+      <h3>Total: KSh {{ total }}</h3>
       <button mat-raised-button color="primary" (click)="openConfirmDialog()">
         Place Order
       </button>

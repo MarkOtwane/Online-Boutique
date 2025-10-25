@@ -58,7 +58,7 @@
             <span>{{ product.category.name }}</span>
           </div>
           <div class="product-price">
-            <span class="price">${{ product.price | number:'1.2-2' }}</span>
+            <span class="price">KSh {{ product.price | number:'1.2-2' }}</span>
           </div>
           <button class="purchase-btn" (click)="onPurchase(product)">
             {{ isLoggedIn ? 'Add to Cart' : 'Sign In to Purchase' }}
@@ -94,7 +94,7 @@
           </svg>
         </div>
         <h3>Fast Shipping</h3>
-        <p>Free shipping on orders over $50</p>
+        <p>Free shipping on orders over KSh 50</p>
       </div>
       <div class="feature-item">
         <div class="feature-icon">

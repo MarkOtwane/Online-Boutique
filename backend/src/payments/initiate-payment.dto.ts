@@ -1,4 +1,11 @@
-import { IsEnum, IsNumber, IsOptional, IsString, IsPhoneNumber, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export enum PaymentMethod {
   MPESA = 'MPESA',

@@ -120,7 +120,7 @@ export class CartComponent implements OnInit {
   }
 
   getShipping(): number {
-    // Free shipping over $50
+    // Free shipping over KSh 50
     return this.getSubtotal() >= 50 ? 0 : 9.99;
   }
 
@@ -134,9 +134,9 @@ export class CartComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-KE', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'KES',
     }).format(amount);
   }
 

@@ -1,17 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
+  BadRequestException,
   Body,
   Controller,
   Post,
-  UseGuards,
   Request,
-  BadRequestException,
-  NotFoundException,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { PaymentsService } from './payments.service';
 import { InitiatePaymentDto } from './initiate-payment.dto';
 import { PaymentCallbackDto } from './payment-callback.dto';
+import { PaymentsService } from './payments.service';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -29,24 +29,33 @@ export class PaymentsController {
   @UseGuards(JwtAuthGuard)
   async initiatePayment(
     @Body(new ValidationPipe()) initiatePaymentDto: InitiatePaymentDto,
-    @Request() req: AuthenticatedRequest
+    @Request() req: AuthenticatedRequest,
   ) {
     try {
       const userId = req.user.id;
-      return await this.paymentsService.initiatePayment(initiatePaymentDto, userId);
+      return await this.paymentsService.initiatePayment(
+        initiatePaymentDto,
+        userId,
+      );
     } catch (error: any) {
       console.error('Payment initiation error:', error);
-      throw new BadRequestException(error.message || 'Failed to initiate payment');
+      throw new BadRequestException(
+        error.message || 'Failed to initiate payment',
+      );
     }
   }
 
   @Post('callback')
-  async handlePaymentCallback(@Body(new ValidationPipe()) callbackDto: PaymentCallbackDto) {
+  async handlePaymentCallback(
+    @Body(new ValidationPipe()) callbackDto: PaymentCallbackDto,
+  ) {
     try {
       return await this.paymentsService.handlePaymentCallback(callbackDto);
     } catch (error: any) {
       console.error('Payment callback error:', error);
-      throw new BadRequestException(error.message || 'Failed to process payment callback');
+      throw new BadRequestException(
+        error.message || 'Failed to process payment callback',
+      );
     }
   }
 
@@ -54,14 +63,19 @@ export class PaymentsController {
   @UseGuards(JwtAuthGuard)
   async checkPaymentStatus(
     @Body(new ValidationPipe()) body: { orderId: number },
-    @Request() req: AuthenticatedRequest
+    @Request() req: AuthenticatedRequest,
   ) {
     try {
       const userId = req.user.id;
-      return await this.paymentsService.checkPaymentStatus(body.orderId, userId);
+      return await this.paymentsService.checkPaymentStatus(
+        body.orderId,
+        userId,
+      );
     } catch (error: any) {
       console.error('Payment status check error:', error);
-      throw new BadRequestException(error.message || 'Failed to check payment status');
+      throw new BadRequestException(
+        error.message || 'Failed to check payment status',
+      );
     }
   }
 }

@@ -21,7 +21,7 @@
         <p>Items in Cart</p>
       </div>
       <div class="stat-card">
-        <h3>${{ totalCartValue.toFixed(2) }}</h3>
+        <h3>KSh {{ totalCartValue.toFixed(2) }}</h3>
         <p>Cart Value</p>
       </div>
       <div class="stat-card">
@@ -67,7 +67,7 @@
             <p>{{ order.createdAt | date:'medium' }}</p>
           </div>
           <div class="order-total">
-            <p><strong>${{ order.total }}</strong></p>
+            <p><strong>KSh {{ order.total }}</strong></p>
           </div>
         </div>
         <button *ngIf="orders.length > 3" class="btn btn-outline" (click)="goToOrderHistory()">
