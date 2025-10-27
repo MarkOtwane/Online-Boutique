@@ -1,31 +1,104 @@
-<div class="form-container">
-  <h2>Register</h2>
-  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
-  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input id="email" formControlName="email" type="email" placeholder="Enter email">
-      <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error">
-        <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required.</span>
-        <span *ngIf="registerForm.get('email')?.errors?.['email']">Invalid email format.</span>
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <div class="language-selector">
+        <mat-icon>language</mat-icon>
+        <select class="language-select">
+          <option value="en" selected>English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+      <div class="logo-section">
+        <div class="logo-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 4H8C5.79086 4 4 5.79086 4 8V16C4 18.2091 5.79086 20 8 20H16C18.2091 20 20 18.2091 20 16V8C20 5.79086 18.2091 4 16 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 12L16 8M16 8H13M16 8V11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1 class="register-title">Create Account</h1>
+        <p class="register-subtitle">Join us today and get started</p>
       </div>
     </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input id="password" formControlName="password" type="password" placeholder="Enter password">
-      <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error">
-        <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required.</span>
-        <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters.</span>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ successMessage }}</span>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <div class="form-field">
+        <label for="email" class="field-label">Email Address</label>
+        <div class="input-wrapper">
+          <mat-icon class="field-icon">email</mat-icon>
+          <input
+            id="email"
+            formControlName="email"
+            type="email"
+            placeholder="Enter your email address"
+            class="form-input"
+            autocomplete="email"
+          />
+        </div>
+        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="field-error">
+          <span *ngIf="registerForm.get('email')?.errors?.['required']">Email address is required</span>
+          <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+        </div>
       </div>
+
+      <div class="form-field">
+        <label for="password" class="field-label">Password</label>
+        <div class="input-wrapper">
+          <mat-icon class="field-icon">lock</mat-icon>
+          <input
+            id="password"
+            formControlName="password"
+            type="password"
+            placeholder="Create a strong password"
+            class="form-input"
+            autocomplete="new-password"
+          />
+        </div>
+        <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="field-error">
+          <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters long</span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="role" class="field-label">Account Type</label>
+        <div class="input-wrapper">
+          <mat-icon class="field-icon">person</mat-icon>
+          <select id="role" formControlName="role" class="form-select">
+            <option value="customer">Customer Account</option>
+            <option value="admin">Administrator Account</option>
+          </select>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="registerForm.invalid || registerForm.disabled"
+        class="register-button"
+        mat-raised-button
+        color="primary"
+      >
+        <mat-icon>person_add</mat-icon>
+        Create Account
+      </button>
+    </form>
+
+    <div class="register-footer">
+      <p class="login-link">
+        Already have an account?
+        <a [routerLink]="['/login']" class="link">Sign in here</a>
+      </p>
     </div>
-    <div class="form-group">
-      <label for="role">Role:</label>
-      <select id="role" formControlName="role">
-        <option value="customer">Customer</option>
-        <option value="admin">Admin</option>
-      </select>
-    </div>
-    <button type="submit" [disabled]="registerForm.invalid">Register</button>
-  </form>
+  </div>
 </div>

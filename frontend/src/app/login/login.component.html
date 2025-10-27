@@ -1,50 +1,92 @@
-<div class="form-container">
-  <h2>Login</h2>
-  <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
-  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="email">Email:</label>
-      <input
-        id="email"
-        formControlName="email"
-        type="email"
-        placeholder="Enter email"
-      />
-      <div
-        *ngIf="
-          loginForm.get('email')?.invalid && loginForm.get('email')?.touched
-        "
-        class="error"
-      >
-        <span *ngIf="loginForm.get('email')?.errors?.['required']"
-          >Email is required.</span
-        >
-        <span *ngIf="loginForm.get('email')?.errors?.['email']"
-          >Invalid email format.</span
-        >
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="language-selector">
+        <mat-icon>language</mat-icon>
+        <select class="language-select">
+          <option value="en" selected>English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+      <div class="logo-section">
+        <div class="logo-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1 class="login-title">Welcome Back</h1>
+        <p class="login-subtitle">Sign in to your account</p>
       </div>
     </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input
-        id="password"
-        formControlName="password"
-        type="password"
-        placeholder="Enter password"
-      />
-      <div
-        *ngIf="
-          loginForm.get('password')?.invalid &&
-          loginForm.get('password')?.touched
-        "
-        class="error"
-      >
-        <span *ngIf="loginForm.get('password')?.errors?.['required']"
-          >Password is required.</span
-        >
-      </div>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ successMessage }}</span>
     </div>
-    <button type="submit" [disabled]="loginForm.invalid">Login</button>
-  </form>
+    <div *ngIf="errorMessage" class="alert alert-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-field">
+        <label for="email" class="field-label">Email Address</label>
+        <div class="input-wrapper">
+          <mat-icon class="field-icon">email</mat-icon>
+          <input
+            id="email"
+            formControlName="email"
+            type="email"
+            placeholder="Enter your email address"
+            class="form-input"
+            autocomplete="email"
+          />
+        </div>
+        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="field-error">
+          <span *ngIf="loginForm.get('email')?.errors?.['required']">Email address is required</span>
+          <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="password" class="field-label">Password</label>
+        <div class="input-wrapper">
+          <mat-icon class="field-icon">lock</mat-icon>
+          <input
+            id="password"
+            formControlName="password"
+            type="password"
+            placeholder="Enter your password"
+            class="form-input"
+            autocomplete="current-password"
+          />
+        </div>
+        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="field-error">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || loginForm.disabled"
+        class="login-button"
+        mat-raised-button
+        color="primary"
+      >
+        <mat-icon>login</mat-icon>
+        Sign In
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p class="signup-link">
+        Don't have an account?
+        <a [routerLink]="['/register']" class="link">Create one here</a>
+      </p>
+    </div>
+  </div>
 </div>
