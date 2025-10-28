@@ -7,38 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-  CANCELLED
-}
-
-enum PaymentMethod {
-  MPESA
-  CARD
-  CASH
-}
-
 model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique
-  products  Product[]
   createdAt DateTime  @default(now())
+  products  Product[]
 }
 
 model Product {
   id           Int         @id @default(autoincrement())
   name         String
   price        Float
-  imageUrl     String? // Optional field for image path
+  imageUrl     String?
   createdAt    DateTime    @default(now())
   commentCount Int         @default(0)
   repostCount  Int         @default(0)
-  category     Category    @relation(fields: [categoryId], references: [id])
   categoryId   Int
-  orderItems   OrderItem[]
   comments     Comment[]
+  orderItems   OrderItem[]
+  category     Category    @relation(fields: [categoryId], references: [id])
   reposts      Repost[]
 }
 
@@ -48,41 +35,41 @@ model User {
   password         String
   role             String                        @default("customer")
   createdAt        DateTime                      @default(now())
-  orders           Order[] // Relation to Order
-  sentMessages     ChatMessage[]                 @relation("MessageSender")
-  receivedMessages ChatMessage[]                 @relation("MessageReceiver")
-  conversations    ChatConversationParticipant[]
-  comments         Comment[]
-  reposts          Repost[]
   isOnline         Boolean                       @default(false)
   lastSeen         DateTime                      @default(now())
+  conversations    ChatConversationParticipant[]
+  receivedMessages ChatMessage[]                 @relation("MessageReceiver")
+  sentMessages     ChatMessage[]                 @relation("MessageSender")
+  comments         Comment[]
+  orders           Order[]
+  reposts          Repost[]
 }
 
 model Order {
-  id                Int           @id @default(autoincrement())
-  user              User          @relation(fields: [userId], references: [id])
+  id                Int            @id @default(autoincrement())
   userId            Int
   total             Float
-  paymentStatus     PaymentStatus @default(PENDING)
+  paymentStatus     PaymentStatus  @default(PENDING)
   paymentMethod     PaymentMethod?
-  phoneNumber       String?       // For M-Pesa payments
-  transactionId     String?       // M-Pesa transaction reference
-  checkoutRequestId String?       // M-Pesa checkout request ID
-  paymentAmount     Float?        // Amount paid (in case of partial payments)
-  paymentDate       DateTime?     // When payment was completed
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  orderItems        OrderItem[]   // Relation to OrderItem
+  phoneNumber       String?
+  transactionId     String?
+  paymentAmount     Float?
+  paymentDate       DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  checkoutRequestId String?
+  user              User           @relation(fields: [userId], references: [id])
+  orderItems        OrderItem[]
 }
 
 model OrderItem {
   id        Int     @id @default(autoincrement())
-  order     Order   @relation(fields: [orderId], references: [id])
   orderId   Int
-  product   Product @relation(fields: [productId], references: [id])
   productId Int
   quantity  Int
-  price     Float // Price at the time of purchase
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 model Comment {
@@ -90,15 +77,15 @@ model Comment {
   productId          Int
   userId             Int
   content            String
-  parentId           Int? // For nested replies
+  parentId           Int?
   isAdminResponse    Boolean   @default(false)
   isOfficialResponse Boolean   @default(false)
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
-  product            Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   parent             Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies            Comment[] @relation("CommentReplies")
+  product            Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@index([userId])
@@ -110,12 +97,12 @@ model Repost {
   id        Int      @id @default(autoincrement())
   productId Int
   userId    Int
-  content   String?  // Optional quote or comment
+  content   String?
   createdAt DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([productId, userId])  // Prevent duplicate reposts
+  @@unique([productId, userId])
   @@index([productId])
   @@index([userId])
 }
@@ -144,16 +131,29 @@ model ChatMessage {
   id             Int              @id @default(autoincrement())
   conversationId Int
   senderId       Int
-  receiverId     Int? // For direct messages, null for group chats
+  receiverId     Int?
   content        String
   isRead         Boolean          @default(false)
   readAt         DateTime?
   createdAt      DateTime         @default(now())
   conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         User             @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
   receiver       User?            @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender         User             @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
   @@index([senderId])
   @@index([receiverId])
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  MPESA
+  CARD
+  CASH
 }
