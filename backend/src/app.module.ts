@@ -11,6 +11,7 @@ import { OrdersModule } from './orders/orders.module';
 import { PrismaService } from './prisma/prisma.service';
 import { ProductsModule } from './products/products.module';
 import { RepostsModule } from './reposts/reposts.module';
+import { ReactionsModule } from './reactions/reactions.module';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
 
@@ -23,6 +24,7 @@ import { PaymentsModule } from './payments/payments.module';
     OrdersModule,
     CommentsModule,
     RepostsModule,
+    ReactionsModule,
     ChatModule,
     DashboardModule,
     PaymentsModule,

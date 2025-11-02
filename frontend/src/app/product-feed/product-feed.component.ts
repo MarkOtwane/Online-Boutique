@@ -3,8 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../services/product.service';
 import { AuthService } from '../services/auth.service';
+import { CommentService } from '../services/comment.service';
+import { RepostService } from '../services/repost.service';
+import { ReactionService } from '../services/reaction.service';
 import { Product } from '../interfaces/product';
 import { Comment } from '../interfaces/comment';
+import { Repost } from '../interfaces/repost';
 
 @Component({
   selector: 'app-product-feed',
@@ -22,15 +26,20 @@ export class ProductFeedComponent implements OnInit, OnDestroy {
   newRepostContent = '';
   isLoading = false;
   errorMessage = '';
+  userReactions: Map<number, boolean> = new Map();
   private pollingInterval: any;
 
   constructor(
     private productService: ProductService,
-    private authService: AuthService
+    private authService: AuthService,
+    private commentService: CommentService,
+    private repostService: RepostService,
+    private reactionService: ReactionService
   ) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadUserReactions();
     this.startPolling();
   }
 
@@ -52,10 +61,12 @@ export class ProductFeedComponent implements OnInit, OnDestroy {
       next: (products) => {
         this.products = products;
         this.isLoading = false;
+        this.loadUserReactions();
       },
       error: (err) => {
         this.errorMessage = 'Failed to load products';
         this.isLoading = false;
+        console.error(err);
       }
     });
   }
@@ -75,21 +86,29 @@ export class ProductFeedComponent implements OnInit, OnDestroy {
   submitComment(): void {
     if (!this.selectedProduct || !this.newComment.trim()) return;
 
-    this.productService.createComment(this.selectedProduct.id, this.newComment).subscribe({
+    this.commentService.createComment({
+      productId: this.selectedProduct.id,
+      content: this.newComment.trim()
+    }).subscribe({
       next: () => {
         this.newComment = '';
         this.loadProductDetail(this.selectedProduct!.id);
       },
       error: (err) => {
         this.errorMessage = 'Failed to add comment';
+        console.error(err);
       }
     });
   }
 
   submitReply(): void {
-    if (!this.replyToCommentId || !this.newReply.trim()) return;
+    if (!this.replyToCommentId || !this.newReply.trim() || !this.selectedProduct) return;
 
-    this.productService.createComment(this.selectedProduct!.id, this.newReply, this.replyToCommentId).subscribe({
+    this.commentService.createComment({
+      productId: this.selectedProduct.id,
+      content: this.newReply.trim(),
+      parentId: this.replyToCommentId
+    }).subscribe({
       next: () => {
         this.newReply = '';
         this.replyToCommentId = null;
@@ -97,6 +116,7 @@ export class ProductFeedComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.errorMessage = 'Failed to add reply';
+        console.error(err);
       }
     });
   }
@@ -114,13 +134,17 @@ export class ProductFeedComponent implements OnInit, OnDestroy {
   submitRepost(): void {
     if (!this.selectedProduct) return;
 
-    this.productService.createRepost(this.selectedProduct.id, this.newRepostContent || undefined).subscribe({
+    this.repostService.createRepost(
+      this.selectedProduct.id,
+      this.newRepostContent.trim() || undefined
+    ).subscribe({
       next: () => {
         this.newRepostContent = '';
         this.loadProductDetail(this.selectedProduct!.id);
       },
       error: (err) => {
         this.errorMessage = 'Failed to repost';
+        console.error(err);
       }
     });
   }
@@ -139,24 +163,67 @@ export class ProductFeedComponent implements OnInit, OnDestroy {
   }
 
   deleteComment(commentId: number): void {
-    this.productService.deleteComment(commentId).subscribe({
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+
+    this.commentService.deleteComment(commentId).subscribe({
       next: () => {
         this.loadProductDetail(this.selectedProduct!.id);
       },
       error: (err) => {
         this.errorMessage = 'Failed to delete comment';
+        console.error(err);
       }
     });
   }
 
   deleteRepost(repostId: number): void {
-    this.productService.deleteRepost(repostId).subscribe({
+    if (!confirm('Are you sure you want to delete this repost?')) return;
+
+    this.repostService.deleteRepost(repostId).subscribe({
       next: () => {
         this.loadProductDetail(this.selectedProduct!.id);
       },
       error: (err) => {
         this.errorMessage = 'Failed to delete repost';
+        console.error(err);
       }
+    });
+  }
+
+  toggleReaction(productId: number): void {
+    if (!this.isAuthenticated()) {
+      this.errorMessage = 'Please login to react';
+      return;
+    }
+
+    this.reactionService.toggleReaction(productId).subscribe({
+      next: (response) => {
+        this.userReactions.set(productId, response.action === 'added');
+        this.loadProductDetail(productId);
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to toggle reaction';
+        console.error(err);
+      }
+    });
+  }
+
+  hasUserReacted(productId: number): boolean {
+    return this.userReactions.get(productId) || false;
+  }
+
+  loadUserReactions(): void {
+    if (!this.isAuthenticated()) return;
+
+    this.products.forEach(product => {
+      this.reactionService.getUserReaction(product.id).subscribe({
+        next: (reaction) => {
+          this.userReactions.set(product.id, !!reaction);
+        },
+        error: () => {
+          this.userReactions.set(product.id, false);
+        }
+      });
     });
   }
 

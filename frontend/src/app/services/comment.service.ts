@@ -21,7 +21,7 @@ export class CommentService {
   }
 
   getProductComments(productId: number): Observable<Comment[]> {
-    return this.http.get<Comment[]>(`${this.apiUrl}/products/${productId}/comments`, {
+    return this.http.get<Comment[]>(`${this.apiUrl}/comments/products/${productId}`, {
       headers: this.getHeaders(),
     });
   }

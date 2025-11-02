@@ -10,6 +10,7 @@ export interface Product {
   createdAt: string;
   commentCount: number;
   repostCount: number;
+  reactionCount: number;
   category?: Category;
   categoryId: number;
   imageUrl?: string;
