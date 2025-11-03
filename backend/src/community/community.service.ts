@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ForbiddenException,
   Injectable,
@@ -5,10 +7,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+  CommunityPostFilters,
+  CreateCommunityCommentDto,
   CreateCommunityPostDto,
   UpdateCommunityPostDto,
-  CreateCommunityCommentDto,
-  CommunityPostFilters,
 } from './community.dto';
 
 @Injectable()
@@ -500,10 +502,7 @@ export class CommunityService {
     // Delete comment and all its replies
     await this.prisma.communityComment.deleteMany({
       where: {
-        OR: [
-          { id: commentId },
-          { parentId: commentId },
-        ],
+        OR: [{ id: commentId }, { parentId: commentId }],
       },
     });
 

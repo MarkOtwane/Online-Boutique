@@ -306,12 +306,13 @@ export class ChatService {
     }
 
     // Check if user is already a participant
-    const isParticipant = await this.prisma.chatConversationParticipant.findFirst({
-      where: {
-        conversationId: groupChat.id,
-        userId,
-      },
-    });
+    const isParticipant =
+      await this.prisma.chatConversationParticipant.findFirst({
+        where: {
+          conversationId: groupChat.id,
+          userId,
+        },
+      });
 
     // If user is not a participant, add them
     if (!isParticipant) {

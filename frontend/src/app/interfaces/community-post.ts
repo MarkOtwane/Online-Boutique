@@ -95,4 +95,5 @@ export interface CommunityPostFilters {
   postType?: string;
   userId?: number;
   productId?: number;
+  [key: string]: string | number | boolean | undefined;
 }

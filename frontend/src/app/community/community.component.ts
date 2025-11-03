@@ -9,7 +9,7 @@ import { AuthService } from '../services/auth.service';
 import { Comment } from '../interfaces/comment';
 import { Product } from '../interfaces/product';
 import { User } from '../interfaces/user';
-import { CommunityPost } from '../interfaces/community-post';
+import { CommunityPost, CreateCommunityPostDto } from '../interfaces/community-post';
 
 interface DiscussionWithProduct extends Comment {
   product: Product;
@@ -93,7 +93,7 @@ export class CommunityComponent implements OnInit {
       return;
     }
 
-    const postData = {
+    const postData: CreateCommunityPostDto = {
       content: this.newPostContent,
       caption: this.newPostCaption,
       imageUrl: this.newPostImageUrl || undefined,

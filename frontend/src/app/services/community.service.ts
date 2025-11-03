@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   CommunityPost,
@@ -25,8 +25,15 @@ export class CommunityService {
   }
 
   getCommunityPosts(filters?: CommunityPostFilters): Observable<CommunityPost[]> {
-    const params = filters ? { params: filters } : {};
-    return this.http.get<CommunityPost[]>(`${this.apiUrl}/posts`, params);
+    let httpParams = new HttpParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          httpParams = httpParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.http.get<CommunityPost[]>(`${this.apiUrl}/posts`, { params: httpParams });
   }
 
   getCommunityPost(postId: number): Observable<CommunityPost> {

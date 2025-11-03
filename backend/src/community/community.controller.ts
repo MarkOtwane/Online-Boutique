@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   Body,
   Controller,
@@ -46,7 +48,10 @@ export class CommunityController {
 
   @Delete('posts/:id')
   @UseGuards(JwtAuthGuard)
-  async deleteCommunityPost(@Request() req: any, @Param('id', ParseIntPipe) postId: number) {
+  async deleteCommunityPost(
+    @Request() req: any,
+    @Param('id', ParseIntPipe) postId: number,
+  ) {
     return this.communityService.deleteCommunityPost(req.user.id, postId);
   }
 
@@ -57,18 +62,28 @@ export class CommunityController {
     @Param('id', ParseIntPipe) postId: number,
     @Body() dto: any,
   ) {
-    return this.communityService.createCommunityComment(req.user.id, postId, dto);
+    return this.communityService.createCommunityComment(
+      req.user.id,
+      postId,
+      dto,
+    );
   }
 
   @Delete('comments/:id')
   @UseGuards(JwtAuthGuard)
-  async deleteCommunityComment(@Request() req: any, @Param('id', ParseIntPipe) commentId: number) {
+  async deleteCommunityComment(
+    @Request() req: any,
+    @Param('id', ParseIntPipe) commentId: number,
+  ) {
     return this.communityService.deleteCommunityComment(req.user.id, commentId);
   }
 
   @Post('posts/:id/reactions')
   @UseGuards(JwtAuthGuard)
-  async toggleCommunityReaction(@Request() req: any, @Param('id', ParseIntPipe) postId: number) {
+  async toggleCommunityReaction(
+    @Request() req: any,
+    @Param('id', ParseIntPipe) postId: number,
+  ) {
     return this.communityService.toggleCommunityReaction(req.user.id, postId);
   }
 
@@ -79,7 +94,11 @@ export class CommunityController {
     @Param('id', ParseIntPipe) postId: number,
     @Body() body: { content?: string },
   ) {
-    return this.communityService.repostCommunityPost(req.user.id, postId, body.content);
+    return this.communityService.repostCommunityPost(
+      req.user.id,
+      postId,
+      body.content,
+    );
   }
 
   @Get('posts/type/:postType')
@@ -93,7 +112,9 @@ export class CommunityController {
   }
 
   @Get('posts/product/:productId')
-  async getProductCommunityPosts(@Param('productId', ParseIntPipe) productId: number) {
+  async getProductCommunityPosts(
+    @Param('productId', ParseIntPipe) productId: number,
+  ) {
     return this.communityService.getCommunityPosts({ productId });
   }
 }
