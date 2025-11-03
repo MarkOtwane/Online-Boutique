@@ -151,7 +151,7 @@ export class AdminOrdersComponent implements OnInit {
       case 'completed': return 'status-completed';
       case 'pending': return 'status-pending';
       case 'cancelled': return 'status-cancelled';
-      case 'shipped': return 'status-shipped';
+      case 'failed': return 'status-failed';
       default: return 'status-default';
     }
   }

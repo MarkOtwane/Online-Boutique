@@ -9,6 +9,16 @@ export class OrdersService {
     private logger: CustomLoggerService,
   ) {}
 
+  private mapPaymentStatusToFrontend(paymentStatus: PaymentStatus): string {
+    const statusMap: Record<PaymentStatus, string> = {
+      [PaymentStatus.PENDING]: 'pending',
+      [PaymentStatus.PAID]: 'completed',
+      [PaymentStatus.CANCELLED]: 'cancelled',
+      [PaymentStatus.FAILED]: 'failed',
+    };
+    return statusMap[paymentStatus] || paymentStatus.toLowerCase();
+  }
+
   async createOrder(
     userId: number,
     items: { productId: number; quantity: number }[],
@@ -51,7 +61,7 @@ export class OrdersService {
 
     this.logger.log(`Order ${order.id} created successfully`);
     // Map paymentStatus to status for frontend compatibility
-    return { ...order, status: order.paymentStatus } as any;
+    return { ...order, status: this.mapPaymentStatusToFrontend(order.paymentStatus) } as any;
   }
 
   async getUserOrders(userId: number): Promise<any[]> {
@@ -62,7 +72,7 @@ export class OrdersService {
       orderBy: { createdAt: 'desc' },
     });
     // Map paymentStatus to status for frontend compatibility
-    return orders.map((order) => ({ ...order, status: order.paymentStatus }));
+    return orders.map((order) => ({ ...order, status: this.mapPaymentStatusToFrontend(order.paymentStatus) }));
   }
 
   async getAllOrders(): Promise<any[]> {
@@ -72,23 +82,44 @@ export class OrdersService {
       orderBy: { createdAt: 'desc' },
     });
     // Map paymentStatus to status for frontend compatibility
-    return orders.map((order) => ({ ...order, status: order.paymentStatus }));
+    return orders.map((order) => ({ ...order, status: this.mapPaymentStatusToFrontend(order.paymentStatus) }));
   }
 
   async updateOrderStatus(orderId: number, status: string): Promise<any> {
     this.logger.log(`Updating order ${orderId} status to ${status}`);
 
-    // Map status to PaymentStatus enum
-    const paymentStatus = status.toUpperCase() as PaymentStatus;
+    // Map frontend status values to PaymentStatus enum
+    const statusMap: Record<string, PaymentStatus> = {
+      pending: PaymentStatus.PENDING,
+      processing: PaymentStatus.PENDING,
+      shipped: PaymentStatus.PAID,
+      completed: PaymentStatus.PAID,
+      cancelled: PaymentStatus.CANCELLED,
+      failed: PaymentStatus.FAILED,
+    };
+
+    const paymentStatus = statusMap[status.toLowerCase()];
+    
+    if (!paymentStatus) {
+      this.logger.error(`Invalid status value: ${status}`);
+      throw new BadRequestException(`Invalid status value: ${status}`);
+    }
 
     const order = await this.prisma.order.update({
-      where: { id: orderId },
+      where: { id: Number(orderId) },
       data: { paymentStatus },
       include: { orderItems: { include: { product: true } }, user: true },
     });
 
     this.logger.log(`Order ${orderId} status updated successfully`);
-    // Map paymentStatus to status for frontend compatibility
-    return { ...order, status: order.paymentStatus };
+    // Map paymentStatus back to the frontend status format
+    const reverseStatusMap: Record<PaymentStatus, string> = {
+      [PaymentStatus.PENDING]: status.toLowerCase() === 'processing' ? 'processing' : 'pending',
+      [PaymentStatus.PAID]: status.toLowerCase() === 'shipped' ? 'shipped' : 'completed',
+      [PaymentStatus.CANCELLED]: 'cancelled',
+      [PaymentStatus.FAILED]: 'failed',
+    };
+    
+    return { ...order, status: reverseStatusMap[order.paymentStatus] || order.paymentStatus.toLowerCase() };
   }
 }

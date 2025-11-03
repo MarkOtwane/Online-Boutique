@@ -24,6 +24,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     createdAt: '',
     commentCount: 0,
     repostCount: 0,
+    reactionCount: 0,
   };
   categories: Category[] = [];
   selectedFile: File | null = null;
