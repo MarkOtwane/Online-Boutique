@@ -2,7 +2,7 @@ export interface ChatMessage {
   id: number;
   conversationId: number;
   senderId: number;
-  receiverId: number;
+  receiverId?: number | null; // null for group messages
   content: string;
   createdAt: string;
   isRead: boolean;
@@ -11,7 +11,7 @@ export interface ChatMessage {
     email: string;
     role: string;
   };
-  receiver: {
+  receiver?: {
     id: number;
     email: string;
     role: string;
@@ -29,10 +29,12 @@ export interface ChatConversation {
   unreadCount: number;
   createdAt: string;
   updatedAt: string;
+  isGlobalGroup?: boolean;
 }
 
 export interface CreateMessageRequest {
-  receiverId: number;
+  conversationId: number;
+  receiverId?: number | null; // null for group messages
   content: string;
 }
 

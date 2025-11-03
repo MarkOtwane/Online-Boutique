@@ -267,4 +267,37 @@ export class ChatService {
   isUserTyping(userId: number): boolean {
     return this.typingUsersSubject.getValue().has(userId);
   }
+
+  // Global Group Chat Methods
+  getGlobalGroupChat(): Observable<ChatConversation> {
+    return this.http.get<ChatConversation>(`${this.apiUrl}/chat/global-group`, {
+      headers: this.getHeaders(),
+    });
+  }
+
+  joinGlobalGroupChat(conversationId: number): void {
+    this.joinConversation(conversationId);
+  }
+
+  leaveGlobalGroupChat(conversationId: number): void {
+    this.leaveConversation(conversationId);
+  }
+
+  sendGlobalGroupMessage(conversationId: number, content: string): void {
+    if (this.socket) {
+      this.socket.emit('sendMessage', { conversationId, content, receiverId: null });
+    }
+  }
+
+  formatMessageTime(timestamp: string): string {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
+    return date.toLocaleDateString();
+  }
 }

@@ -135,6 +135,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (!receiverId) return;
 
     const messageData: CreateMessageRequest = {
+      conversationId: this.activeConversation.id,
       receiverId,
       content: this.newMessage.trim(),
     };

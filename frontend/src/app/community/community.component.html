@@ -15,6 +15,13 @@
     </button>
     <button
       class="tab-button"
+      [class.active]="activeTab === 'chat'"
+      (click)="onTabChange('chat')"
+    >
+      <i class="fas fa-comments"></i> Group Chat
+    </button>
+    <button
+      class="tab-button"
       [class.active]="activeTab === 'discussions'"
       (click)="onTabChange('discussions')"
     >
@@ -157,6 +164,11 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Group Chat Tab -->
+  <div *ngIf="activeTab === 'chat'" class="group-chat-tab">
+    <app-group-chat></app-group-chat>
   </div>
 
   <!-- Product Discussions Tab -->

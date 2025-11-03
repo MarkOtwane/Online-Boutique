@@ -1,0 +1,95 @@
+<div class="group-chat-container">
+  <div class="chat-header">
+    <div class="chat-title">
+      <i class="fas fa-users"></i>
+      <h3>Community Chat</h3>
+      <span class="online-count">{{ getOnlineUsersCount() }} online</span>
+    </div>
+    <div class="chat-actions">
+      <button 
+        class="btn btn-sm btn-outline-primary" 
+        (click)="toggleOnlineUsers()"
+        [class.active]="showOnlineUsers"
+      >
+        <i class="fas fa-users"></i> Online Users
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading chat...</p>
+  </div>
+
+  <!-- Chat Interface -->
+  <div *ngIf="!loading && globalGroupChat" class="chat-interface">
+    <!-- Online Users Panel -->
+    <div *ngIf="showOnlineUsers" class="online-users-panel">
+      <h4>Online Users ({{ getOnlineUsersCount() }})</h4>
+      <div class="users-list">
+        <div *ngFor="let user of onlineUsers" class="user-item">
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="user-info">
+            <span class="username">{{ user.email }}</span>
+            <span class="user-role" [class]="user.role">{{ user.role }}</span>
+          </div>
+          <div class="online-indicator"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Area -->
+    <div class="messages-container" [class.with-users]="showOnlineUsers">
+      <div *ngIf="messages.length === 0" class="no-messages">
+        <i class="fas fa-comments"></i>
+        <p>No messages yet. Start the conversation!</p>
+      </div>
+
+      <div *ngFor="let message of messages" class="message" [class.own-message]="isCurrentUser(message.senderId)">
+        <div class="message-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="sender-name">{{ getSenderDisplayName(message.sender) }}</span>
+            <span class="message-time">{{ formatMessageTime(message.createdAt) }}</span>
+          </div>
+          <div class="message-text">{{ message.content }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-container">
+      <div class="input-group">
+        <textarea 
+          [(ngModel)]="newMessage" 
+          (keypress)="onKeyPress($event)"
+          placeholder="Type your message..."
+          class="form-control message-input"
+          rows="2"
+          [disabled]="!isConnected"
+        ></textarea>
+        <button 
+          class="btn btn-primary send-button" 
+          (click)="sendMessage()"
+          [disabled]="!newMessage.trim() || !isConnected"
+        >
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      <div class="connection-status" *ngIf="!isConnected">
+        <i class="fas fa-wifi"></i> Reconnecting...
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !globalGroupChat" class="error-state">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>Unable to load chat. Please try again later.</p>
+  </div>
+</div>

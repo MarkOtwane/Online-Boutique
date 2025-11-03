@@ -10,6 +10,7 @@ import { Comment } from '../interfaces/comment';
 import { Product } from '../interfaces/product';
 import { User } from '../interfaces/user';
 import { CommunityPost, CreateCommunityPostDto } from '../interfaces/community-post';
+import { GroupChatComponent } from '../chat/group-chat.component';
 
 interface DiscussionWithProduct extends Comment {
   product: Product;
@@ -18,7 +19,7 @@ interface DiscussionWithProduct extends Comment {
 @Component({
   selector: 'app-community',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, GroupChatComponent],
   templateUrl: './community.component.html',
   styleUrls: ['./community.component.css'],
 })
@@ -35,7 +36,7 @@ export class CommunityComponent implements OnInit {
   selectedProductId = '';
   searchQuery = '';
   currentUser: User | null = null;
-  activeTab: 'discussions' | 'community' = 'community'; // Default to community posts
+  activeTab: 'discussions' | 'community' | 'chat' = 'community'; // Default to community posts
   postTypeFilter = '';
   newPostContent = '';
   newPostCaption = '';
@@ -258,7 +259,7 @@ export class CommunityComponent implements OnInit {
   }
 
   // Event Handlers
-  onTabChange(tab: 'discussions' | 'community'): void {
+  onTabChange(tab: 'discussions' | 'community' | 'chat'): void {
     this.activeTab = tab;
     this.searchQuery = '';
     this.selectedProductId = '';
@@ -266,9 +267,10 @@ export class CommunityComponent implements OnInit {
     
     if (tab === 'community') {
       this.loadCommunityPosts();
-    } else {
+    } else if (tab === 'discussions') {
       this.loadAllDiscussions();
     }
+    // Chat tab doesn't need data loading as the component handles it internally
   }
 
   onProductFilterChange(): void {
