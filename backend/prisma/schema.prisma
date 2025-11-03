@@ -29,6 +29,7 @@ model Product {
   category     Category    @relation(fields: [categoryId], references: [id])
   reposts      Repost[]
   reactions    Reaction[]
+  communityPosts CommunityPost[]
 }
 
 model User {
@@ -46,6 +47,10 @@ model User {
   orders           Order[]
   reposts          Repost[]
   reactions        Reaction[]
+  communityPosts   CommunityPost[]
+  communityComments CommunityComment[]
+  communityReactions CommunityReaction[]
+  communityReposts CommunityRepost[]
 }
 
 model Order {
@@ -114,6 +119,7 @@ model ChatConversation {
   id           Int                           @id @default(autoincrement())
   createdAt    DateTime                      @default(now())
   updatedAt    DateTime                      @updatedAt
+  isGlobalGroup Boolean                      @default(false)
   participants ChatConversationParticipant[]
   messages     ChatMessage[]
 }
@@ -173,4 +179,84 @@ enum PaymentMethod {
   MPESA
   CARD
   CASH
+}
+
+model CommunityPost {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  productId     Int?
+  content       String
+  imageUrl      String?
+  caption       String
+  postType      PostType  @default(GENERAL)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  commentCount  Int       @default(0)
+  reactionCount Int       @default(0)
+  shareCount    Int       @default(0)
+  repostCount   Int       @default(0)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product       Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  comments      CommunityComment[]
+  reactions     CommunityReaction[]
+  reposts       CommunityRepost[]
+
+  @@index([userId])
+  @@index([productId])
+  @@index([postType])
+  @@index([createdAt])
+}
+
+model CommunityComment {
+  id             Int       @id @default(autoincrement())
+  communityPostId Int
+  userId         Int
+  content        String
+  parentId       Int?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  communityPost  CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent         CommunityComment? @relation("CommunityCommentReplies", fields: [parentId], references: [id])
+  replies        CommunityComment[] @relation("CommunityCommentReplies")
+
+  @@index([communityPostId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model CommunityReaction {
+  id            Int       @id @default(autoincrement())
+  communityPostId Int
+  userId        Int
+  type          String    @default("like")
+  createdAt     DateTime  @default(now())
+  communityPost CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityPostId, userId])
+  @@index([communityPostId])
+  @@index([userId])
+}
+
+model CommunityRepost {
+  id            Int       @id @default(autoincrement())
+  communityPostId Int
+  userId        Int
+  content       String?
+  createdAt     DateTime  @default(now())
+  communityPost CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityPostId, userId])
+  @@index([communityPostId])
+  @@index([userId])
+}
+
+enum PostType {
+  GENERAL
+  PRODUCT_REVIEW
+  LIFESTYLE
+  TRENDS
+  ADMIN_ANNOUNCEMENT
 }

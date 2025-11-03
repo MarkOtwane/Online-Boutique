@@ -6,6 +6,7 @@ import { CustomLoggerService } from './auth/logger.service';
 import { CategoriesModule } from './categories/categories.module';
 import { ChatModule } from './chat/chat.module';
 import { CommentsModule } from './comments/comments.module';
+import { CommunityModule } from './community/community.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { OrdersModule } from './orders/orders.module';
 import { PrismaService } from './prisma/prisma.service';
@@ -26,6 +27,7 @@ import { PaymentsModule } from './payments/payments.module';
     RepostsModule,
     ReactionsModule,
     ChatModule,
+    CommunityModule,
     DashboardModule,
     PaymentsModule,
   ],

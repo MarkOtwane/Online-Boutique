@@ -288,6 +288,72 @@ export class ChatService {
     });
   }
 
+  async getOrCreateGlobalGroupChat(userId: number) {
+    // Check if a global group chat already exists
+    let groupChat = await this.prisma.chatConversation.findFirst({
+      where: {
+        isGlobalGroup: true,
+      },
+    });
+
+    // If no global group chat exists, create one
+    if (!groupChat) {
+      groupChat = await this.prisma.chatConversation.create({
+        data: {
+          isGlobalGroup: true,
+        },
+      });
+    }
+
+    // Check if user is already a participant
+    const isParticipant = await this.prisma.chatConversationParticipant.findFirst({
+      where: {
+        conversationId: groupChat.id,
+        userId,
+      },
+    });
+
+    // If user is not a participant, add them
+    if (!isParticipant) {
+      await this.prisma.chatConversationParticipant.create({
+        data: {
+          conversationId: groupChat.id,
+          userId,
+        },
+      });
+    }
+
+    // Get fresh data with participants and user info
+    const freshGroupChat = await this.prisma.chatConversation.findUnique({
+      where: { id: groupChat.id },
+      include: {
+        participants: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+                isOnline: true,
+                lastSeen: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!freshGroupChat) {
+      throw new Error('Failed to create or find global group chat');
+    }
+
+    return {
+      ...freshGroupChat,
+      participants: freshGroupChat.participants.map((p) => p.user),
+      unreadCount: 0,
+    };
+  }
+
   async markMessageAsRead(userId: number, messageId: number) {
     const message = await this.prisma.chatMessage.findUnique({
       where: { id: messageId },

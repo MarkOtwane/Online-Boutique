@@ -89,4 +89,10 @@ export class ChatController {
   async setOnlineStatus(@Request() req, @Body() body: { isOnline: boolean }) {
     return this.chatService.setUserOnlineStatus(req.user.id, body.isOnline);
   }
+
+  @Get('global-group')
+  @UseGuards(JwtAuthGuard)
+  async getGlobalGroupChat(@Request() req) {
+    return this.chatService.getOrCreateGlobalGroupChat(req.user.id);
+  }
 }
