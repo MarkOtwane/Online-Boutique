@@ -71,16 +71,8 @@
         </div>
       </div>
 
-      <div class="form-field">
-        <label for="role" class="field-label">Account Type</label>
-        <div class="input-wrapper">
-          <mat-icon class="field-icon">person</mat-icon>
-          <select id="role" formControlName="role" class="form-select">
-            <option value="customer">Customer Account</option>
-            <option value="admin">Administrator Account</option>
-          </select>
-        </div>
-      </div>
+      <!-- Role selection removed - all new registrations are customer accounts -->
+      <!-- Admin accounts are seeded or manually promoted in the database -->
 
       <button
         type="submit"

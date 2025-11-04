@@ -53,13 +53,12 @@ export class AuthService {
 
   register(
     email: string,
-    password: string,
-    role: string = 'customer'
+    password: string
   ): Observable<{ access_token: string; user: User }> {
     return this.http
       .post<{ access_token: string; user: User }>(
         `${this.apiUrl}${API_CONFIG.ENDPOINTS.AUTH.REGISTER}`,
-        { email, password, role }
+        { email, password }
       )
       .pipe(
         tap((response) => {

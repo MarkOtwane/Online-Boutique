@@ -11,7 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -24,8 +23,7 @@ import { AuthService } from '../services/auth.service';
     MatIconModule,
     MatButtonModule,
     MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule
+    MatFormFieldModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
@@ -43,14 +41,13 @@ export class RegisterComponent {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      role: ['customer', Validators.required],
     });
   }
 
   onSubmit(): void {
     if (this.registerForm.valid) {
-      const { email, password, role } = this.registerForm.value;
-      this.authService.register(email, password, role).subscribe({
+      const { email, password } = this.registerForm.value;
+      this.authService.register(email, password).subscribe({
         next: () => {
           this.successMessage =
             'Registration successful! Redirecting to login...';

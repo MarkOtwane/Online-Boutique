@@ -14,12 +14,13 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(email: string, password: string, role?: string) {
+  async register(email: string, password: string) {
     try {
+      // Always register as customer - admin accounts are seeded or manually promoted
       const user = await this.usersService.createUser({
         email,
         password,
-        role,
+        role: 'customer', // Enforce customer role for registration
       });
       const payload = { sub: user.id, email: user.email, role: user.role };
       return {
