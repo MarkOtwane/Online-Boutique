@@ -15,42 +15,42 @@ model Category {
 }
 
 model Product {
-  id           Int         @id @default(autoincrement())
-  name         String
-  price        Float
-  imageUrl     String?
-  createdAt    DateTime    @default(now())
-  commentCount Int         @default(0)
-  repostCount  Int         @default(0)
-  reactionCount Int        @default(0)
-  categoryId   Int
-  comments     Comment[]
-  orderItems   OrderItem[]
-  category     Category    @relation(fields: [categoryId], references: [id])
-  reposts      Repost[]
-  reactions    Reaction[]
+  id             Int             @id @default(autoincrement())
+  name           String
+  price          Float
+  imageUrl       String?
+  createdAt      DateTime        @default(now())
+  commentCount   Int             @default(0)
+  repostCount    Int             @default(0)
+  categoryId     Int
+  reactionCount  Int             @default(0)
+  comments       Comment[]
   communityPosts CommunityPost[]
+  orderItems     OrderItem[]
+  category       Category        @relation(fields: [categoryId], references: [id])
+  reactions      Reaction[]
+  reposts        Repost[]
 }
 
 model User {
-  id               Int                           @id @default(autoincrement())
-  email            String                        @unique
-  password         String
-  role             String                        @default("customer")
-  createdAt        DateTime                      @default(now())
-  isOnline         Boolean                       @default(false)
-  lastSeen         DateTime                      @default(now())
-  conversations    ChatConversationParticipant[]
-  receivedMessages ChatMessage[]                 @relation("MessageReceiver")
-  sentMessages     ChatMessage[]                 @relation("MessageSender")
-  comments         Comment[]
-  orders           Order[]
-  reposts          Repost[]
-  reactions        Reaction[]
-  communityPosts   CommunityPost[]
-  communityComments CommunityComment[]
+  id                 Int                           @id @default(autoincrement())
+  email              String                        @unique
+  password           String
+  role               String                        @default("customer")
+  createdAt          DateTime                      @default(now())
+  isOnline           Boolean                       @default(false)
+  lastSeen           DateTime                      @default(now())
+  conversations      ChatConversationParticipant[]
+  receivedMessages   ChatMessage[]                 @relation("MessageReceiver")
+  sentMessages       ChatMessage[]                 @relation("MessageSender")
+  comments           Comment[]
+  communityComments  CommunityComment[]
+  communityPosts     CommunityPost[]
   communityReactions CommunityReaction[]
-  communityReposts CommunityRepost[]
+  communityReposts   CommunityRepost[]
+  orders             Order[]
+  reactions          Reaction[]
+  reposts            Repost[]
 }
 
 model Order {
@@ -116,12 +116,12 @@ model Repost {
 }
 
 model ChatConversation {
-  id           Int                           @id @default(autoincrement())
-  createdAt    DateTime                      @default(now())
-  updatedAt    DateTime                      @updatedAt
-  isGlobalGroup Boolean                      @default(false)
-  participants ChatConversationParticipant[]
-  messages     ChatMessage[]
+  id            Int                           @id @default(autoincrement())
+  createdAt     DateTime                      @default(now())
+  updatedAt     DateTime                      @updatedAt
+  isGlobalGroup Boolean                       @default(false)
+  participants  ChatConversationParticipant[]
+  messages      ChatMessage[]
 }
 
 model ChatConversationParticipant {
@@ -154,13 +154,6 @@ model ChatMessage {
   @@index([receiverId])
 }
 
-enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-  CANCELLED
-}
-
 model Reaction {
   id        Int      @id @default(autoincrement())
   productId Int
@@ -175,29 +168,23 @@ model Reaction {
   @@index([userId])
 }
 
-enum PaymentMethod {
-  MPESA
-  CARD
-  CASH
-}
-
 model CommunityPost {
-  id            Int       @id @default(autoincrement())
+  id            Int                 @id @default(autoincrement())
   userId        Int
   productId     Int?
   content       String
   imageUrl      String?
   caption       String
-  postType      PostType  @default(GENERAL)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  commentCount  Int       @default(0)
-  reactionCount Int       @default(0)
-  shareCount    Int       @default(0)
-  repostCount   Int       @default(0)
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product       Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  postType      PostType            @default(GENERAL)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  commentCount  Int                 @default(0)
+  reactionCount Int                 @default(0)
+  shareCount    Int                 @default(0)
+  repostCount   Int                 @default(0)
   comments      CommunityComment[]
+  product       Product?            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   reactions     CommunityReaction[]
   reposts       CommunityRepost[]
 
@@ -208,17 +195,17 @@ model CommunityPost {
 }
 
 model CommunityComment {
-  id             Int       @id @default(autoincrement())
+  id              Int                @id @default(autoincrement())
   communityPostId Int
-  userId         Int
-  content        String
-  parentId       Int?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  communityPost  CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parent         CommunityComment? @relation("CommunityCommentReplies", fields: [parentId], references: [id])
-  replies        CommunityComment[] @relation("CommunityCommentReplies")
+  userId          Int
+  content         String
+  parentId        Int?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  communityPost   CommunityPost      @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
+  parent          CommunityComment?  @relation("CommunityCommentReplies", fields: [parentId], references: [id])
+  replies         CommunityComment[] @relation("CommunityCommentReplies")
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([communityPostId])
   @@index([userId])
@@ -226,13 +213,13 @@ model CommunityComment {
 }
 
 model CommunityReaction {
-  id            Int       @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   communityPostId Int
-  userId        Int
-  type          String    @default("like")
-  createdAt     DateTime  @default(now())
-  communityPost CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int
+  type            String        @default("like")
+  createdAt       DateTime      @default(now())
+  communityPost   CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([communityPostId, userId])
   @@index([communityPostId])
@@ -240,17 +227,30 @@ model CommunityReaction {
 }
 
 model CommunityRepost {
-  id            Int       @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   communityPostId Int
-  userId        Int
-  content       String?
-  createdAt     DateTime  @default(now())
-  communityPost CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int
+  content         String?
+  createdAt       DateTime      @default(now())
+  communityPost   CommunityPost @relation(fields: [communityPostId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([communityPostId, userId])
   @@index([communityPostId])
   @@index([userId])
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  MPESA
+  CARD
+  CASH
 }
 
 enum PostType {
