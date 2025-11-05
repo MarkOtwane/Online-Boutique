@@ -270,7 +270,7 @@ export class ChatService {
 
   // Global Group Chat Methods
   getGlobalGroupChat(): Observable<ChatConversation> {
-    return this.http.get<ChatConversation>(`${this.apiUrl}/chat/global-group`, {
+    return this.http.get<ChatConversation>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.CHAT.GLOBAL_GROUP}`, {
       headers: this.getHeaders(),
     });
   }

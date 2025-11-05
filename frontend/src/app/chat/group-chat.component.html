@@ -1,17 +1,92 @@
 <div class="group-chat-container">
   <div class="chat-header">
     <div class="chat-title">
-      <i class="fas fa-users"></i>
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17 21V19C17 16.7909 15.2091 15 13 15H5C2.79086 15 1 16.7909 1 19V21"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <circle
+          cx="9"
+          cy="7"
+          r="4"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M23 21V19C23 17.1362 21.7252 15.57 19.9 15.16"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M16 3.13C17.725 3.59 18.725 5.03 18.725 6.7C18.725 8.37 17.725 9.81 16 10.27"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
       <h3>Community Chat</h3>
       <span class="online-count">{{ getOnlineUsersCount() }} online</span>
     </div>
     <div class="chat-actions">
-      <button 
-        class="btn btn-sm btn-outline-primary" 
+      <button
+        class="btn btn-sm btn-outline-primary"
         (click)="toggleOnlineUsers()"
         [class.active]="showOnlineUsers"
       >
-        <i class="fas fa-users"></i> Online Users
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M17 21V19C17 16.7909 15.2091 15 13 15H5C2.79086 15 1 16.7909 1 19V21"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <circle
+            cx="9"
+            cy="7"
+            r="4"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M23 21V19C23 17.1362 21.7252 15.57 19.9 15.16"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M16 3.13C17.725 3.59 18.725 5.03 18.725 6.7C18.725 8.37 17.725 9.81 16 10.27"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        Online Users
       </button>
     </div>
   </div>
@@ -48,14 +123,22 @@
         <p>No messages yet. Start the conversation!</p>
       </div>
 
-      <div *ngFor="let message of messages" class="message" [class.own-message]="isCurrentUser(message.senderId)">
+      <div
+        *ngFor="let message of messages"
+        class="message"
+        [class.own-message]="isCurrentUser(message.senderId)"
+      >
         <div class="message-avatar">
           <i class="fas fa-user"></i>
         </div>
         <div class="message-content">
           <div class="message-header">
-            <span class="sender-name">{{ getSenderDisplayName(message.sender) }}</span>
-            <span class="message-time">{{ formatMessageTime(message.createdAt) }}</span>
+            <span class="sender-name">{{
+              getSenderDisplayName(message.sender)
+            }}</span>
+            <span class="message-time">{{
+              formatMessageTime(message.createdAt)
+            }}</span>
           </div>
           <div class="message-text">{{ message.content }}</div>
         </div>
@@ -65,16 +148,16 @@
     <!-- Message Input -->
     <div class="message-input-container">
       <div class="input-group">
-        <textarea 
-          [(ngModel)]="newMessage" 
+        <textarea
+          [(ngModel)]="newMessage"
           (keypress)="onKeyPress($event)"
           placeholder="Type your message..."
           class="form-control message-input"
           rows="2"
           [disabled]="!isConnected"
         ></textarea>
-        <button 
-          class="btn btn-primary send-button" 
+        <button
+          class="btn btn-primary send-button"
           (click)="sendMessage()"
           [disabled]="!newMessage.trim() || !isConnected"
         >

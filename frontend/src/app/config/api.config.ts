@@ -33,6 +33,7 @@ export const API_CONFIG = {
       MESSAGES: '/chat/messages',
       MESSAGE_READ: (id: number) => `/chat/messages/${id}/read`,
       ONLINE_USERS: '/chat/users/online',
+      GLOBAL_GROUP: '/chat/global-group',
     },
   },
 };
