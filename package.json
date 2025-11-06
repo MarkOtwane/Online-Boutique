@@ -1,11 +1,11 @@
 {
-  "name": "online-boutique-backend",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "build": "cd backend && npm run build",
-    "start:prod": "cd backend && npm run start:prod",
-    "prebuild": "cd backend && npm install",
-    "postinstall": "cd backend && npm install"
-  }
+	"name": "online-boutique-backend",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"build": "cd backend && npm run build",
+		"start:prod": "node backend/dist/main.js",
+		"prebuild": "cd backend && npm install",
+		"postinstall": "cd backend && npm install"
+	}
 }
