@@ -396,7 +396,7 @@ export class CommunityService {
         data: {
           communityPostId: postId,
           userId,
-          type: 'like',
+          reactionKind: 'like',
         },
         include: {
           user: {

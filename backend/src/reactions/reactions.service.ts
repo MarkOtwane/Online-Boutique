@@ -48,7 +48,7 @@ export class ReactionsService {
         data: {
           productId,
           userId,
-          type: 'like',
+          reactionKind: 'like',
         },
       });
 
