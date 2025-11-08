@@ -16,6 +16,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({
@@ -31,7 +32,10 @@ export class ChatGateway
 
   private connectedUsers: Map<string, number> = new Map();
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   afterInit(server: Server) {
     console.log('Chat Gateway initialized');
@@ -45,19 +49,32 @@ export class ChatGateway
         client.handshake.headers?.authorization?.split(' ')[1];
 
       if (!token) {
+        console.log('No token provided, disconnecting client');
         client.disconnect();
         return;
       }
 
-      // Here you would verify the JWT token and get user info
-      // For now, we'll use a simple approach
-      const userId = client.handshake.auth?.userId;
-      if (userId) {
-        this.connectedUsers.set(client.id, userId);
-        await this.chatService.setUserOnlineStatus(userId, true);
+      // Verify JWT token and extract user info
+      try {
+        const payload = this.jwtService.verify(token, {
+          secret: 'your-secret-key',
+        });
+        const userId = payload.sub;
 
-        // Notify other users that this user is online
-        client.broadcast.emit('userOnline', { userId });
+        if (userId) {
+          this.connectedUsers.set(client.id, userId);
+          await this.chatService.setUserOnlineStatus(userId, true);
+
+          // Notify other users that this user is online
+          client.broadcast.emit('userOnline', { userId });
+          console.log(`User ${userId} connected via WebSocket`);
+        } else {
+          console.log('No userId in token payload, disconnecting');
+          client.disconnect();
+        }
+      } catch (jwtError) {
+        console.error('JWT verification failed:', jwtError);
+        client.disconnect();
       }
     } catch (error) {
       console.error('Connection error:', error);
@@ -101,7 +118,7 @@ export class ChatGateway
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody()
-    data: { conversationId: number; content: string; receiverId: number },
+    data: { conversationId: number; content: string; receiverId?: number | null },
   ) {
     try {
       const userId = this.connectedUsers.get(client.id);
@@ -111,7 +128,8 @@ export class ChatGateway
 
       // Save message to database
       const message = await this.chatService.sendMessage(userId, {
-        receiverId: data.receiverId,
+        conversationId: data.conversationId,
+        receiverId: data.receiverId || null, // Allow null for group messages
         content: data.content,
       });
 
