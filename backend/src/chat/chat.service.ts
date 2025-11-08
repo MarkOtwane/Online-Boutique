@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   ForbiddenException,
   Injectable,
@@ -202,37 +204,63 @@ export class ChatService {
   }
 
   async sendMessage(userId: number, dto: CreateMessageDto) {
-    // Find or create conversation between users
-    let conversation = await this.prisma.chatConversation.findFirst({
-      where: {
-        participants: {
-          every: {
-            userId: {
-              in: [userId, dto.receiverId],
+    let conversation;
+
+    if (dto.conversationId) {
+      // Sending to an existing conversation (could be private or group)
+      conversation = await this.prisma.chatConversation.findFirst({
+        where: {
+          id: dto.conversationId,
+          participants: {
+            some: {
+              userId,
             },
           },
         },
-      },
-    });
-
-    if (!conversation) {
-      conversation = await this.prisma.chatConversation.create({
-        data: {},
       });
 
-      // Add participants
-      await this.prisma.chatConversationParticipant.createMany({
-        data: [
-          {
-            conversationId: conversation.id,
-            userId,
+      if (!conversation) {
+        throw new ForbiddenException(
+          'You are not a participant in this conversation',
+        );
+      }
+    } else if (dto.receiverId) {
+      // Creating new private conversation
+      conversation = await this.prisma.chatConversation.findFirst({
+        where: {
+          participants: {
+            every: {
+              userId: {
+                in: [userId, dto.receiverId],
+              },
+            },
           },
-          {
-            conversationId: conversation.id,
-            userId: dto.receiverId,
-          },
-        ],
+        },
       });
+
+      if (!conversation) {
+        conversation = await this.prisma.chatConversation.create({
+          data: {},
+        });
+
+        // Add participants
+        await this.prisma.chatConversationParticipant.createMany({
+          data: [
+            {
+              conversationId: conversation.id,
+              userId,
+            },
+            {
+              conversationId: conversation.id,
+              userId: dto.receiverId,
+            },
+          ],
+        });
+      }
+    } else {
+      throw new ForbiddenException(
+        'Either conversationId or receiverId must be provided',
+      );
     }
 
     // Create the message
@@ -240,7 +268,7 @@ export class ChatService {
       data: {
         conversationId: conversation.id,
         senderId: userId,
-        receiverId: dto.receiverId,
+        receiverId: dto.receiverId || null, // Allow null for group messages
         content: dto.content,
       },
       include: {
@@ -251,13 +279,15 @@ export class ChatService {
             role: true,
           },
         },
-        receiver: {
-          select: {
-            id: true,
-            email: true,
-            role: true,
-          },
-        },
+        receiver: dto.receiverId
+          ? {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+              },
+            }
+          : false,
       },
     });
 

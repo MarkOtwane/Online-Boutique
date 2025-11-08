@@ -1,8 +1,13 @@
-import { IsInt, IsString, MinLength } from 'class-validator';
+import { IsInt, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateMessageDto {
+  @IsOptional()
   @IsInt()
-  receiverId: number;
+  receiverId?: number;
+
+  @IsOptional()
+  @IsInt()
+  conversationId?: number;
 
   @IsString()
   @MinLength(1)
