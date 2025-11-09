@@ -396,7 +396,7 @@ export class CommunityService {
         data: {
           communityPostId: postId,
           userId,
-          reactionKind: 'like',
+          type: 'like',
         },
         include: {
           user: {
@@ -459,7 +459,7 @@ export class CommunityService {
             role: true,
           },
         },
-        communityPost: {
+        post: {
           include: {
             user: {
               select: {
