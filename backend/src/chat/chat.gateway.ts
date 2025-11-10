@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -16,7 +17,6 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { JwtService } from '@nestjs/jwt';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({
@@ -57,7 +57,7 @@ export class ChatGateway
       // Verify JWT token and extract user info
       try {
         const payload = this.jwtService.verify(token, {
-          secret: 'your-secret-key',
+          secret: process.env.JWT_SECRET,
         });
         const userId = payload.sub;
 
@@ -118,7 +118,11 @@ export class ChatGateway
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody()
-    data: { conversationId: number; content: string; receiverId?: number | null },
+    data: {
+      conversationId: number;
+      content: string;
+      receiverId?: number | null;
+    },
   ) {
     try {
       const userId = this.connectedUsers.get(client.id);
