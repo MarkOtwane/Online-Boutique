@@ -15,6 +15,8 @@ import { RepostsModule } from './reposts/reposts.module';
 import { ReactionsModule } from './reactions/reactions.module';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
+import { MailerModule } from './mailer/mailer.module';
+import { TrackingModule } from './tracking/tracking.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { PaymentsModule } from './payments/payments.module';
     CommunityModule,
     DashboardModule,
     PaymentsModule,
+    MailerModule,
+    TrackingModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, CustomLoggerService],

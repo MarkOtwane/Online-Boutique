@@ -21,6 +21,7 @@
     <!-- Navigation -->
     <nav class="nav-links">
       <a routerLink="/products">PRODUCTS</a>
+      <a routerLink="/tracking">TRACKING</a>
       <a routerLink="/chat" *ngIf="authService.isAuthenticated() && authService.getUser()?.role === 'customer'">CHAT</a>
       <a routerLink="/about">ABOUT</a>
       <a routerLink="/contact">CONTACT</a>

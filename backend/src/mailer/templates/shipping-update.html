@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Shipping Update - Boutique</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #059669; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .tracking-info { background: white; padding: 15px; margin: 20px 0; border-radius: 5px; border-left: 4px solid #059669; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .button { display: inline-block; padding: 10px 20px; background: #059669; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Shipping Update</h1>
+            <p>Your order is on the way!</p>
+        </div>
+
+        <div class="content">
+            <p>Dear Customer,</p>
+            <p>Great news! Your order has been shipped and is now on its way to you.</p>
+
+            <div class="tracking-info">
+                <h3>Tracking Information</h3>
+                <p><strong>Order #:</strong> {{orderId}}</p>
+                <p><strong>Tracking Number:</strong> {{trackingId}}</p>
+                <p><strong>Current Status:</strong> {{status}}</p>
+                <p><strong>Shipped Date:</strong> {{shippedDate}}</p>
+                {{#if estimatedDelivery}}
+                <p><strong>Estimated Delivery:</strong> {{estimatedDelivery}}</p>
+                {{/if}}
+            </div>
+
+            <p>You can track your package in real-time by visiting our tracking page and entering your tracking number.</p>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="{{trackingUrl}}" class="button">Track Your Package</a>
+            </div>
+
+            <p>If you have any questions about your shipment, please don't hesitate to contact us.</p>
+
+            <p>Thank you for shopping with us!</p>
+            <p>Best regards,<br>The Boutique Team</p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>&copy; 2025 Boutique. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Delivery Confirmation - Boutique</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #7c3aed; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .delivery-info { background: white; padding: 15px; margin: 20px 0; border-radius: 5px; border-left: 4px solid #7c3aed; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .button { display: inline-block; padding: 10px 20px; background: #7c3aed; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Package Delivered!</h1>
+            <p>Your order has been successfully delivered</p>
+        </div>
+
+        <div class="content">
+            <p>Dear Customer,</p>
+            <p>We're happy to confirm that your order has been successfully delivered!</p>
+
+            <div class="delivery-info">
+                <h3>Delivery Details</h3>
+                <p><strong>Order #:</strong> {{orderId}}</p>
+                <p><strong>Tracking Number:</strong> {{trackingId}}</p>
+                <p><strong>Delivered Date:</strong> {{deliveredDate}}</p>
+                <p><strong>Delivery Location:</strong> {{deliveryLocation}}</p>
+            </div>
+
+            <p>We hope you love your purchase! If you have any feedback or questions about your order, please don't hesitate to reach out.</p>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="{{reviewUrl}}" class="button">Leave a Review</a>
+            </div>
+
+            <p>Thank you for choosing Boutique for your shopping needs. We look forward to serving you again!</p>
+
+            <p>Best regards,<br>The Boutique Team</p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>&copy; 2025 Boutique. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

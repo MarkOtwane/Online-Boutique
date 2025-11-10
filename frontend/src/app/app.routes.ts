@@ -20,6 +20,7 @@ import { ProductDetailComponent } from './product-detail/product-detail.componen
 import { ChatComponent } from './chat/chat.component';
 import { CommunityComponent } from './community/community.component';
 import { ProductFeedComponent } from './product-feed/product-feed.component';
+import { TrackingComponent } from './tracking/tracking.component';
 
 export const routes: Routes = [
        { path: '', component: HomeComponent },
@@ -28,6 +29,7 @@ export const routes: Routes = [
        { path: 'product/:id', component: ProductDetailComponent },
        { path: 'cart', component: CartComponent },
        { path: 'community', component: CommunityComponent },
+       { path: 'tracking', component: TrackingComponent },
       {
         path: 'user',
         component: UserLayoutComponent,

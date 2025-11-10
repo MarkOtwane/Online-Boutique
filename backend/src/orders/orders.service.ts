@@ -1,12 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PaymentStatus } from '@prisma/client';
 import { CustomLoggerService } from '../auth/logger.service';
+import { MailerService } from '../mailer/mailer.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { TrackingService } from '../tracking/tracking.service';
 @Injectable()
 export class OrdersService {
   constructor(
     private prisma: PrismaService,
     private logger: CustomLoggerService,
+    private trackingService: TrackingService,
+    private mailerService: MailerService,
   ) {}
 
   private mapPaymentStatusToFrontend(paymentStatus: PaymentStatus): string {
@@ -61,7 +66,10 @@ export class OrdersService {
 
     this.logger.log(`Order ${order.id} created successfully`);
     // Map paymentStatus to status for frontend compatibility
-    return { ...order, status: this.mapPaymentStatusToFrontend(order.paymentStatus) } as any;
+    return {
+      ...order,
+      status: this.mapPaymentStatusToFrontend(order.paymentStatus),
+    } as any;
   }
 
   async getUserOrders(userId: number): Promise<any[]> {
@@ -72,7 +80,10 @@ export class OrdersService {
       orderBy: { createdAt: 'desc' },
     });
     // Map paymentStatus to status for frontend compatibility
-    return orders.map((order) => ({ ...order, status: this.mapPaymentStatusToFrontend(order.paymentStatus) }));
+    return orders.map((order) => ({
+      ...order,
+      status: this.mapPaymentStatusToFrontend(order.paymentStatus),
+    }));
   }
 
   async getAllOrders(): Promise<any[]> {
@@ -82,7 +93,10 @@ export class OrdersService {
       orderBy: { createdAt: 'desc' },
     });
     // Map paymentStatus to status for frontend compatibility
-    return orders.map((order) => ({ ...order, status: this.mapPaymentStatusToFrontend(order.paymentStatus) }));
+    return orders.map((order) => ({
+      ...order,
+      status: this.mapPaymentStatusToFrontend(order.paymentStatus),
+    }));
   }
 
   async updateOrderStatus(orderId: number, status: string): Promise<any> {
@@ -99,7 +113,7 @@ export class OrdersService {
     };
 
     const paymentStatus = statusMap[status.toLowerCase()];
-    
+
     if (!paymentStatus) {
       this.logger.error(`Invalid status value: ${status}`);
       throw new BadRequestException(`Invalid status value: ${status}`);
@@ -112,14 +126,88 @@ export class OrdersService {
     });
 
     this.logger.log(`Order ${orderId} status updated successfully`);
+
+    // Handle automatic tracking and email notifications
+    if (status.toLowerCase() === 'shipped') {
+      await this.handleOrderShipped(order);
+    } else if (status.toLowerCase() === 'completed') {
+      await this.handleOrderDelivered(order);
+    }
+
     // Map paymentStatus back to the frontend status format
     const reverseStatusMap: Record<PaymentStatus, string> = {
-      [PaymentStatus.PENDING]: status.toLowerCase() === 'processing' ? 'processing' : 'pending',
-      [PaymentStatus.PAID]: status.toLowerCase() === 'shipped' ? 'shipped' : 'completed',
+      [PaymentStatus.PENDING]:
+        status.toLowerCase() === 'processing' ? 'processing' : 'pending',
+      [PaymentStatus.PAID]:
+        status.toLowerCase() === 'shipped' ? 'shipped' : 'completed',
       [PaymentStatus.CANCELLED]: 'cancelled',
       [PaymentStatus.FAILED]: 'failed',
     };
-    
-    return { ...order, status: reverseStatusMap[order.paymentStatus] || order.paymentStatus.toLowerCase() };
+
+    return {
+      ...order,
+      status:
+        reverseStatusMap[order.paymentStatus] ||
+        order.paymentStatus.toLowerCase(),
+    };
+  }
+
+  private async handleOrderShipped(order: any): Promise<void> {
+    try {
+      // Create tracking record
+      const tracking = await this.trackingService.createTracking({
+        orderId: order.id,
+        initialStatus: 'shipped',
+        location: 'Warehouse',
+        notes: 'Order has been shipped',
+      });
+
+      // Send shipping confirmation email
+      await this.mailerService.sendShippingUpdate(order.id, order.user.email, {
+        trackingId: tracking.trackingId,
+        status: 'Shipped',
+        shippedDate: new Date().toISOString(),
+        trackingUrl: `${process.env.FRONTEND_URL}/tracking?id=${tracking.trackingId}`,
+        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+      });
+
+      this.logger.log(`Shipping notification sent for order ${order.id}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to handle order shipped for ${order.id}:`,
+        error,
+      );
+    }
+  }
+
+  private async handleOrderDelivered(order: any): Promise<void> {
+    try {
+      // Update tracking to delivered
+      await this.trackingService.updateTracking(order.id, {
+        status: 'delivered',
+        location: 'Delivered to customer',
+        notes: 'Package successfully delivered',
+      });
+
+      // Send delivery confirmation email
+      await this.mailerService.sendEmail({
+        to: order.user.email,
+        template: 'delivery-confirmation',
+        context: {
+          orderId: order.id,
+          trackingId: `TRK-${order.id}`,
+          deliveredDate: new Date().toISOString(),
+          deliveryLocation: 'Customer address',
+          reviewUrl: `${process.env.FRONTEND_URL}/products`,
+        },
+      });
+
+      this.logger.log(`Delivery notification sent for order ${order.id}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to handle order delivered for ${order.id}:`,
+        error,
+      );
+    }
   }
 }

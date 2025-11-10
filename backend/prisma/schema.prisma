@@ -51,6 +51,7 @@ model User {
   communityComments  CommunityComment[]
   communityReactions CommunityReaction[]
   communityReposts   CommunityRepost[]
+  emailLogs          EmailLog[]
 }
 
 model Order {
@@ -68,6 +69,8 @@ model Order {
   checkoutRequestId String?
   user              User           @relation(fields: [userId], references: [id])
   orderItems        OrderItem[]
+  tracking          OrderTracking?
+  emailLogs         EmailLog[]
 }
 
 model OrderItem {
@@ -259,4 +262,70 @@ model CommunityRepost {
   @@unique([communityPostId, userId])
   @@index([communityPostId])
   @@index([userId])
+}
+
+model OrderTracking {
+  id            Int                  @id @default(autoincrement())
+  orderId       Int                  @unique
+  trackingId    String               @unique // UUID-based
+  currentStatus TrackingStatus
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  order         Order                @relation(fields: [orderId], references: [id])
+  checkpoints   TrackingCheckpoint[]
+
+  @@index([trackingId])
+  @@index([currentStatus])
+}
+
+model TrackingCheckpoint {
+  id         Int            @id @default(autoincrement())
+  trackingId Int
+  status     TrackingStatus
+  location   String
+  notes      String?
+  timestamp  DateTime       @default(now())
+  tracking   OrderTracking  @relation(fields: [trackingId], references: [id], onDelete: Cascade)
+
+  @@index([trackingId])
+  @@index([status])
+}
+
+model EmailLog {
+  id        Int         @id @default(autoincrement())
+  to        String
+  subject   String
+  template  String
+  status    EmailStatus
+  provider  String
+  error     String?
+  sentAt    DateTime?
+  createdAt DateTime    @default(now())
+  orderId   Int?
+  userId    Int?
+  order     Order?      @relation(fields: [orderId], references: [id])
+  user      User?       @relation(fields: [userId], references: [id])
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([status])
+}
+
+enum TrackingStatus {
+  ORDER_PLACED
+  PROCESSING
+  DISPATCHED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+  DELIVERED
+  BOUNCED
 }

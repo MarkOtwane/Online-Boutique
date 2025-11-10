@@ -35,6 +35,12 @@ export const API_CONFIG = {
       ONLINE_USERS: '/chat/users/online',
       GLOBAL_GROUP: '/chat/global-group',
     },
+    TRACKING: {
+      BASE: '/tracking',
+      BY_ID: (trackingId: string) => `/tracking/${trackingId}`,
+      BY_ORDER: (orderId: number) => `/tracking/order/${orderId}`,
+      STATS: '/tracking/admin/stats',
+    },
   },
 };
 

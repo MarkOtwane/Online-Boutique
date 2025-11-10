@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Order Confirmation - Boutique</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #2563eb; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .order-details { background: white; padding: 15px; margin: 20px 0; border-radius: 5px; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .button { display: inline-block; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Confirmation</h1>
+            <p>Thank you for your order!</p>
+        </div>
+
+        <div class="content">
+            <p>Dear Customer,</p>
+            <p>Your order has been successfully placed and confirmed. Here are the details:</p>
+
+            <div class="order-details">
+                <h3>Order #{{orderId}}</h3>
+                <p><strong>Status:</strong> Confirmed</p>
+                <p><strong>Order Date:</strong> {{orderDate}}</p>
+                {{#if estimatedDelivery}}
+                <p><strong>Estimated Delivery:</strong> {{estimatedDelivery}}</p>
+                {{/if}}
+            </div>
+
+            {{#if items}}
+            <h4>Order Items:</h4>
+            <ul>
+                {{#each items}}
+                <li>{{name}} - ${{price}} x {{quantity}}</li>
+                {{/each}}
+            </ul>
+            {{/if}}
+
+            {{#if total}}
+            <p><strong>Total Amount:</strong> ${{total}}</p>
+            {{/if}}
+
+            <p>You will receive tracking information once your order ships. You can track your order using the tracking number that will be provided in a separate email.</p>
+
+            <p>If you have any questions, please contact our support team.</p>
+
+            <p>Best regards,<br>The Boutique Team</p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>&copy; 2025 Boutique. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

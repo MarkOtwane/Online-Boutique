@@ -1,0 +1,182 @@
+<div class="p-6">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Email Management</h1>
+    <p class="text-gray-600">Send emails and monitor email delivery status</p>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" *ngIf="stats">
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Total Emails</p>
+          <p class="text-2xl font-bold text-gray-900">{{ stats.total }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Sent</p>
+          <p class="text-2xl font-bold text-gray-900">{{ stats.sent }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-red-100 rounded-lg">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Failed</p>
+          <p class="text-2xl font-bold text-gray-900">{{ stats.failed }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-yellow-100 rounded-lg">
+          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Pending</p>
+          <p class="text-2xl font-bold text-gray-900">{{ stats.pending }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Send Email -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Send Email</h2>
+      <form (ngSubmit)="sendEmail()" #emailForm="ngForm">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Recipient Email</label>
+            <input
+              type="email"
+              [(ngModel)]="emailData.to"
+              name="to"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="recipient@example.com"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+            <input
+              type="text"
+              [(ngModel)]="emailData.subject"
+              name="subject"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Email subject"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Template</label>
+            <select
+              [(ngModel)]="emailData.template"
+              name="template"
+              (change)="updateTemplateData()"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option *ngFor="let template of templates" [value]="template.value">
+                {{ template.label }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Template Data (JSON)</label>
+            <textarea
+              [(ngModel)]="emailData.data"
+              name="data"
+              rows="6"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+              placeholder='{"orderId": "ORD-001", "total": 99.99}'
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="!emailForm.form.valid"
+            class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Send Email
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Email Logs -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Email Logs</h2>
+      <div class="space-y-3" *ngIf="emailLogs.length > 0; else noEmails">
+        <div *ngFor="let log of emailLogs.slice(0, 10)" class="p-3 border border-gray-200 rounded-md">
+          <div class="flex justify-between items-start mb-2">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900 truncate">{{ log.subject }}</p>
+              <p class="text-xs text-gray-500">To: {{ log.to }}</p>
+            </div>
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ getStatusColor(log.status) }}">
+              {{ log.status }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center">
+            <p class="text-xs text-gray-500">{{ formatDate(log.sentAt) }}</p>
+            <button
+              *ngIf="log.error"
+              class="text-xs text-red-600 hover:text-red-800"
+              title="{{ log.error }}"
+            >
+              View Error
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-template #noEmails>
+        <p class="text-gray-500 text-center py-8">No emails sent yet</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Template Preview Info -->
+  <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-lg font-medium text-blue-900 mb-2">Email Templates</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white p-4 rounded-md">
+        <h4 class="font-medium text-gray-900">Order Confirmation</h4>
+        <p class="text-sm text-gray-600">Sent when order is placed</p>
+      </div>
+      <div class="bg-white p-4 rounded-md">
+        <h4 class="font-medium text-gray-900">Shipping Update</h4>
+        <p class="text-sm text-gray-600">Sent when order ships</p>
+      </div>
+      <div class="bg-white p-4 rounded-md">
+        <h4 class="font-medium text-gray-900">Delivery Confirmation</h4>
+        <p class="text-sm text-gray-600">Sent when order is delivered</p>
+      </div>
+    </div>
+  </div>
+</div>
