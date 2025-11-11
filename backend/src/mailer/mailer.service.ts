@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
@@ -10,12 +8,18 @@ import * as handlebars from 'handlebars';
 import * as path from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailProvider } from './interfaces/email-provider.interface';
-import { EmailJobData, EmailQueue } from './queues/email.queue';
 
 export interface EmailTemplateData {
   subject: string;
   html: string;
   text?: string;
+}
+
+export interface EmailJobData {
+  to: string;
+  subject: string;
+  html: string;
+  from?: string;
 }
 
 @Injectable()
@@ -25,7 +29,6 @@ export class MailerService {
 
   constructor(
     @Inject('EmailProvider') private readonly emailProvider: EmailProvider,
-    private readonly emailQueue: EmailQueue,
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
   ) {
@@ -92,11 +95,39 @@ export class MailerService {
         },
       });
 
-      // Queue email for sending
-      await this.emailQueue.addEmailJob(emailData);
+      // Send email directly
+      const result = await this.emailProvider.sendEmail({
+        to: emailData.to,
+        subject: emailData.subject,
+        html: emailData.html,
+        from: emailData.from,
+      });
+
+      // Update email log status
+      const emailLog = await this.prisma.emailLog.findFirst({
+        where: {
+          to: options.to,
+          subject: emailData.subject,
+          template: options.template,
+          status: 'PENDING',
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (emailLog) {
+        await this.prisma.emailLog.update({
+          where: { id: emailLog.id },
+          data: {
+            status: result.success ? 'SENT' : 'FAILED',
+            provider: 'smtp',
+            sentAt: result.success ? new Date() : null,
+            error: result.success ? null : result.error,
+          },
+        });
+      }
 
       this.logger.log(
-        `Email queued for ${options.to} using template ${options.template}`,
+        `Email ${result.success ? 'sent' : 'failed'} for ${options.to} using template ${options.template}`,
       );
     } catch (error) {
       this.logger.error(`Failed to queue email: ${error.message}`, error.stack);

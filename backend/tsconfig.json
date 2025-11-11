@@ -32,10 +32,5 @@
     "noImplicitOverride": false
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "test/**/*",
-    "**/*.spec.ts",
-    "prisma/**/*"
-  ]
+  "exclude": ["node_modules", "test/**/*", "prisma/**/*"]
 }

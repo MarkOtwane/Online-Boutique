@@ -3,10 +3,11 @@ import {
   Get,
   UseGuards,
   SetMetadata,
-  Request,
   Query,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../roles.guard';
 import {
@@ -33,9 +34,9 @@ export class DashboardController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @SetMetadata('roles', ['admin'])
   async getTopProducts(
-    @Query('limit', ParseIntPipe) limit: number = 6,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
   ): Promise<TopProduct[]> {
-    return this.dashboardService.getTopProducts(limit);
+    return this.dashboardService.getTopProducts(limit ?? 6);
   }
 
   @Get('admin/revenue-data')
@@ -59,15 +60,22 @@ export class DashboardController {
     @Query('type') type: 'sales' | 'products' | 'customers',
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-  ) {
+  ): Promise<unknown> {
     const start = startDate ? new Date(startDate) : undefined;
     const end = endDate ? new Date(endDate) : undefined;
-    return this.dashboardService.generateReport(type, start, end);
+    const report: unknown = await this.dashboardService.generateReport(
+      type,
+      start,
+      end,
+    );
+    return report;
   }
 
   @Get('user')
   @UseGuards(JwtAuthGuard)
-  async getUserDashboard(@Request() req): Promise<UserDashboardData> {
+  async getUserDashboard(
+    @Req() req: Request & { user: { id: number } },
+  ): Promise<UserDashboardData> {
     return this.dashboardService.getUserDashboardData(req.user.id);
   }
 }

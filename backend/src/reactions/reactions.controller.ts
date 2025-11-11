@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
