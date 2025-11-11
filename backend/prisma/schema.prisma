@@ -15,21 +15,24 @@ model Category {
 }
 
 model Product {
-  id             Int             @id @default(autoincrement())
-  name           String
-  price          Float
-  imageUrl       String?
-  createdAt      DateTime        @default(now())
-  commentCount   Int             @default(0)
-  repostCount    Int             @default(0)
-  reactionCount  Int             @default(0)
-  categoryId     Int
-  comments       Comment[]
-  orderItems     OrderItem[]
-  category       Category        @relation(fields: [categoryId], references: [id])
-  reposts        Repost[]
-  reactions      Reaction[]
-  communityPosts CommunityPost[]
+  id                 Int                     @id @default(autoincrement())
+  name               String
+  price              Float
+  imageUrl           String?
+  createdAt          DateTime                @default(now())
+  commentCount       Int                     @default(0)
+  repostCount        Int                     @default(0)
+  reactionCount      Int                     @default(0)
+  categoryId         Int
+  comments           Comment[]
+  orderItems         OrderItem[]
+  category           Category                @relation(fields: [categoryId], references: [id])
+  reposts            Repost[]
+  reactions          Reaction[]
+  communityPosts     CommunityPost[]
+  reviews            Review[]
+  userBehaviors      UserBehavior[]
+  recommendations    ProductRecommendation[]
 }
 
 model User {
@@ -52,6 +55,10 @@ model User {
   communityReactions CommunityReaction[]
   communityReposts   CommunityRepost[]
   emailLogs          EmailLog[]
+  reviews            Review[]
+  userBehaviors      UserBehavior[]
+  reviewHelpfulness  UserReviewHelpfulness[]
+  recommendations    ProductRecommendation[]
 }
 
 model Order {
@@ -328,4 +335,87 @@ enum EmailStatus {
   FAILED
   DELIVERED
   BOUNCED
+}
+
+model Review {
+  id               Int                    @id @default(autoincrement())
+  productId        Int
+  userId           Int
+  title            String?
+  content          String
+  rating           Int
+  verifiedPurchase Boolean                @default(false)
+  helpfulCount     Int                    @default(0)
+  notHelpfulCount  Int                    @default(0)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  isApproved       Boolean                @default(false)
+  reviewImages     String[]
+  
+  product          Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  helpfulness      UserReviewHelpfulness[]
+  
+  @@index([productId])
+  @@index([userId])
+  @@index([rating])
+  @@index([createdAt])
+  @@index([isApproved])
+}
+
+model UserReviewHelpfulness {
+  id         Int      @id @default(autoincrement())
+  reviewId   Int
+  userId     Int
+  isHelpful  Boolean
+  createdAt  DateTime @default(now())
+  
+  review     Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([reviewId, userId])
+  @@index([reviewId])
+  @@index([userId])
+}
+
+model UserBehavior {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  productId   Int?
+  actionType  String    // 'view', 'cart_add', 'purchase', 'review', 'search'
+  metadata    Json?
+  timestamp   DateTime  @default(now())
+  sessionId   String?
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([productId])
+  @@index([actionType])
+  @@index([timestamp])
+  @@index([sessionId])
+}
+
+model ProductRecommendation {
+  id                  Int                    @id @default(autoincrement())
+  userId              Int
+  productId           Int
+  recommendationType  String                 // 'collaborative', 'content_based', 'trending', 'personalized'
+  score               Float                  // AI confidence score
+  reason              String?                // Explanation for the recommendation
+  createdAt           DateTime               @default(now())
+  isViewed            Boolean                @default(false)
+  isClicked           Boolean                @default(false)
+  isPurchased         Boolean                @default(false)
+  
+  user                User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product             Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([productId])
+  @@index([recommendationType])
+  @@index([score])
+  @@index([createdAt])
+  @@unique([userId, productId, recommendationType])
 }

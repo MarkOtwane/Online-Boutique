@@ -17,6 +17,8 @@ import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
 import { MailerModule } from './mailer/mailer.module';
 import { TrackingModule } from './tracking/tracking.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { TrackingModule } from './tracking/tracking.module';
     PaymentsModule,
     MailerModule,
     TrackingModule,
+    ReviewsModule,
+    RecommendationsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService, CustomLoggerService],

@@ -1,4 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PaymentStatus } from '@prisma/client';
 import { CustomLoggerService } from '../auth/logger.service';
@@ -155,7 +158,7 @@ export class OrdersService {
   private async handleOrderShipped(order: any): Promise<void> {
     try {
       // Create tracking record
-      const tracking = await this.trackingService.createTracking({
+      const trackingId = await this.trackingService.createTracking({
         orderId: order.id,
         initialStatus: 'shipped',
         location: 'Warehouse',
@@ -164,11 +167,13 @@ export class OrdersService {
 
       // Send shipping confirmation email
       await this.mailerService.sendShippingUpdate(order.id, order.user.email, {
-        trackingId: tracking.trackingId,
+        trackingId: trackingId,
         status: 'Shipped',
         shippedDate: new Date().toISOString(),
-        trackingUrl: `${process.env.FRONTEND_URL}/tracking?id=${tracking.trackingId}`,
-        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+        trackingUrl: `${process.env.FRONTEND_URL}/tracking?id=${trackingId}`,
+        estimatedDelivery: new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000,
+        ).toISOString(), // 7 days from now
       });
 
       this.logger.log(`Shipping notification sent for order ${order.id}`);
