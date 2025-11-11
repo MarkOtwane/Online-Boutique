@@ -17,9 +17,12 @@ export class TrackingService {
 
   constructor(private http: HttpClient) {}
 
-  // Public tracking lookup (no auth required)
+  // Tracking lookup (auth required)
   getTrackingInfo(trackingId: string): Observable<TrackingInfo> {
-    return this.http.get<TrackingInfo>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.TRACKING.BY_ID(trackingId)}`);
+    return this.http.get<TrackingInfo>(
+      `${this.apiUrl}${API_CONFIG.ENDPOINTS.TRACKING.BY_ID(trackingId)}`,
+      { headers: getAuthHeaders() }
+    );
   }
 
   // Admin methods

@@ -24,4 +24,8 @@ export class HeaderComponent {
   logout(): void {
     this.authService.logout();
   }
+
+  onLogoClick(): void {
+    this.authService.navigateToDashboard();
+  }
 }

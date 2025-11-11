@@ -29,6 +29,7 @@
         <h4>Customer Service</h4>
         <ul>
           <ng-container *ngIf="isLoggedIn; else publicServices">
+            <li><a [routerLink]="['/tracking']">Track Order</a></li>
             <li><a [routerLink]="['/order-history']">Order History</a></li>
             <li><a [routerLink]="['/dashboard']">My Account</a></li>
             <li><a href="#">Contact Us</a></li>

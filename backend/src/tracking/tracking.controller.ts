@@ -35,6 +35,7 @@ export class TrackingController {
   }
 
   @Get(':trackingId')
+  @UseGuards(JwtAuthGuard)
   async getTrackingInfo(@Param('trackingId') trackingId: string) {
     return this.trackingService.getTrackingInfo(trackingId);
   }

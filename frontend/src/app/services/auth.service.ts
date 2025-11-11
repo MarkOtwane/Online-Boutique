@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { User } from '../interfaces/user';
 import { API_CONFIG } from '../config/api.config';
 
@@ -13,7 +14,7 @@ export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     // Try to load user from localStorage first for immediate availability
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -87,10 +88,48 @@ export class AuthService {
       );
   }
 
-  logout(): void {
+  logout(redirectToHome: boolean = true): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
     this.userSubject.next(null);
+    
+    // Always redirect to home page after logout
+    if (redirectToHome) {
+      this.router.navigate(['/']);
+    }
+  }
+
+  // Get redirect URL based on user role
+  getDashboardUrl(): string {
+    const user = this.getUser();
+    if (!user) return '/';
+    
+    switch (user.role) {
+      case 'admin':
+        return '/admin/dashboard';
+      case 'customer':
+        return '/user/dashboard';
+      default:
+        return '/';
+    }
+  }
+
+  // Navigate to appropriate dashboard
+  navigateToDashboard(): void {
+    const user = this.getUser();
+    if (!user) return;
+    
+    switch (user.role) {
+      case 'admin':
+        this.router.navigate(['/admin/dashboard']);
+        break;
+      case 'customer':
+        this.router.navigate(['/user/dashboard']);
+        break;
+      default:
+        // Unknown role, stay on current page
+        break;
+    }
   }
 
   isAuthenticated(): boolean {
