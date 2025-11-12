@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { DashboardService, UserDashboardData } from '../../services/dashboard.service';
+import { TrackingService } from '../../services/tracking.service';
+import { TrackingInfo } from '../../interfaces/tracking';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -24,7 +26,8 @@ export class UserDashboardComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private trackingService: TrackingService
   ) {}
 
   ngOnInit(): void {
@@ -89,5 +92,24 @@ export class UserDashboardComponent implements OnInit {
 
   getMemberSince(): string {
     return this.dashboardService.formatDate(this.dashboardData.memberSince);
+  }
+
+  trackOrder(order: any): void {
+    // First try to get tracking info for the order
+    this.trackingService.getOrderTracking(order.id).subscribe({
+      next: (trackingInfo) => {
+        if (trackingInfo && trackingInfo.trackingId) {
+          // Navigate to tracking page with tracking ID
+          window.location.href = `/tracking?id=${trackingInfo.trackingId}`;
+        } else {
+          // If no tracking info found, show a message
+          alert('Tracking information is not available for this order yet.');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching tracking info:', error);
+        alert('Unable to fetch tracking information. Please try again later.');
+      }
+    });
   }
 }

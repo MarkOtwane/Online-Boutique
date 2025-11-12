@@ -183,4 +183,25 @@ export class ChatGateway
       });
     });
   }
+
+  // Method to emit real-time order status updates to specific users
+  async emitOrderStatusUpdate(userId: number, orderData: any) {
+    this.server.emit('orderStatusUpdate', {
+      userId,
+      orderData,
+    });
+  }
+
+  // Method to emit order tracking updates to specific users
+  async emitOrderTrackingUpdate(userId: number, trackingData: any) {
+    this.server.emit('orderTrackingUpdate', {
+      userId,
+      trackingData,
+    });
+  }
+
+  // Helper method to get connected users for order updates
+  getConnectedUsers(): Map<string, number> {
+    return this.connectedUsers;
+  }
 }

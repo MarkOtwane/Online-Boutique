@@ -6,9 +6,10 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CustomLoggerService } from '../auth/logger.service';
 import { TrackingModule } from '../tracking/tracking.module';
 import { MailerModule } from '../mailer/mailer.module';
+import { ChatModule } from '../chat/chat.module';
 
 @Module({
-  imports: [TrackingModule, MailerModule],
+  imports: [TrackingModule, MailerModule, ChatModule],
   controllers: [OrdersController],
   providers: [OrdersService, PrismaService, JwtAuthGuard, CustomLoggerService],
 })

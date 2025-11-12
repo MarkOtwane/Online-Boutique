@@ -30,3 +30,201 @@ h2 {
 .order-item:first-child {
   border-top: none;
 }
+
+/* Tracking Status Styles */
+.tracking-status {
+  margin-top: 15px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-left: 24px;
+}
+
+.status-badge[data-status="pending"] {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-badge[data-status="processing"] {
+  background-color: #cce7ff;
+  color: #0066cc;
+  border: 1px solid #a3d5ff;
+}
+
+.status-badge[data-status="shipped"] {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-badge[data-status="completed"] {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.status-badge[data-status="delivered"] {
+  background-color: #f0f9ff;
+  color: #0ea5e9;
+  border: 1px solid #bae6fd;
+}
+
+.status-badge[data-status="cancelled"] {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.status-badge[data-status="failed"] {
+  background-color: #f5c6cb;
+  color: #721c24;
+  border: 1px solid #e9b3ba;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.status-dot.active {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-50%) scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.status-location {
+  margin-top: 8px;
+  color: #6c757d;
+  font-size: 12px;
+}
+
+/* Real-time Notifications Styles */
+.real-time-notifications {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 320px;
+}
+
+.notification-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 12px;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+  border-left: 4px solid #28a745;
+}
+
+.notification-content {
+  padding: 16px;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.notification-type {
+  font-size: 12px;
+  font-weight: 600;
+  color: #28a745;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: #6c757d;
+}
+
+.notification-message {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.notification-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.notification-status[data-status="shipped"] {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.notification-status[data-status="completed"] {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.notification-status[data-status="delivered"] {
+  background-color: #f0f9ff;
+  color: #0ea5e9;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Button Styles */
+mat-card-actions button {
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+mat-card-actions button svg {
+  width: 16px;
+  height: 16px;
+}

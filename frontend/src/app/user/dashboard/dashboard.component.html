@@ -121,7 +121,7 @@
             <strong>Total: {{ formatCurrency(order.total) }}</strong>
           </div>
           <div class="order-actions">
-            <button class="btn-outline small">Track Order</button>
+            <button class="btn-outline small" (click)="trackOrder(order)">Track Order</button>
             <button class="btn-primary small">Reorder</button>
           </div>
         </div>

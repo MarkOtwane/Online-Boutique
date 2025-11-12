@@ -51,4 +51,13 @@ export class OrdersController {
   ): Promise<any> {
     return this.ordersService.updateOrderStatus(orderId, body.status);
   }
+
+  @Get(':id/tracking')
+  @UseGuards(JwtAuthGuard)
+  async getOrderTracking(
+    @Param('id') orderId: number,
+    @Request() req,
+  ): Promise<any> {
+    return this.ordersService.getOrderTrackingForUser(orderId, req.user.id);
+  }
 }

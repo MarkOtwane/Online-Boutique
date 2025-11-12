@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChatGateway } from '../chat/chat.gateway';
 
 export interface TrackingInfo {
   trackingId: string;
@@ -38,7 +35,10 @@ export interface UpdateTrackingDto {
 
 @Injectable()
 export class TrackingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly chatGateway?: ChatGateway,
+  ) {}
 
   async createTracking(dto: CreateTrackingDto): Promise<string> {
     // Check if order exists
@@ -56,7 +56,25 @@ export class TrackingService {
     });
 
     if (existingTracking) {
-      throw new BadRequestException('Tracking already exists for this order');
+      // If tracking exists, create a new checkpoint with the updated status
+      await this.prisma.trackingCheckpoint.create({
+        data: {
+          trackingId: existingTracking.id,
+          status: (dto.initialStatus as any) || 'ORDER_PLACED',
+          location: dto.location || 'Order Processing Center',
+          notes: dto.notes || 'Status updated',
+        },
+      });
+
+      // Update the current status
+      await this.prisma.orderTracking.update({
+        where: { orderId: dto.orderId },
+        data: {
+          currentStatus: (dto.initialStatus as any) || 'ORDER_PLACED',
+        },
+      });
+
+      return existingTracking.trackingId;
     }
 
     // Generate unique tracking ID

@@ -74,6 +74,7 @@ model Order {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   checkoutRequestId String?
+  isStatusFinal     Boolean        @default(false) // Track if order status has been finalized
   user              User           @relation(fields: [userId], references: [id])
   orderItems        OrderItem[]
   tracking          OrderTracking?

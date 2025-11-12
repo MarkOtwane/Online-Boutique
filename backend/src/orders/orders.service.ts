@@ -8,6 +8,8 @@ import { CustomLoggerService } from '../auth/logger.service';
 import { MailerService } from '../mailer/mailer.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { TrackingService } from '../tracking/tracking.service';
+import { ChatGateway } from '../chat/chat.gateway';
+
 @Injectable()
 export class OrdersService {
   constructor(
@@ -15,6 +17,7 @@ export class OrdersService {
     private logger: CustomLoggerService,
     private trackingService: TrackingService,
     private mailerService: MailerService,
+    private chatGateway: ChatGateway,
   ) {}
 
   private mapPaymentStatusToFrontend(paymentStatus: PaymentStatus): string {
@@ -52,6 +55,7 @@ export class OrdersService {
       return sum + (product ? product.price * item.quantity : 0);
     }, 0);
 
+    // Create the order first (outside transaction)
     const order = await this.prisma.order.create({
       data: {
         userId,
@@ -68,6 +72,24 @@ export class OrdersService {
     });
 
     this.logger.log(`Order ${order.id} created successfully`);
+
+    // Now create tracking for the order (outside the transaction)
+    try {
+      const trackingId = await this.trackingService.createTracking({
+        orderId: order.id,
+        initialStatus: 'ORDER_PLACED',
+        location: 'Order Processing Center',
+        notes: 'Order received and processing started',
+      });
+      this.logger.log(`Tracking ${trackingId} created for order ${order.id}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to create tracking for order ${order.id}:`,
+        error,
+      );
+      // Don't fail the order creation if tracking fails
+    }
+
     // Map paymentStatus to status for frontend compatibility
     return {
       ...order,
@@ -105,6 +127,24 @@ export class OrdersService {
   async updateOrderStatus(orderId: number, status: string): Promise<any> {
     this.logger.log(`Updating order ${orderId} status to ${status}`);
 
+    // Check if order exists and get current status
+    const currentOrder = await this.prisma.order.findUnique({
+      where: { id: Number(orderId) },
+    });
+
+    if (!currentOrder) {
+      this.logger.error(`Order ${orderId} not found`);
+      throw new BadRequestException('Order not found');
+    }
+
+    // Prevent status changes if order is already finalized
+    if (currentOrder.isStatusFinal) {
+      this.logger.error(`Order ${orderId} status is already finalized`);
+      throw new BadRequestException(
+        'Order status is already finalized and cannot be changed',
+      );
+    }
+
     // Map frontend status values to PaymentStatus enum
     const statusMap: Record<string, PaymentStatus> = {
       pending: PaymentStatus.PENDING,
@@ -122,20 +162,19 @@ export class OrdersService {
       throw new BadRequestException(`Invalid status value: ${status}`);
     }
 
+    // Update order status and mark as finalized
     const order = await this.prisma.order.update({
       where: { id: Number(orderId) },
-      data: { paymentStatus },
+      data: {
+        paymentStatus,
+        isStatusFinal: true, // Mark as finalized after first status change
+      },
       include: { orderItems: { include: { product: true } }, user: true },
     });
 
-    this.logger.log(`Order ${orderId} status updated successfully`);
-
-    // Handle automatic tracking and email notifications
-    if (status.toLowerCase() === 'shipped') {
-      await this.handleOrderShipped(order);
-    } else if (status.toLowerCase() === 'completed') {
-      await this.handleOrderDelivered(order);
-    }
+    this.logger.log(
+      `Order ${orderId} status updated successfully and finalized`,
+    );
 
     // Map paymentStatus back to the frontend status format
     const reverseStatusMap: Record<PaymentStatus, string> = {
@@ -147,12 +186,31 @@ export class OrdersService {
       [PaymentStatus.FAILED]: 'failed',
     };
 
-    return {
+    // Handle automatic tracking and email notifications
+    if (status.toLowerCase() === 'shipped') {
+      await this.handleOrderShipped(order);
+    } else if (status.toLowerCase() === 'completed') {
+      await this.handleOrderDelivered(order);
+    }
+
+    // Emit real-time order status update to the customer
+    const mappedOrder = {
       ...order,
       status:
         reverseStatusMap[order.paymentStatus] ||
         order.paymentStatus.toLowerCase(),
     };
+
+    // Emit order status update to the user
+    await this.chatGateway.emitOrderStatusUpdate(order.userId, {
+      orderId: order.id,
+      status: mappedOrder.status,
+      previousStatus: currentOrder.paymentStatus.toLowerCase(),
+      timestamp: new Date().toISOString(),
+      orderDetails: mappedOrder,
+    });
+
+    return mappedOrder;
   }
 
   private async handleOrderShipped(order: any): Promise<void> {
@@ -174,6 +232,19 @@ export class OrdersService {
         estimatedDelivery: new Date(
           Date.now() + 7 * 24 * 60 * 60 * 1000,
         ).toISOString(), // 7 days from now
+      });
+
+      // Emit tracking update to the customer
+      await this.chatGateway.emitOrderTrackingUpdate(order.userId, {
+        orderId: order.id,
+        trackingId: trackingId,
+        status: 'shipped',
+        location: 'Warehouse',
+        notes: 'Order has been shipped',
+        timestamp: new Date().toISOString(),
+        estimatedDelivery: new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
       });
 
       this.logger.log(`Shipping notification sent for order ${order.id}`);
@@ -207,6 +278,17 @@ export class OrdersService {
         },
       });
 
+      // Emit tracking update to the customer
+      await this.chatGateway.emitOrderTrackingUpdate(order.userId, {
+        orderId: order.id,
+        trackingId: `TRK-${order.id}`,
+        status: 'delivered',
+        location: 'Delivered to customer',
+        notes: 'Package successfully delivered',
+        timestamp: new Date().toISOString(),
+        deliveredDate: new Date().toISOString(),
+      });
+
       this.logger.log(`Delivery notification sent for order ${order.id}`);
     } catch (error) {
       this.logger.error(
@@ -214,5 +296,35 @@ export class OrdersService {
         error,
       );
     }
+  }
+
+  // Helper method to get tracking for an order
+  async getOrderTrackingForUser(orderId: number, userId: number): Promise<any> {
+    // Verify order belongs to user
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id: orderId,
+        userId: userId,
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException('Order not found or access denied');
+    }
+
+    // Get tracking information
+    const trackingInfo = await this.trackingService.getOrderTracking(orderId);
+
+    return {
+      order,
+      tracking: trackingInfo,
+    };
   }
 }

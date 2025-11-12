@@ -18,9 +18,51 @@
           <p>Subtotal: KSh {{ item.price * item.quantity }}</p>
         </div>
       </div>
+      
+      <!-- Real-time tracking status -->
+      <div class="tracking-status" *ngIf="getOrderTrackingStatus(order.id) as tracking">
+        <div class="status-badge" [attr.data-status]="tracking.status">
+          <span class="status-dot" [class.active]="tracking.status !== 'delivered'"></span>
+          {{ tracking.status | titlecase }}
+        </div>
+        <p class="status-location" *ngIf="tracking.location">
+          <small>{{ tracking.location }}</small>
+        </p>
+      </div>
     </mat-card-content>
-    <mat-card-actions *ngIf="isAdmin">
-      <button mat-button color="primary" (click)="showDetails(order.id)">View Details</button>
+    <mat-card-actions>
+      <button mat-button color="primary" (click)="trackOrder(order.id)" *ngIf="!isAdmin">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        Track Order
+      </button>
+      <button mat-button color="accent" (click)="viewTrackingDetails(order.id)" *ngIf="!isAdmin && getOrderTrackingStatus(order.id)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+        View Tracking
+      </button>
+      <button mat-button color="primary" (click)="showDetails(order.id)" *ngIf="isAdmin">View Details</button>
     </mat-card-actions>
   </mat-card>
+</div>
+
+<!-- Real-time updates notification -->
+<div class="real-time-notifications" *ngIf="recentUpdates.length > 0">
+  <div *ngFor="let update of recentUpdates.slice(0, 3)" class="notification-card">
+    <div class="notification-content">
+      <div class="notification-header">
+        <span class="notification-type">Order Update</span>
+        <span class="notification-time">{{ update.timestamp | date:'short' }}</span>
+      </div>
+      <p class="notification-message">
+        Order #{{ update.orderId }} status changed to <strong>{{ update.status }}</strong>
+      </p>
+      <div class="notification-status" [attr.data-status]="update.status">
+        {{ update.status | titlecase }}
+      </div>
+    </div>
+  </div>
 </div>
