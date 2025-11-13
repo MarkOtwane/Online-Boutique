@@ -175,4 +175,23 @@ export class TrackingComponent implements OnInit {
   trackByTimestamp(index: number, item: any): any {
     return item.timestamp;
   }
+
+  formatStatusLabel(status: string): string {
+    // Convert status from backend format (e.g., ORDER_PLACED) to readable format
+    const statusMap: { [key: string]: string } = {
+      'ORDER_PLACED': 'Order Placed',
+      'PROCESSING': 'Processing',
+      'SHIPPED': 'Shipped',
+      'IN_TRANSIT': 'In Transit',
+      'OUT_FOR_DELIVERY': 'Out for Delivery',
+      'DELIVERED': 'Delivered',
+      'CANCELLED': 'Cancelled',
+      'RETURNED': 'Returned'
+    };
+    
+    const upperStatus = status.toUpperCase().replace(/\s+/g, '_');
+    return statusMap[upperStatus] || status.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+  }
 }
