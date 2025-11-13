@@ -3,10 +3,10 @@
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
-		"build": "cd backend && npm run build",
-		"start:prod": "node backend/dist/main.js",
-		"prebuild": "cd backend && npm install",
-		"postinstall": "cd backend && npm install"
+		"build": "cd src/backend && npm run build",
+		"start:prod": "node ./src/backend/dist/main.js",
+		"prebuild": "cd src/backend && npm install",
+		"postinstall": "cd src/backend && npm install"
 	},
 	"dependencies": {
 		"axios": "^1.13.2"
