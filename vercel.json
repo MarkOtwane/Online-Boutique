@@ -3,11 +3,5 @@
 	"buildCommand": "cd frontend && npm run build",
 	"outputDirectory": "frontend/dist/frontend",
 	"framework": "angular",
-	"cleanUrls": true,
-	"routes": [
-		{
-			"src": "/(.*)",
-			"dest": "/index.html"
-		}
-	]
+	"rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
