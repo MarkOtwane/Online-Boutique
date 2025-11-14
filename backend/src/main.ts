@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,10 +17,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-  await app.listen(port, '0.0.0.0');
+  await app.listen(process.env.PORT || 3000);
 }
+
 bootstrap();
-
-// update the main.ts to enable hosting in render that's the backend
-
