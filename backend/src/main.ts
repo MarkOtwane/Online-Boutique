@@ -21,3 +21,6 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
 }
 bootstrap();
+
+// update the main.ts to enable hosting in render that's the backend
+
