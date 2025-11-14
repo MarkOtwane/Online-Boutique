@@ -1,6 +1,7 @@
 services:
-  - type: web
-    name: online-boutique-backend
-    runtime: node
-    buildCommand: npm run build
-    startCommand: npm run start:prod
+     - type: web
+       name: online-boutique-backend
+       runtime: node
+       rootDir: backend
+       buildCommand: npm run build
+       startCommand: npm run start:prod
