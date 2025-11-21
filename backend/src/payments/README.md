@@ -23,7 +23,8 @@ MPESA_CONSUMER_SECRET="your-mpesa-consumer-secret"
 MPESA_SHORTCODE="your-mpesa-shortcode"
 MPESA_PASSKEY="your-mpesa-passkey"
 MPESA_BASE_URL="https://sandbox.safaricom.co.ke"
-BACKEND_URL="http://localhost:3000"
+# Set your backend public URL here (e.g. from your deployment provider):
+BACKEND_URL="https://online-boutique-tv00.onrender.com"
 ```
 
 ### Database Migration
@@ -47,6 +48,7 @@ The payment fields have been added to the Order model:
 Initiate a payment for an order.
 
 **Request Body:**
+
 ```json
 {
   "orderId": 1,
@@ -57,6 +59,7 @@ Initiate a payment for an order.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -73,6 +76,7 @@ Initiate a payment for an order.
 M-Pesa callback endpoint for payment status updates.
 
 **Request Body:**
+
 ```json
 {
   "MerchantRequestID": "12345-67890",
@@ -91,6 +95,7 @@ M-Pesa callback endpoint for payment status updates.
 Check the status of a payment.
 
 **Request Body:**
+
 ```json
 {
   "orderId": 1
@@ -98,6 +103,7 @@ Check the status of a payment.
 ```
 
 **Response:**
+
 ```json
 {
   "orderId": 1,

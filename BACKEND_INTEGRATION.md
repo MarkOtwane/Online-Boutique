@@ -11,7 +11,7 @@ Your Angular frontend is now fully integrated with your NestJS backend API. Here
 -    **File**: `frontend/src/app/config/api.config.ts`
 -    **Purpose**: Centralized API configuration with all endpoint definitions
 -    **Features**:
-     -    Base URL configuration (`http://localhost:3000`)
+     -    Base URL configuration (`environment.apiUrl` — configure per deployment)
      -    Organized endpoint structure
      -    Helper function for auth headers
 
@@ -130,7 +130,7 @@ cd backend
 npm run start:dev
 ```
 
-The backend will run on `http://localhost:3000`
+The backend will run at the URL configured in your deployment (set `DATABASE_URL` / `BACKEND_URL` / `environment.apiUrl`). Example: `https://online-boutique-tv00.onrender.com`
 
 ### 2. Start the Frontend
 

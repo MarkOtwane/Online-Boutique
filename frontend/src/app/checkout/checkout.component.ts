@@ -1,19 +1,26 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router, RouterModule } from '@angular/router';
+import { API_CONFIG } from '../config/api.config';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { CartItem } from '../interfaces/cart-item';
 import { AuthService } from '../services/auth.service';
 import { CartService } from '../services/cart.service';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatDialogModule, MatSnackBarModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    MatDialogModule,
+    MatSnackBarModule,
+  ],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css'],
 })
@@ -27,7 +34,7 @@ export class CheckoutComponent implements OnInit {
   paymentMethods = [
     { value: 'MPESA', label: 'M-Pesa' },
     { value: 'CARD', label: 'Card Payment' },
-    { value: 'CASH', label: 'Cash on Delivery' }
+    { value: 'CASH', label: 'Cash on Delivery' },
   ];
 
   constructor(
@@ -87,7 +94,11 @@ export class CheckoutComponent implements OnInit {
     });
 
     this.http
-      .post('http://localhost:3000/orders', orderData, { headers })
+      .post(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ORDERS.BASE}`,
+        orderData,
+        { headers }
+      )
       .subscribe({
         next: (orderResponse: any) => {
           if (this.selectedPaymentMethod === 'MPESA') {
@@ -130,7 +141,9 @@ export class CheckoutComponent implements OnInit {
     });
 
     this.http
-      .post('http://localhost:3000/payments/initiate', paymentData, { headers })
+      .post(`${API_CONFIG.BASE_URL}/payments/initiate`, paymentData, {
+        headers,
+      })
       .subscribe({
         next: (paymentResponse: any) => {
           this.successMessage = `Payment initiated successfully! ${paymentResponse.message}. Please check your phone for the M-Pesa prompt.`;

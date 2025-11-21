@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { RouterModule, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { User } from '../interfaces/user';
-import { Order } from '../interfaces/order';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { API_CONFIG } from '../config/api.config';
 import { CartItem } from '../interfaces/cart';
+import { Order } from '../interfaces/order';
+import { User } from '../interfaces/user';
 import { AuthService } from '../services/auth.service';
 import { CartService } from '../services/cart.service';
 
@@ -44,7 +45,7 @@ export class DashboardComponent implements OnInit {
     });
 
     // Subscribe to cart changes
-    this.cartService.cartItems$.subscribe(items => {
+    this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items;
       this.totalCartValue = this.cartService.getTotal();
     });
@@ -58,16 +59,21 @@ export class DashboardComponent implements OnInit {
   }
 
   loadUserOrders(): void {
-    this.http.get<Order[]>('http://localhost:3000/orders', {
-      headers: this.getHeaders()
-    }).subscribe({
-      next: (orders) => {
-        this.orders = orders || [];
-      },
-      error: (error) => {
-        console.error('Error loading orders:', error);
-      }
-    });
+    this.http
+      .get<Order[]>(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ORDERS.BASE}`,
+        {
+          headers: this.getHeaders(),
+        }
+      )
+      .subscribe({
+        next: (orders) => {
+          this.orders = orders || [];
+        },
+        error: (error) => {
+          console.error('Error loading orders:', error);
+        },
+      });
   }
 
   goToCart(): void {

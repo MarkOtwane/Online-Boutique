@@ -3,7 +3,7 @@
 # Test script for enhanced chat functionality
 # This script tests private messaging, group chat, and WebSocket functionality
 
-BASE_URL="http://localhost:3000"
+BASE_URL="https://online-boutique-tv00.onrender.com"
 FRONTEND_URL="http://localhost:4200"
 
 echo "=========================================="

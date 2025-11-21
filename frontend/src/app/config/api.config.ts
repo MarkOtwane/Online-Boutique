@@ -1,5 +1,7 @@
+import { environment } from '../../environments/environment';
+
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:3000',
+  BASE_URL: environment.apiUrl,
   ENDPOINTS: {
     AUTH: {
       LOGIN: '/auth/login',
@@ -29,7 +31,8 @@ export const API_CONFIG = {
     },
     CHAT: {
       CONVERSATIONS: '/chat/conversations',
-      CONVERSATION_MESSAGES: (id: number) => `/chat/conversations/${id}/messages`,
+      CONVERSATION_MESSAGES: (id: number) =>
+        `/chat/conversations/${id}/messages`,
       MESSAGES: '/chat/messages',
       MESSAGE_READ: (id: number) => `/chat/messages/${id}/read`,
       ONLINE_USERS: '/chat/users/online',
