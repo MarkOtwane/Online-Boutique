@@ -2,7 +2,12 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
@@ -19,8 +24,18 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
+    const authHeader = request.headers?.authorization;
+
+    if (!authHeader) {
+      throw new ForbiddenException('Authentication token missing');
+    }
+
     const user = request.user; // Set by JwtStrategy
 
-    return user && requiredRoles.includes(user.role);
+    if (!user) {
+      throw new ForbiddenException('Invalid or expired authentication token');
+    }
+
+    return requiredRoles.includes(user.role);
   }
 }
