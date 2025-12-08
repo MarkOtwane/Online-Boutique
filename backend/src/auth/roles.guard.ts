@@ -36,7 +36,17 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Invalid or expired authentication token');
     }
 
-    if (!requiredRoles.includes(user.role)) {
+    // Compare roles case-insensitively to avoid mismatch due to casing
+    const normalizedRequired = requiredRoles.map((r) => r.toLowerCase());
+    const userRole = (user.role || '').toString().toLowerCase();
+
+    // Add lightweight logging in non-production to help debug role mismatches
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.debug('RolesGuard:', { requiredRoles, userRole });
+    }
+
+    if (!normalizedRequired.includes(userRole)) {
       throw new ForbiddenException('Insufficient permissions for this action');
     }
 
