@@ -185,6 +185,7 @@ export class ProductsComponent implements OnInit {
         },
         error: (err) => {
           const errorMsg =
+            err?.error?.originalMessage ||
             err?.error?.message ||
             err?.message ||
             err.statusText ||

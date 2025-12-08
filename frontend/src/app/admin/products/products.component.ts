@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ProductService } from '../../services/product.service';
-import { Product } from '../../interfaces/product';
 import { Category } from '../../interfaces/category';
+import { Product } from '../../interfaces/product';
+import { ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-admin-products',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './products.component.html',
-  styleUrls: ['./products.component.css']
+  styleUrls: ['./products.component.css'],
 })
 export class AdminProductsComponent implements OnInit {
   Math = Math;
@@ -20,22 +20,22 @@ export class AdminProductsComponent implements OnInit {
   filteredProducts: Product[] = [];
   selectedProducts: number[] = [];
   isLoading = true;
-  
+
   // Search and filter
   searchTerm = '';
   selectedCategory = '';
   sortBy = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
-  
+
   // Pagination
   currentPage = 1;
   itemsPerPage = 10;
-  
+
   // Modal states
   showDeleteModal = false;
   showBulkDeleteModal = false;
   productToDelete: Product | null = null;
-  
+
   // Success/Error messages
   successMessage = '';
   errorMessage = '';
@@ -59,7 +59,7 @@ export class AdminProductsComponent implements OnInit {
         console.error('Error loading products:', error);
         this.errorMessage = 'Failed to load products';
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -70,7 +70,7 @@ export class AdminProductsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading categories:', error);
-      }
+      },
     });
   }
 
@@ -79,16 +79,19 @@ export class AdminProductsComponent implements OnInit {
 
     // Search filter
     if (this.searchTerm) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        product.category?.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+          product.category?.name
+            .toLowerCase()
+            .includes(this.searchTerm.toLowerCase())
       );
     }
 
     // Category filter
     if (this.selectedCategory) {
-      filtered = filtered.filter(product =>
-        product.category?.name === this.selectedCategory
+      filtered = filtered.filter(
+        (product) => product.category?.name === this.selectedCategory
       );
     }
 
@@ -175,19 +178,19 @@ export class AdminProductsComponent implements OnInit {
   }
 
   toggleSelectAll(): void {
-    const currentPageProductIds = this.paginatedProducts.map(p => p.id);
-    const allCurrentPageSelected = currentPageProductIds.every(id => 
+    const currentPageProductIds = this.paginatedProducts.map((p) => p.id);
+    const allCurrentPageSelected = currentPageProductIds.every((id) =>
       this.selectedProducts.includes(id)
     );
 
     if (allCurrentPageSelected) {
       // Deselect all current page products
-      this.selectedProducts = this.selectedProducts.filter(id => 
-        !currentPageProductIds.includes(id)
+      this.selectedProducts = this.selectedProducts.filter(
+        (id) => !currentPageProductIds.includes(id)
       );
     } else {
       // Select all current page products
-      currentPageProductIds.forEach(id => {
+      currentPageProductIds.forEach((id) => {
         if (!this.selectedProducts.includes(id)) {
           this.selectedProducts.push(id);
         }
@@ -196,8 +199,10 @@ export class AdminProductsComponent implements OnInit {
   }
 
   get isAllCurrentPageSelected(): boolean {
-    const currentPageProductIds = this.paginatedProducts.map(p => p.id);
-    return currentPageProductIds.every(id => this.selectedProducts.includes(id));
+    const currentPageProductIds = this.paginatedProducts.map((p) => p.id);
+    return currentPageProductIds.every((id) =>
+      this.selectedProducts.includes(id)
+    );
   }
 
   // Delete operations
@@ -211,20 +216,26 @@ export class AdminProductsComponent implements OnInit {
 
     this.productService.deleteProduct(this.productToDelete.id).subscribe({
       next: () => {
-        this.successMessage = `Product "${this.productToDelete!.name}" deleted successfully`;
+        this.successMessage = `Product "${
+          this.productToDelete!.name
+        }" deleted successfully`;
         this.loadProducts();
         this.showDeleteModal = false;
         this.productToDelete = null;
-        setTimeout(() => this.successMessage = '', 3000);
+        setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (error) => {
         console.error('Delete product error:', error);
-        const errorMsg = error?.error?.message || error?.message || 'Unknown error occurred';
+        const errorMsg =
+          error?.error?.originalMessage ||
+          error?.error?.message ||
+          error?.message ||
+          'Unknown error occurred';
         this.errorMessage = `Failed to delete product: ${errorMsg}`;
         this.showDeleteModal = false;
         this.productToDelete = null;
-        setTimeout(() => this.errorMessage = '', 5000);
-      }
+        setTimeout(() => (this.errorMessage = ''), 5000);
+      },
     });
   }
 
@@ -234,23 +245,26 @@ export class AdminProductsComponent implements OnInit {
   }
 
   bulkDeleteProducts(): void {
-    const deletePromises = this.selectedProducts.map(id => 
+    const deletePromises = this.selectedProducts.map((id) =>
       this.productService.deleteProduct(id).toPromise()
     );
 
-    Promise.all(deletePromises).then(() => {
-      this.successMessage = `${this.selectedProducts.length} products deleted successfully`;
-      this.selectedProducts = [];
-      this.loadProducts();
-      this.showBulkDeleteModal = false;
-      setTimeout(() => this.successMessage = '', 3000);
-    }).catch(error => {
-      console.error('Bulk delete products error:', error);
-      const errorMsg = error?.error?.message || error?.message || 'Unknown error occurred';
-      this.errorMessage = `Failed to delete some products: ${errorMsg}`;
-      this.showBulkDeleteModal = false;
-      setTimeout(() => this.errorMessage = '', 5000);
-    });
+    Promise.all(deletePromises)
+      .then(() => {
+        this.successMessage = `${this.selectedProducts.length} products deleted successfully`;
+        this.selectedProducts = [];
+        this.loadProducts();
+        this.showBulkDeleteModal = false;
+        setTimeout(() => (this.successMessage = ''), 3000);
+      })
+      .catch((error) => {
+        console.error('Bulk delete products error:', error);
+        const errorMsg =
+          error?.error?.message || error?.message || 'Unknown error occurred';
+        this.errorMessage = `Failed to delete some products: ${errorMsg}`;
+        this.showBulkDeleteModal = false;
+        setTimeout(() => (this.errorMessage = ''), 5000);
+      });
   }
 
   cancelDelete(): void {
@@ -263,7 +277,7 @@ export class AdminProductsComponent implements OnInit {
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(amount);
   }
 
@@ -271,11 +285,16 @@ export class AdminProductsComponent implements OnInit {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 
   getProductImageUrl(product: Product): string {
-    return product.imageUrl || `https://via.placeholder.com/100x100/cccccc/666666?text=${encodeURIComponent(product.name.substring(0, 2))}`;
+    return (
+      product.imageUrl ||
+      `https://via.placeholder.com/100x100/cccccc/666666?text=${encodeURIComponent(
+        product.name.substring(0, 2)
+      )}`
+    );
   }
 }

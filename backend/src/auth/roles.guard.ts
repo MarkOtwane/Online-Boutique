@@ -36,6 +36,10 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Invalid or expired authentication token');
     }
 
-    return requiredRoles.includes(user.role);
+    if (!requiredRoles.includes(user.role)) {
+      throw new ForbiddenException('Insufficient permissions for this action');
+    }
+
+    return true;
   }
 }

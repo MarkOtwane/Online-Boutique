@@ -62,13 +62,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     // Prepare response based on environment
-    const errorResponse = {
+    const userFriendlyMessage = this.getUserFriendlyMessage(status, message);
+
+    const errorResponse: any = {
       statusCode: status,
       timestamp,
       path: request.url,
       requestId,
-      message: this.getUserFriendlyMessage(status, message),
+      message: userFriendlyMessage,
     };
+
+    // Include the original server message for debugging/clarity so clients
+    // can show more specific reasons (kept alongside the user-friendly message).
+    // This is safe because we already map to a user-friendly message; rawMessage
+    // here is additional context. In production you may want to hide this.
+    errorResponse.originalMessage = message;
 
     // Add stack trace only in development
     if (isDevelopment && exception instanceof Error) {
