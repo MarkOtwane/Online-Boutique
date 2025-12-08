@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   BadRequestException,
-  Body,
   Controller,
   Delete,
   Get,
@@ -12,7 +11,6 @@ import {
   Put,
   Query,
   Req,
-  Request,
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
@@ -216,7 +214,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @SetMetadata('roles', ['admin'])
   async delete(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     return this.productsService.delete(id);
