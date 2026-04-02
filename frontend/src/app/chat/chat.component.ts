@@ -2,14 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import {
-  ChatConversation,
-  ChatMessage,
-  ChatUser,
-  CreateMessageRequest,
-} from '../interfaces/chat';
+import { ChatConversation, ChatMessage, ChatUser } from '../interfaces/chat';
 import { User } from '../interfaces/user';
 import { AuthService } from '../services/auth.service';
+import { ChatCryptoService } from '../services/chat-crypto.service';
 import { ChatService } from '../services/chat.service';
 
 @Component({
@@ -29,18 +25,19 @@ export class ChatComponent implements OnInit, OnDestroy {
   loading = false;
   selectedUser: ChatUser | null = null;
   showNewChatModal = false;
+  private typingTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private chatService: ChatService,
-    private authService: AuthService
+    private authService: AuthService,
+    private chatCryptoService: ChatCryptoService,
   ) {}
 
   ngOnInit(): void {
     this.authService.user$.subscribe((user) => {
       this.currentUser = user;
       if (user && (user.role === 'customer' || user.role === 'admin')) {
-        // Initialize socket connection when user is authenticated
-        this.chatService.initializeSocketConnection();
+        void this.chatService.initializeSocketConnection();
         this.loadConversations();
         this.loadOnlineUsers();
       }
@@ -65,14 +62,46 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cleanup if needed
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+    }
+    this.chatService.disconnect();
   }
 
   loadConversations(): void {
     this.loading = true;
     this.chatService.getConversations().subscribe({
-      next: (conversations) => {
-        this.conversations = conversations;
+      next: async (conversations) => {
+        this.conversations = await Promise.all(
+          conversations.map(async (conversation) => {
+            if (!conversation.lastMessage) {
+              return conversation;
+            }
+
+            try {
+              await this.chatCryptoService.setConversationKeyFromBundle(
+                conversation.id,
+                conversation.myKeyBundle,
+              );
+              const content = await this.chatCryptoService.decryptMessage(
+                conversation.id,
+                conversation.lastMessage.encryptedContent,
+                conversation.lastMessage.iv,
+              );
+
+              return {
+                ...conversation,
+                lastMessage: {
+                  ...conversation.lastMessage,
+                  content,
+                },
+              };
+            } catch (_error) {
+              return conversation;
+            }
+          }),
+        );
+        this.chatService.updateConversations(this.conversations);
         this.loading = false;
       },
       error: (error) => {
@@ -86,7 +115,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chatService.getOnlineUsers().subscribe({
       next: (users) => {
         this.onlineUsers = users.filter(
-          (user) => user.id !== this.currentUser?.id
+          (user) => user.id !== this.currentUser?.id,
         );
       },
       error: (error) => {
@@ -97,6 +126,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   selectConversation(conversation: ChatConversation): void {
     this.chatService.setActiveConversation(conversation);
+    this.markMessagesAsRead();
   }
 
   openNewChatModal(): void {
@@ -113,51 +143,56 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.selectedUser = user;
   }
 
-  startConversation(): void {
+  async startConversation(): Promise<void> {
     if (!this.selectedUser) return;
 
-    this.chatService.createConversation(this.selectedUser.id).subscribe({
-      next: (conversation) => {
-        this.conversations.unshift(conversation);
-        this.chatService.setActiveConversation(conversation);
-        this.closeNewChatModal();
-      },
-      error: (error) => {
-        console.error('Error creating conversation:', error);
-      },
-    });
+    if (!this.selectedUser.chatPublicKey) {
+      console.error('Selected user has no chat public key registered');
+      return;
+    }
+
+    const keyBundles = await this.chatCryptoService.buildConversationKeyBundles(
+      this.selectedUser.chatPublicKey,
+    );
+
+    this.chatService
+      .createConversation(
+        this.selectedUser.id,
+        keyBundles.initiatorKeyBundle,
+        keyBundles.recipientKeyBundle,
+      )
+      .subscribe({
+        next: (conversation) => {
+          this.conversations.unshift(conversation);
+          this.chatService.setActiveConversation(conversation);
+          this.closeNewChatModal();
+        },
+        error: (error) => {
+          console.error('Error creating conversation:', error);
+        },
+      });
   }
 
   sendMessage(): void {
     if (!this.newMessage.trim() || !this.activeConversation) return;
 
-    const receiverId = this.getReceiverId();
-    if (!receiverId) return;
+    const plainText = this.newMessage.trim();
+    this.newMessage = '';
+    this.emitTyping(false);
 
-    const messageData: CreateMessageRequest = {
-      conversationId: this.activeConversation.id,
-      receiverId,
-      content: this.newMessage.trim(),
-    };
-
-    this.chatService.sendMessage(messageData).subscribe({
-      next: (message) => {
-        this.chatService.addMessage(message);
-        this.newMessage = '';
-      },
-      error: (error) => {
-        console.error('Error sending message:', error);
-      },
-    });
+    void this.chatService.sendEncryptedMessage(plainText);
   }
 
-  getReceiverId(): number | null {
-    if (!this.activeConversation || !this.currentUser) return null;
+  onMessageInput(): void {
+    this.emitTyping(true);
 
-    const receiver = this.activeConversation.participants.find(
-      (participant) => participant.id !== this.currentUser!.id
-    );
-    return receiver ? receiver.id : null;
+    if (this.typingTimeout) {
+      clearTimeout(this.typingTimeout);
+    }
+
+    this.typingTimeout = setTimeout(() => {
+      this.emitTyping(false);
+    }, 1000);
   }
 
   getReceiverInfo(): ChatUser | null {
@@ -165,7 +200,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     return (
       this.activeConversation.participants.find(
-        (participant) => participant.id !== this.currentUser!.id
+        (participant) => participant.id !== this.currentUser!.id,
       ) || null
     );
   }
@@ -175,7 +210,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     return (
       conversation.participants.find(
-        (participant) => participant.id !== this.currentUser!.id
+        (participant) => participant.id !== this.currentUser!.id,
       ) || null
     );
   }
@@ -210,7 +245,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (!this.activeConversation) return;
 
     this.messages.forEach((message) => {
-      if (!message.isRead && message.receiverId === this.currentUser?.id) {
+      if (!message.isRead && message.senderId !== this.currentUser?.id) {
         this.chatService.markMessageAsRead(message.id).subscribe({
           error: (error) =>
             console.error('Error marking message as read:', error),
@@ -224,5 +259,13 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.currentUser?.role === 'customer' ||
       this.currentUser?.role === 'admin'
     );
+  }
+
+  private emitTyping(isTyping: boolean): void {
+    if (!this.activeConversation) {
+      return;
+    }
+
+    this.chatService.sendTypingStatus(this.activeConversation.id, isTyping);
   }
 }

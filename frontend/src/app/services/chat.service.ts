@@ -1,84 +1,114 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { ChatMessage, ChatConversation, CreateMessageRequest, ChatUser } from '../interfaces/chat';
 import { API_CONFIG } from '../config/api.config';
+import {
+  ChatConversation,
+  ChatMessage,
+  ChatUser,
+  CreateMessageRequest,
+} from '../interfaces/chat';
+import { ChatCryptoService } from './chat-crypto.service';
+
+interface IncomingEncryptedMessage {
+  id: string;
+  conversationId: string;
+  senderId: number;
+  encryptedContent: string;
+  iv: string;
+  algorithm: string;
+  clientMessageId?: string;
+  createdAt: string;
+  isRead: boolean;
+  sender: {
+    id: number;
+    email: string;
+    role: string;
+  };
+}
 
 @Injectable({
-   providedIn: 'root',
- })
+  providedIn: 'root',
+})
 export class ChatService {
-   private apiUrl = API_CONFIG.BASE_URL;
-   private socket: Socket | null = null;
-   private conversationsSubject = new BehaviorSubject<ChatConversation[]>([]);
-   private activeConversationSubject = new BehaviorSubject<ChatConversation | null>(null);
-   private messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
-   private onlineUsersSubject = new BehaviorSubject<ChatUser[]>([]);
-   private typingUsersSubject = new BehaviorSubject<Set<number>>(new Set());
+  private apiUrl = API_CONFIG.BASE_URL;
+  private socket: Socket | null = null;
+  private activeConversationId: string | null = null;
 
-   conversations$ = this.conversationsSubject.asObservable();
-   activeConversation$ = this.activeConversationSubject.asObservable();
-   messages$ = this.messagesSubject.asObservable();
-   onlineUsers$ = this.onlineUsersSubject.asObservable();
-   typingUsers$ = this.typingUsersSubject.asObservable();
+  private conversationsSubject = new BehaviorSubject<ChatConversation[]>([]);
+  private activeConversationSubject =
+    new BehaviorSubject<ChatConversation | null>(null);
+  private messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
+  private onlineUsersSubject = new BehaviorSubject<ChatUser[]>([]);
+  private typingUsersSubject = new BehaviorSubject<Set<number>>(new Set());
 
-   constructor(private http: HttpClient) {
-     // Don't initialize socket immediately - wait for authentication
-   }
+  conversations$ = this.conversationsSubject.asObservable();
+  activeConversation$ = this.activeConversationSubject.asObservable();
+  messages$ = this.messagesSubject.asObservable();
+  onlineUsers$ = this.onlineUsersSubject.asObservable();
+  typingUsers$ = this.typingUsersSubject.asObservable();
 
-   public initializeSocketConnection(): void {
-     if (this.socket) {
-       this.socket.disconnect();
-     }
-     this.initializeSocket();
-   }
+  constructor(
+    private http: HttpClient,
+    private chatCryptoService: ChatCryptoService,
+  ) {}
 
-   private initializeSocket(): void {
-     const token = localStorage.getItem('access_token');
-     if (!token) {
-       console.warn('No access token found for socket connection');
-       return;
-     }
-     
-     this.socket = io(this.apiUrl, {
-       auth: {
-         token,
-       },
-     });
+  async initializeSocketConnection(): Promise<void> {
+    await this.chatCryptoService.ensureIdentity();
+    const publicKey = await this.chatCryptoService.getPublicKeyBundle();
+    await firstValueFrom(this.upsertPublicKey(publicKey));
 
-     this.socket.on('connect', () => {
-       console.log('Connected to chat server');
-     });
+    if (this.socket) {
+      this.socket.disconnect();
+    }
 
-     this.socket.on('disconnect', () => {
-       console.log('Disconnected from chat server');
-     });
+    this.initializeSocket();
+  }
 
-     this.socket.on('newMessage', (message: ChatMessage) => {
-       this.handleNewMessage(message);
-     });
+  private initializeSocket(): void {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      return;
+    }
 
-     this.socket.on('userOnline', (data: { userId: number }) => {
-       this.handleUserOnline(data.userId);
-     });
+    this.socket = io(this.apiUrl, {
+      auth: {
+        token,
+      },
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      transports: ['websocket', 'polling'],
+    });
 
-     this.socket.on('userOffline', (data: { userId: number }) => {
-       this.handleUserOffline(data.userId);
-     });
+    this.socket.on('connect', () => {
+      if (this.activeConversationId) {
+        this.joinConversation(this.activeConversationId);
+      }
+    });
 
-     this.socket.on('userTyping', (data: { userId: number; isTyping: boolean }) => {
-       this.handleUserTyping(data);
-     });
+    this.socket.on('receiveMessage', (message: IncomingEncryptedMessage) => {
+      void this.handleIncomingEncryptedMessage(message);
+    });
 
-     this.socket.on('messageRead', (data: { messageId: number }) => {
-       this.handleMessageRead(data.messageId);
-     });
+    this.socket.on('userOnline', (data: { userId: number }) => {
+      this.handleUserOnline(data.userId);
+    });
 
-     this.socket.on('newConversation', (data: any) => {
-       this.handleNewConversation(data);
-     });
-   }
+    this.socket.on('userOffline', (data: { userId: number }) => {
+      this.handleUserOffline(data.userId);
+    });
+
+    this.socket.on(
+      'typing',
+      (data: { conversationId: string; userId: number; isTyping: boolean }) => {
+        if (this.activeConversationId === data.conversationId) {
+          this.handleUserTyping(data);
+        }
+      },
+    );
+  }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('access_token');
@@ -89,27 +119,41 @@ export class ChatService {
   }
 
   getConversations(): Observable<ChatConversation[]> {
-    return this.http.get<ChatConversation[]>(`${this.apiUrl}/chat/conversations`, {
-      headers: this.getHeaders(),
-    });
+    return this.http.get<ChatConversation[]>(
+      `${this.apiUrl}/chat/conversations`,
+      {
+        headers: this.getHeaders(),
+      },
+    );
   }
 
-  getConversationMessages(conversationId: number): Observable<ChatMessage[]> {
-    return this.http.get<ChatMessage[]>(`${this.apiUrl}/chat/conversations/${conversationId}/messages`, {
-      headers: this.getHeaders(),
-    });
+  getConversationMessages(
+    conversationId: string,
+  ): Observable<IncomingEncryptedMessage[]> {
+    return this.http.get<IncomingEncryptedMessage[]>(
+      `${this.apiUrl}/chat/conversations/${conversationId}/messages`,
+      {
+        headers: this.getHeaders(),
+      },
+    );
   }
 
-  createConversation(userId: number): Observable<ChatConversation> {
-    return this.http.post<ChatConversation>(`${this.apiUrl}/chat/conversations`, { userId }, {
-      headers: this.getHeaders(),
-    });
-  }
-
-  sendMessage(messageData: CreateMessageRequest): Observable<ChatMessage> {
-    return this.http.post<ChatMessage>(`${this.apiUrl}/chat/messages`, messageData, {
-      headers: this.getHeaders(),
-    });
+  createConversation(
+    userId: number,
+    initiatorKeyBundle: string,
+    recipientKeyBundle: string,
+  ): Observable<ChatConversation> {
+    return this.http.post<ChatConversation>(
+      `${this.apiUrl}/chat/conversations`,
+      {
+        userId,
+        initiatorKeyBundle,
+        recipientKeyBundle,
+      },
+      {
+        headers: this.getHeaders(),
+      },
+    );
   }
 
   getOnlineUsers(): Observable<ChatUser[]> {
@@ -118,144 +162,148 @@ export class ChatService {
     });
   }
 
-  markMessageAsRead(messageId: number): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/chat/messages/${messageId}/read`, {}, {
-      headers: this.getHeaders(),
-    });
+  markMessageAsRead(messageId: string): Observable<void> {
+    return this.http.put<void>(
+      `${this.apiUrl}/chat/messages/${messageId}/read`,
+      {},
+      {
+        headers: this.getHeaders(),
+      },
+    );
   }
 
-  // Local state management methods
   setActiveConversation(conversation: ChatConversation | null): void {
+    const previousId = this.activeConversationId;
+
     this.activeConversationSubject.next(conversation);
-    if (conversation) {
-      this.loadConversationMessages(conversation.id);
+    this.activeConversationId = conversation?.id || null;
+
+    if (previousId && previousId !== this.activeConversationId) {
+      this.leaveConversation(previousId);
     }
+
+    if (conversation) {
+      this.joinConversation(conversation.id);
+      void this.loadConversationMessages(conversation);
+      return;
+    }
+
+    this.messagesSubject.next([]);
   }
 
-  addMessage(message: ChatMessage): void {
-    const currentMessages = this.messagesSubject.getValue();
-    this.messagesSubject.next([...currentMessages, message]);
+  async loadConversationMessages(
+    conversation: ChatConversation,
+  ): Promise<void> {
+    await this.chatCryptoService.setConversationKeyFromBundle(
+      conversation.id,
+      conversation.myKeyBundle,
+    );
+
+    this.getConversationMessages(conversation.id).subscribe({
+      next: (messages) => {
+        void this.decryptMessages(messages);
+      },
+      error: (error) => {
+        console.error('Error loading messages:', error);
+      },
+    });
   }
 
   updateConversations(conversations: ChatConversation[]): void {
     this.conversationsSubject.next(conversations);
   }
 
-  loadConversationMessages(conversationId: number): void {
-    this.getConversationMessages(conversationId).subscribe({
-      next: (messages) => this.messagesSubject.next(messages),
-      error: (error) => console.error('Error loading messages:', error),
-    });
-  }
-
-  getActiveConversation(): ChatConversation | null {
-    return this.activeConversationSubject.getValue();
-  }
-
-  getMessages(): ChatMessage[] {
-    return this.messagesSubject.getValue();
-  }
-
-  // Real-time event handlers
-  private handleNewMessage(message: ChatMessage): void {
-    const currentMessages = this.messagesSubject.getValue();
-    const activeConversation = this.activeConversationSubject.getValue();
-
-    // Only add message if it belongs to the active conversation
-    if (activeConversation && message.conversationId === activeConversation.id) {
-      this.messagesSubject.next([...currentMessages, message]);
+  async sendEncryptedMessage(plainText: string): Promise<void> {
+    if (!this.socket || !this.activeConversationId) {
+      return;
     }
 
-    // Update conversation's last message
-    this.updateConversationLastMessage(message);
-  }
-
-  private handleUserOnline(userId: number): void {
-    const currentUsers = this.onlineUsersSubject.getValue();
-    const userExists = currentUsers.find(user => user.id === userId);
-
-    if (!userExists) {
-      // Fetch user details and add to online users
-      this.http.get<ChatUser[]>(`${this.apiUrl}/chat/users/online`).subscribe({
-        next: (users) => {
-          const updatedUser = users.find(user => user.id === userId);
-          if (updatedUser) {
-            this.onlineUsersSubject.next([...currentUsers, updatedUser]);
-          }
-        },
-      });
-    }
-  }
-
-  private handleUserOffline(userId: number): void {
-    const currentUsers = this.onlineUsersSubject.getValue();
-    const filteredUsers = currentUsers.filter(user => user.id !== userId);
-    this.onlineUsersSubject.next(filteredUsers);
-  }
-
-  private handleUserTyping(data: { userId: number; isTyping: boolean }): void {
-    const currentTypingUsers = this.typingUsersSubject.getValue();
-    const newTypingUsers = new Set(currentTypingUsers);
-
-    if (data.isTyping) {
-      newTypingUsers.add(data.userId);
-    } else {
-      newTypingUsers.delete(data.userId);
-    }
-
-    this.typingUsersSubject.next(newTypingUsers);
-  }
-
-  private handleMessageRead(messageId: number): void {
-    const currentMessages = this.messagesSubject.getValue();
-    const updatedMessages = currentMessages.map(msg =>
-      msg.id === messageId ? { ...msg, isRead: true } : msg
+    const encrypted = await this.chatCryptoService.encryptMessage(
+      this.activeConversationId,
+      plainText,
     );
-    this.messagesSubject.next(updatedMessages);
-  }
 
-  private handleNewConversation(data: any): void {
-    // Refresh conversations list when a new conversation is created
-    this.getConversations().subscribe({
-      next: (conversations) => {
-        this.conversationsSubject.next(conversations);
+    const clientMessageId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    const optimisticMessage: ChatMessage = {
+      id: clientMessageId,
+      conversationId: this.activeConversationId,
+      senderId: -1,
+      content: plainText,
+      encryptedContent: encrypted.encryptedContent,
+      iv: encrypted.iv,
+      algorithm: encrypted.algorithm,
+      clientMessageId,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      sender: {
+        id: -1,
+        email: 'me',
+        role: 'customer',
       },
-    });
-  }
+    };
 
-  private updateConversationLastMessage(message: ChatMessage): void {
-    const currentConversations = this.conversationsSubject.getValue();
-    const updatedConversations = currentConversations.map(conv =>
-      conv.id === message.conversationId
-        ? { ...conv, lastMessage: message, updatedAt: message.createdAt }
-        : conv
+    this.messagesSubject.next([
+      ...this.messagesSubject.getValue(),
+      optimisticMessage,
+    ]);
+
+    const payload: CreateMessageRequest = {
+      conversationId: this.activeConversationId,
+      encryptedContent: encrypted.encryptedContent,
+      iv: encrypted.iv,
+      algorithm: encrypted.algorithm,
+      clientMessageId,
+    };
+
+    this.socket.emit(
+      'sendMessage',
+      payload,
+      (ack: {
+        ok: boolean;
+        message?: IncomingEncryptedMessage;
+        error?: string;
+      }) => {
+        if (!ack?.ok || !ack.message) {
+          this.messagesSubject.next(
+            this.messagesSubject
+              .getValue()
+              .filter((msg) => msg.id !== clientMessageId),
+          );
+          return;
+        }
+
+        void this.replaceOptimisticMessage(
+          clientMessageId,
+          ack.message,
+          plainText,
+        );
+      },
     );
-    this.conversationsSubject.next(updatedConversations);
   }
 
-  // Socket.IO methods for real-time functionality
-  joinConversation(conversationId: number): void {
-    if (this.socket) {
-      this.socket.emit('joinChat', { conversationId });
+  sendTypingStatus(conversationId: string, isTyping: boolean): void {
+    if (!this.socket) {
+      return;
     }
+
+    this.socket.emit('typing', { conversationId, isTyping });
   }
 
-  leaveConversation(conversationId: number): void {
-    if (this.socket) {
-      this.socket.emit('leaveChat', { conversationId });
+  joinConversation(conversationId: string): void {
+    if (!this.socket) {
+      return;
     }
+
+    this.socket.emit('joinConversation', { conversationId });
   }
 
-  sendMessageRealTime(conversationId: number, content: string, receiverId: number): void {
-    if (this.socket) {
-      this.socket.emit('sendMessage', { conversationId, content, receiverId });
+  leaveConversation(conversationId: string): void {
+    if (!this.socket) {
+      return;
     }
-  }
 
-  sendTypingStatus(conversationId: number, isTyping: boolean): void {
-    if (this.socket) {
-      this.socket.emit('typing', { conversationId, isTyping });
-    }
+    this.socket.emit('leaveConversation', { conversationId });
   }
 
   disconnect(): void {
@@ -268,27 +316,6 @@ export class ChatService {
     return this.typingUsersSubject.getValue().has(userId);
   }
 
-  // Global Group Chat Methods
-  getGlobalGroupChat(): Observable<ChatConversation> {
-    return this.http.get<ChatConversation>(`${this.apiUrl}${API_CONFIG.ENDPOINTS.CHAT.GLOBAL_GROUP}`, {
-      headers: this.getHeaders(),
-    });
-  }
-
-  joinGlobalGroupChat(conversationId: number): void {
-    this.joinConversation(conversationId);
-  }
-
-  leaveGlobalGroupChat(conversationId: number): void {
-    this.leaveConversation(conversationId);
-  }
-
-  sendGlobalGroupMessage(conversationId: number, content: string): void {
-    if (this.socket) {
-      this.socket.emit('sendMessage', { conversationId, content, receiverId: null });
-    }
-  }
-
   formatMessageTime(timestamp: string): string {
     const date = new Date(timestamp);
     const now = new Date();
@@ -299,5 +326,150 @@ export class ChatService {
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
     return date.toLocaleDateString();
+  }
+
+  private upsertPublicKey(publicKey: string): Observable<unknown> {
+    return this.http.post(
+      `${this.apiUrl}/chat/keys/public`,
+      { publicKey },
+      {
+        headers: this.getHeaders(),
+      },
+    );
+  }
+
+  private async handleIncomingEncryptedMessage(
+    message: IncomingEncryptedMessage,
+  ): Promise<void> {
+    try {
+      const content = await this.chatCryptoService.decryptMessage(
+        message.conversationId,
+        message.encryptedContent,
+        message.iv,
+      );
+
+      const next: ChatMessage = {
+        ...message,
+        content,
+      };
+
+      if (this.activeConversationId === next.conversationId) {
+        this.messagesSubject.next([...this.messagesSubject.getValue(), next]);
+      }
+
+      this.updateConversationLastMessage(next);
+    } catch (error) {
+      console.error('Unable to decrypt incoming chat message', error);
+    }
+  }
+
+  private async decryptMessages(
+    messages: IncomingEncryptedMessage[],
+  ): Promise<void> {
+    const decrypted = await Promise.all(
+      messages.map(async (message) => {
+        const content = await this.chatCryptoService.decryptMessage(
+          message.conversationId,
+          message.encryptedContent,
+          message.iv,
+        );
+
+        return {
+          ...message,
+          content,
+        };
+      }),
+    );
+
+    this.messagesSubject.next(decrypted);
+  }
+
+  private async replaceOptimisticMessage(
+    optimisticId: string,
+    serverMessage: IncomingEncryptedMessage,
+    fallbackPlainText: string,
+  ): Promise<void> {
+    const current = this.messagesSubject.getValue();
+
+    let content = fallbackPlainText;
+    try {
+      content = await this.chatCryptoService.decryptMessage(
+        serverMessage.conversationId,
+        serverMessage.encryptedContent,
+        serverMessage.iv,
+      );
+    } catch (_error) {
+      content = fallbackPlainText;
+    }
+
+    const updated = current.map((message) =>
+      message.id === optimisticId
+        ? {
+            ...serverMessage,
+            content,
+          }
+        : message,
+    );
+
+    this.messagesSubject.next(updated);
+    this.updateConversationLastMessage({ ...serverMessage, content });
+  }
+
+  private handleUserOnline(userId: number): void {
+    const currentUsers = this.onlineUsersSubject.getValue();
+    const userExists = currentUsers.find((user) => user.id === userId);
+
+    if (userExists) {
+      return;
+    }
+
+    this.http
+      .get<ChatUser[]>(`${this.apiUrl}/chat/users/online`, {
+        headers: this.getHeaders(),
+      })
+      .subscribe({
+        next: (users) => {
+          const updatedUser = users.find((user) => user.id === userId);
+          if (updatedUser) {
+            this.onlineUsersSubject.next([...currentUsers, updatedUser]);
+          }
+        },
+      });
+  }
+
+  private handleUserOffline(userId: number): void {
+    const currentUsers = this.onlineUsersSubject.getValue();
+    this.onlineUsersSubject.next(
+      currentUsers.filter((user) => user.id !== userId),
+    );
+  }
+
+  private handleUserTyping(data: { userId: number; isTyping: boolean }): void {
+    const current = this.typingUsersSubject.getValue();
+    const next = new Set(current);
+
+    if (data.isTyping) {
+      next.add(data.userId);
+    } else {
+      next.delete(data.userId);
+    }
+
+    this.typingUsersSubject.next(next);
+  }
+
+  private updateConversationLastMessage(message: ChatMessage): void {
+    const updated = this.conversationsSubject
+      .getValue()
+      .map((conversation) =>
+        conversation.id === message.conversationId
+          ? {
+              ...conversation,
+              lastMessage: message,
+              updatedAt: message.createdAt,
+            }
+          : conversation,
+      );
+
+    this.conversationsSubject.next(updated);
   }
 }

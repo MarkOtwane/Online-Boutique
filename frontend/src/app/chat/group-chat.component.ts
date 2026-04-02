@@ -1,17 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChatService } from '../services/chat.service';
-import { AuthService } from '../services/auth.service';
-import { ChatMessage, ChatConversation } from '../interfaces/chat';
+import { ChatConversation, ChatMessage } from '../interfaces/chat';
 import { User } from '../interfaces/user';
+import { AuthService } from '../services/auth.service';
+import { ChatService } from '../services/chat.service';
 
 @Component({
   selector: 'app-group-chat',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './group-chat.component.html',
-  styleUrls: ['./group-chat.component.css']
+  styleUrls: ['./group-chat.component.css'],
 })
 export class GroupChatComponent implements OnInit, OnDestroy {
   globalGroupChat: ChatConversation | null = null;
@@ -25,11 +25,11 @@ export class GroupChatComponent implements OnInit, OnDestroy {
 
   constructor(
     private chatService: ChatService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
-    this.authService.user$.subscribe(user => {
+    this.authService.user$.subscribe((user) => {
       this.currentUser = user;
       if (user && !this.isConnected) {
         this.initializeChat();
@@ -37,7 +37,7 @@ export class GroupChatComponent implements OnInit, OnDestroy {
     });
 
     // Subscribe to messages
-    this.chatService.messages$.subscribe(messages => {
+    this.chatService.messages$.subscribe((messages) => {
       this.messages = messages;
       this.scrollToBottom();
     });
@@ -47,29 +47,15 @@ export class GroupChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.globalGroupChat) {
-      this.chatService.leaveGlobalGroupChat(this.globalGroupChat.id);
-    }
+    this.chatService.disconnect();
   }
 
   initializeChat(): void {
     this.loading = true;
-    this.chatService.initializeSocketConnection();
-    
-    this.chatService.getGlobalGroupChat().subscribe({
-      next: (groupChat) => {
-        this.globalGroupChat = groupChat;
-        this.chatService.joinGlobalGroupChat(groupChat.id);
-        this.chatService.loadConversationMessages(groupChat.id);
-        this.loading = false;
-        
-        // Load online users
-        this.loadOnlineUsers();
-      },
-      error: (error) => {
-        console.error('Error loading global group chat:', error);
-        this.loading = false;
-      }
+
+    void this.chatService.initializeSocketConnection().finally(() => {
+      this.loading = false;
+      this.loadOnlineUsers();
     });
   }
 
@@ -80,34 +66,16 @@ export class GroupChatComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading online users:', error);
-      }
+      },
     });
   }
 
   sendMessage(): void {
-    if (!this.newMessage.trim() || !this.globalGroupChat) {
+    if (!this.newMessage.trim()) {
       return;
     }
 
-    const messageContent = this.newMessage.trim();
     this.newMessage = '';
-
-    // Send real-time message
-    this.chatService.sendGlobalGroupMessage(this.globalGroupChat.id, messageContent);
-
-    // Also send via HTTP as backup
-    this.chatService.sendMessage({
-      conversationId: this.globalGroupChat.id,
-      receiverId: undefined,
-      content: messageContent
-    }).subscribe({
-      next: (message) => {
-        console.log('Message sent successfully:', message);
-      },
-      error: (error) => {
-        console.error('Error sending message:', error);
-      }
-    });
   }
 
   onKeyPress(event: KeyboardEvent): void {

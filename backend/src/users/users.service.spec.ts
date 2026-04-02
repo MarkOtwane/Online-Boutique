@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { UsersService } from './users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -22,7 +22,7 @@ describe('UsersService', () => {
             chatMessage: {
               deleteMany: jest.fn(),
             },
-            chatConversationParticipant: {
+            chatConversation: {
               deleteMany: jest.fn(),
             },
             comment: {

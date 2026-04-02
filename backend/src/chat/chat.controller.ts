@@ -6,14 +6,17 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { CreateConversationDto, CreateMessageDto } from './chat.dto';
+import {
+  CreateConversationDto,
+  CreateMessageDto,
+  UpsertChatPublicKeyDto,
+} from './chat.dto';
 import { ChatService } from './chat.service';
 
 @Controller('chat')
@@ -30,7 +33,7 @@ export class ChatController {
   @UseGuards(JwtAuthGuard)
   async getConversationMessages(
     @Request() req,
-    @Param('id', ParseIntPipe) conversationId: number,
+    @Param('id') conversationId: string,
   ) {
     return this.chatService.getConversationMessages(
       conversationId,
@@ -77,10 +80,7 @@ export class ChatController {
 
   @Put('messages/:id/read')
   @UseGuards(JwtAuthGuard)
-  async markMessageAsRead(
-    @Request() req,
-    @Param('id', ParseIntPipe) messageId: number,
-  ) {
+  async markMessageAsRead(@Request() req, @Param('id') messageId: string) {
     return this.chatService.markMessageAsRead(req.user.id, messageId);
   }
 
@@ -90,9 +90,12 @@ export class ChatController {
     return this.chatService.setUserOnlineStatus(req.user.id, body.isOnline);
   }
 
-  @Get('global-group')
+  @Post('keys/public')
   @UseGuards(JwtAuthGuard)
-  async getGlobalGroupChat(@Request() req) {
-    return this.chatService.getOrCreateGlobalGroupChat(req.user.id);
+  async upsertChatPublicKey(
+    @Request() req,
+    @Body() dto: UpsertChatPublicKeyDto,
+  ) {
+    return this.chatService.upsertChatPublicKey(req.user.id, dto);
   }
 }

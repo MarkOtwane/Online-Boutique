@@ -1,25 +1,54 @@
-import { IsInt, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MinLength,
+} from 'class-validator';
 
 export class CreateMessageDto {
-  @IsOptional()
-  @IsInt()
-  receiverId?: number;
-
-  @IsOptional()
-  @IsInt()
-  conversationId?: number;
+  @IsUUID()
+  conversationId: string;
 
   @IsString()
   @MinLength(1)
-  content: string;
+  encryptedContent: string;
+
+  @IsString()
+  @MinLength(1)
+  iv: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  algorithm?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  clientMessageId?: string;
 }
 
 export class CreateConversationDto {
   @IsInt()
   userId: number;
+
+  @IsString()
+  @MinLength(1)
+  initiatorKeyBundle: string;
+
+  @IsString()
+  @MinLength(1)
+  recipientKeyBundle: string;
 }
 
 export class MarkMessageReadDto {
-  @IsInt()
-  messageId: number;
+  @IsUUID()
+  messageId: string;
+}
+
+export class UpsertChatPublicKeyDto {
+  @IsString()
+  @MinLength(1)
+  publicKey: string;
 }

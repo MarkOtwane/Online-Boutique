@@ -1,9 +1,12 @@
 export interface ChatMessage {
-  id: number;
-  conversationId: number;
+  id: string;
+  conversationId: string;
   senderId: number;
-  receiverId?: number | null; // null for group messages
   content: string;
+  encryptedContent: string;
+  iv: string;
+  algorithm: string;
+  clientMessageId?: string;
   createdAt: string;
   isRead: boolean;
   sender: {
@@ -11,37 +14,40 @@ export interface ChatMessage {
     email: string;
     role: string;
   };
-  receiver?: {
-    id: number;
-    email: string;
-    role: string;
-  };
 }
 
 export interface ChatConversation {
-  id: number;
+  id: string;
+  participant1Id: number;
+  participant2Id: number;
+  myKeyBundle: string;
   participants: {
     id: number;
     email: string;
     role: string;
+    chatPublicKey?: string | null;
+    isOnline?: boolean;
+    lastSeen?: string;
   }[];
   lastMessage?: ChatMessage;
   unreadCount: number;
   createdAt: string;
   updatedAt: string;
-  isGlobalGroup?: boolean;
 }
 
 export interface CreateMessageRequest {
-  conversationId: number;
-  receiverId?: number | null; // null for group messages
-  content: string;
+  conversationId: string;
+  encryptedContent: string;
+  iv: string;
+  algorithm?: string;
+  clientMessageId?: string;
 }
 
 export interface ChatUser {
   id: number;
   email: string;
   role: string;
+  chatPublicKey?: string | null;
   isOnline?: boolean;
   lastSeen?: string;
 }

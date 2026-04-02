@@ -1,12 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateConversationDto, CreateMessageDto } from './chat.dto';
+import {
+  CreateConversationDto,
+  CreateMessageDto,
+  UpsertChatPublicKeyDto,
+} from './chat.dto';
 
 @Injectable()
 export class ChatService {
@@ -15,24 +19,27 @@ export class ChatService {
   async getConversations(userId: number) {
     const conversations = await this.prisma.chatConversation.findMany({
       where: {
-        participants: {
-          some: {
-            userId,
-          },
-        },
+        OR: [{ participant1Id: userId }, { participant2Id: userId }],
       },
       include: {
-        participants: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                email: true,
-                role: true,
-                isOnline: true,
-                lastSeen: true,
-              },
-            },
+        participant1: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            isOnline: true,
+            lastSeen: true,
+            chatPublicKey: true,
+          },
+        },
+        participant2: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            isOnline: true,
+            lastSeen: true,
+            chatPublicKey: true,
           },
         },
         messages: {
@@ -56,42 +63,35 @@ export class ChatService {
       },
     });
 
-    return conversations.map((conversation) => {
-      const { messages, participants, ...conversationData } = conversation;
-      const otherParticipants = participants
-        .filter((p) => p.userId !== userId)
-        .map((p) => p.user);
+    return Promise.all(
+      conversations.map(async (conversation) => {
+        const participants = [
+          conversation.participant1,
+          conversation.participant2,
+        ].filter((participant) => participant.id !== userId);
 
-      const lastMessage = messages[0] || null;
-      const unreadCount = this.getUnreadCount(conversation.id, userId);
+        const myKeyBundle =
+          conversation.participant1Id === userId
+            ? conversation.participant1KeyBundle
+            : conversation.participant2KeyBundle;
 
-      return {
-        ...conversationData,
-        participants: otherParticipants,
-        lastMessage,
-        unreadCount,
-      };
-    });
+        return {
+          id: conversation.id,
+          createdAt: conversation.createdAt,
+          updatedAt: conversation.updatedAt,
+          participant1Id: conversation.participant1Id,
+          participant2Id: conversation.participant2Id,
+          participants,
+          myKeyBundle,
+          lastMessage: conversation.messages[0] || null,
+          unreadCount: await this.getUnreadCount(conversation.id, userId),
+        };
+      }),
+    );
   }
 
-  async getConversationMessages(conversationId: number, userId: number) {
-    // Verify user is part of the conversation
-    const conversation = await this.prisma.chatConversation.findFirst({
-      where: {
-        id: conversationId,
-        participants: {
-          some: {
-            userId,
-          },
-        },
-      },
-    });
-
-    if (!conversation) {
-      throw new ForbiddenException(
-        'You do not have access to this conversation',
-      );
-    }
+  async getConversationMessages(conversationId: string, userId: number) {
+    await this.assertConversationMembership(conversationId, userId);
 
     return this.prisma.chatMessage.findMany({
       where: {
@@ -99,13 +99,6 @@ export class ChatService {
       },
       include: {
         sender: {
-          select: {
-            id: true,
-            email: true,
-            role: true,
-          },
-        },
-        receiver: {
           select: {
             id: true,
             email: true,
@@ -120,156 +113,112 @@ export class ChatService {
   }
 
   async createConversation(userId: number, dto: CreateConversationDto) {
-    // Check if conversation already exists between these users
-    const existingConversation = await this.prisma.chatConversation.findFirst({
-      where: {
-        participants: {
-          every: {
-            userId: {
-              in: [userId, dto.userId],
-            },
-          },
-        },
-      },
-      include: {
-        participants: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                email: true,
-                role: true,
-                isOnline: true,
-                lastSeen: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (existingConversation) {
-      const otherParticipants = existingConversation.participants
-        .filter((p) => p.userId !== userId)
-        .map((p) => p.user);
-
-      return {
-        ...existingConversation,
-        participants: otherParticipants,
-        unreadCount: 0,
-      };
-    }
-
-    // Create new conversation
-    const conversation = await this.prisma.chatConversation.create({
-      data: {},
-      include: {
-        participants: true,
-      },
-    });
-
-    // Add participants
-    await this.prisma.chatConversationParticipant.createMany({
-      data: [
-        {
-          conversationId: conversation.id,
-          userId,
-        },
-        {
-          conversationId: conversation.id,
-          userId: dto.userId,
-        },
-      ],
-    });
-
-    // Fetch complete conversation data
-    return this.prisma.chatConversation.findUnique({
-      where: { id: conversation.id },
-      include: {
-        participants: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                email: true,
-                role: true,
-                isOnline: true,
-                lastSeen: true,
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  async sendMessage(userId: number, dto: CreateMessageDto) {
-    let conversation;
-
-    if (dto.conversationId) {
-      // Sending to an existing conversation (could be private or group)
-      conversation = await this.prisma.chatConversation.findFirst({
-        where: {
-          id: dto.conversationId,
-          participants: {
-            some: {
-              userId,
-            },
-          },
-        },
-      });
-
-      if (!conversation) {
-        throw new ForbiddenException(
-          'You are not a participant in this conversation',
-        );
-      }
-    } else if (dto.receiverId) {
-      // Creating new private conversation
-      conversation = await this.prisma.chatConversation.findFirst({
-        where: {
-          participants: {
-            every: {
-              userId: {
-                in: [userId, dto.receiverId],
-              },
-            },
-          },
-        },
-      });
-
-      if (!conversation) {
-        conversation = await this.prisma.chatConversation.create({
-          data: {},
-        });
-
-        // Add participants
-        await this.prisma.chatConversationParticipant.createMany({
-          data: [
-            {
-              conversationId: conversation.id,
-              userId,
-            },
-            {
-              conversationId: conversation.id,
-              userId: dto.receiverId,
-            },
-          ],
-        });
-      }
-    } else {
+    if (userId === dto.userId) {
       throw new ForbiddenException(
-        'Either conversationId or receiverId must be provided',
+        'You cannot create a conversation with yourself',
       );
     }
 
-    // Create the message
+    const recipient = await this.prisma.user.findUnique({
+      where: { id: dto.userId },
+      select: { id: true },
+    });
+
+    if (!recipient) {
+      throw new NotFoundException('Recipient not found');
+    }
+
+    const pair = this.getOrderedPair(userId, dto.userId);
+
+    const existing = await this.prisma.chatConversation.findUnique({
+      where: {
+        participant1Id_participant2Id: {
+          participant1Id: pair.participant1Id,
+          participant2Id: pair.participant2Id,
+        },
+      },
+      include: {
+        participant1: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            isOnline: true,
+            lastSeen: true,
+            chatPublicKey: true,
+          },
+        },
+        participant2: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            isOnline: true,
+            lastSeen: true,
+            chatPublicKey: true,
+          },
+        },
+      },
+    });
+
+    if (existing) {
+      return this.formatConversationForUser(existing, userId);
+    }
+
+    const conversation = await this.prisma.chatConversation.create({
+      data: {
+        participant1Id: pair.participant1Id,
+        participant2Id: pair.participant2Id,
+        participant1KeyBundle:
+          pair.participant1Id === userId
+            ? dto.initiatorKeyBundle
+            : dto.recipientKeyBundle,
+        participant2KeyBundle:
+          pair.participant2Id === userId
+            ? dto.initiatorKeyBundle
+            : dto.recipientKeyBundle,
+      },
+      include: {
+        participant1: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            isOnline: true,
+            lastSeen: true,
+            chatPublicKey: true,
+          },
+        },
+        participant2: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            isOnline: true,
+            lastSeen: true,
+            chatPublicKey: true,
+          },
+        },
+      },
+    });
+
+    return this.formatConversationForUser(conversation, userId);
+  }
+
+  async sendMessage(userId: number, dto: CreateMessageDto) {
+    const conversation = await this.assertConversationMembership(
+      dto.conversationId,
+      userId,
+    );
+
     const message = await this.prisma.chatMessage.create({
       data: {
         conversationId: conversation.id,
         senderId: userId,
-        receiverId: dto.receiverId || null, // Allow null for group messages
-        content: dto.content,
+        encryptedContent: dto.encryptedContent,
+        iv: dto.iv,
+        algorithm: dto.algorithm || 'AES-GCM',
+        clientMessageId: dto.clientMessageId,
       },
       include: {
         sender: {
@@ -279,19 +228,9 @@ export class ChatService {
             role: true,
           },
         },
-        receiver: dto.receiverId
-          ? {
-              select: {
-                id: true,
-                email: true,
-                role: true,
-              },
-            }
-          : false,
       },
     });
 
-    // Update conversation's updatedAt timestamp
     await this.prisma.chatConversation.update({
       where: { id: conversation.id },
       data: { updatedAt: new Date() },
@@ -314,89 +253,30 @@ export class ChatService {
         role: true,
         isOnline: true,
         lastSeen: true,
+        chatPublicKey: true,
       },
     });
   }
 
-  async getOrCreateGlobalGroupChat(userId: number) {
-    // Check if a global group chat already exists
-    let groupChat = await this.prisma.chatConversation.findFirst({
-      where: {
-        isGlobalGroup: true,
-      },
-    });
-
-    // If no global group chat exists, create one
-    if (!groupChat) {
-      groupChat = await this.prisma.chatConversation.create({
-        data: {
-          isGlobalGroup: true,
-        },
-      });
-    }
-
-    // Check if user is already a participant
-    const isParticipant =
-      await this.prisma.chatConversationParticipant.findFirst({
-        where: {
-          conversationId: groupChat.id,
-          userId,
-        },
-      });
-
-    // If user is not a participant, add them
-    if (!isParticipant) {
-      await this.prisma.chatConversationParticipant.create({
-        data: {
-          conversationId: groupChat.id,
-          userId,
-        },
-      });
-    }
-
-    // Get fresh data with participants and user info
-    const freshGroupChat = await this.prisma.chatConversation.findUnique({
-      where: { id: groupChat.id },
-      include: {
-        participants: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                email: true,
-                role: true,
-                isOnline: true,
-                lastSeen: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!freshGroupChat) {
-      throw new Error('Failed to create or find global group chat');
-    }
-
-    return {
-      ...freshGroupChat,
-      participants: freshGroupChat.participants.map((p) => p.user),
-      unreadCount: 0,
-    };
-  }
-
-  async markMessageAsRead(userId: number, messageId: number) {
+  async markMessageAsRead(userId: number, messageId: string) {
     const message = await this.prisma.chatMessage.findUnique({
       where: { id: messageId },
+      include: {
+        conversation: true,
+      },
     });
 
     if (!message) {
       throw new NotFoundException('Message not found');
     }
 
-    if (message.receiverId !== userId) {
+    const isParticipant =
+      message.conversation.participant1Id === userId ||
+      message.conversation.participant2Id === userId;
+
+    if (!isParticipant) {
       throw new ForbiddenException(
-        'You can only mark your own messages as read',
+        'You can only mark messages in your conversations',
       );
     }
 
@@ -419,14 +299,101 @@ export class ChatService {
     });
   }
 
+  async upsertChatPublicKey(userId: number, dto: UpsertChatPublicKeyDto) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        chatPublicKey: dto.publicKey,
+      },
+      select: {
+        id: true,
+        email: true,
+        chatPublicKey: true,
+      },
+    });
+  }
+
+  async assertConversationMembership(conversationId: string, userId: number) {
+    const conversation = await this.prisma.chatConversation.findFirst({
+      where: {
+        id: conversationId,
+        OR: [{ participant1Id: userId }, { participant2Id: userId }],
+      },
+    });
+
+    if (!conversation) {
+      throw new ForbiddenException(
+        'You do not have access to this conversation',
+      );
+    }
+
+    return conversation;
+  }
+
+  private formatConversationForUser(
+    conversation: {
+      id: string;
+      participant1Id: number;
+      participant2Id: number;
+      participant1KeyBundle: string;
+      participant2KeyBundle: string;
+      participant1: {
+        id: number;
+        email: string;
+        role: string;
+        isOnline: boolean;
+        lastSeen: Date;
+        chatPublicKey: string | null;
+      };
+      participant2: {
+        id: number;
+        email: string;
+        role: string;
+        isOnline: boolean;
+        lastSeen: Date;
+        chatPublicKey: string | null;
+      };
+      createdAt: Date;
+      updatedAt: Date;
+    },
+    userId: number,
+  ) {
+    return {
+      id: conversation.id,
+      createdAt: conversation.createdAt,
+      updatedAt: conversation.updatedAt,
+      participant1Id: conversation.participant1Id,
+      participant2Id: conversation.participant2Id,
+      participants: [
+        conversation.participant1,
+        conversation.participant2,
+      ].filter((participant) => participant.id !== userId),
+      myKeyBundle:
+        conversation.participant1Id === userId
+          ? conversation.participant1KeyBundle
+          : conversation.participant2KeyBundle,
+      unreadCount: 0,
+    };
+  }
+
+  private getOrderedPair(userA: number, userB: number) {
+    if (userA < userB) {
+      return { participant1Id: userA, participant2Id: userB };
+    }
+
+    return { participant1Id: userB, participant2Id: userA };
+  }
+
   private async getUnreadCount(
-    conversationId: number,
+    conversationId: string,
     userId: number,
   ): Promise<number> {
     return this.prisma.chatMessage.count({
       where: {
         conversationId,
-        receiverId: userId,
+        senderId: {
+          not: userId,
+        },
         isRead: false,
       },
     });

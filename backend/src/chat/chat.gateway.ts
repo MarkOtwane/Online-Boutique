@@ -1,10 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
@@ -19,10 +15,13 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 
+type AuthenticatedSocket = Socket & { data: { userId?: number } };
+
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
+  transports: ['websocket', 'polling'],
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -30,178 +29,208 @@ export class ChatGateway
   @WebSocketServer()
   server: Server;
 
-  private connectedUsers: Map<string, number> = new Map();
+  private userSockets: Map<number, Set<string>> = new Map();
 
   constructor(
     private readonly chatService: ChatService,
     private readonly jwtService: JwtService,
   ) {}
 
-  afterInit(server: Server) {
-    console.log('Chat Gateway initialized');
+  afterInit() {
+    console.log('Secure private chat gateway initialized');
   }
 
-  async handleConnection(client: Socket, ...args: any[]) {
+  async handleConnection(client: AuthenticatedSocket) {
     try {
-      // Extract token from handshake auth
       const token =
         client.handshake.auth?.token ||
         client.handshake.headers?.authorization?.split(' ')[1];
 
       if (!token) {
-        console.log('No token provided, disconnecting client');
         client.disconnect();
         return;
       }
 
-      // Verify JWT token and extract user info
-      try {
-        const payload = this.jwtService.verify(token, {
-          secret: process.env.JWT_SECRET,
-        });
-        const userId = payload.sub;
+      const payload = await this.jwtService.verifyAsync<{
+        sub: number;
+      }>(token, {
+        secret: process.env.JWT_SECRET,
+      });
 
-        if (userId) {
-          this.connectedUsers.set(client.id, userId);
-          await this.chatService.setUserOnlineStatus(userId, true);
-
-          // Notify other users that this user is online
-          client.broadcast.emit('userOnline', { userId });
-          console.log(`User ${userId} connected via WebSocket`);
-        } else {
-          console.log('No userId in token payload, disconnecting');
-          client.disconnect();
-        }
-      } catch (jwtError) {
-        console.error('JWT verification failed:', jwtError);
+      if (!payload?.sub) {
         client.disconnect();
+        return;
       }
-    } catch (error) {
-      console.error('Connection error:', error);
+
+      client.data.userId = payload.sub;
+      this.trackUserSocket(payload.sub, client.id);
+      await this.chatService.setUserOnlineStatus(payload.sub, true);
+
+      client.broadcast.emit('userOnline', { userId: payload.sub });
+    } catch {
       client.disconnect();
     }
   }
 
-  async handleDisconnect(client: Socket) {
-    const userId = this.connectedUsers.get(client.id);
-    if (userId) {
-      this.connectedUsers.delete(client.id);
-      await this.chatService.setUserOnlineStatus(userId, false);
+  async handleDisconnect(client: AuthenticatedSocket) {
+    const userId = client.data.userId;
+    if (!userId) {
+      return;
+    }
 
-      // Notify other users that this user is offline
+    this.untrackUserSocket(userId, client.id);
+
+    const stillConnected = this.userSockets.get(userId);
+    if (!stillConnected || stillConnected.size === 0) {
+      await this.chatService.setUserOnlineStatus(userId, false);
       client.broadcast.emit('userOffline', { userId });
     }
   }
 
-  @SubscribeMessage('joinChat')
-  handleJoinChat(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: number },
+  @SubscribeMessage('joinConversation')
+  async handleJoinConversation(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { conversationId: string },
   ) {
-    client.join(`conversation_${data.conversationId}`);
+    const userId = client.data.userId;
+
+    if (!userId) {
+      return { ok: false, error: 'Unauthorized' };
+    }
+
+    if (!data?.conversationId) {
+      return { ok: false, error: 'conversationId is required' };
+    }
+
+    await this.chatService.assertConversationMembership(
+      data.conversationId,
+      userId,
+    );
+
+    await client.join(this.getConversationRoom(data.conversationId));
+
     return {
-      event: 'joinedChat',
-      data: { conversationId: data.conversationId },
+      ok: true,
+      conversationId: data.conversationId,
     };
   }
 
-  @SubscribeMessage('leaveChat')
-  handleLeaveChat(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: number },
+  @SubscribeMessage('leaveConversation')
+  async handleLeaveConversation(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { conversationId: string },
   ) {
-    client.leave(`conversation_${data.conversationId}`);
-    return { event: 'leftChat', data: { conversationId: data.conversationId } };
+    const userId = client.data.userId;
+
+    if (!userId) {
+      return { ok: false, error: 'Unauthorized' };
+    }
+
+    if (!data?.conversationId) {
+      return { ok: false, error: 'conversationId is required' };
+    }
+
+    await this.chatService.assertConversationMembership(
+      data.conversationId,
+      userId,
+    );
+
+    await client.leave(this.getConversationRoom(data.conversationId));
+    return { ok: true, conversationId: data.conversationId };
   }
 
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody()
     data: {
-      conversationId: number;
-      content: string;
-      receiverId?: number | null;
+      conversationId: string;
+      encryptedContent: string;
+      iv: string;
+      algorithm?: string;
+      clientMessageId?: string;
     },
   ) {
-    try {
-      const userId = this.connectedUsers.get(client.id);
-      if (!userId) {
-        return { error: 'User not authenticated' };
-      }
+    const userId = client.data.userId;
 
-      // Save message to database
-      const message = await this.chatService.sendMessage(userId, {
-        conversationId: data.conversationId,
-        receiverId: data.receiverId || null, // Allow null for group messages
-        content: data.content,
-      });
-
-      // Emit to conversation room
-      this.server
-        .to(`conversation_${data.conversationId}`)
-        .emit('newMessage', message);
-
-      return { event: 'messageSent', data: message };
-    } catch (error) {
-      console.error('Error sending message:', error);
-      return { error: 'Failed to send message' };
+    if (!userId) {
+      return { ok: false, error: 'Unauthorized' };
     }
+
+    const message = await this.chatService.sendMessage(userId, {
+      conversationId: data.conversationId,
+      encryptedContent: data.encryptedContent,
+      iv: data.iv,
+      algorithm: data.algorithm,
+      clientMessageId: data.clientMessageId,
+    });
+
+    this.server
+      .to(this.getConversationRoom(data.conversationId))
+      .emit('receiveMessage', message);
+
+    return { ok: true, message };
   }
 
   @SubscribeMessage('typing')
-  handleTyping(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: number; isTyping: boolean },
+  async handleTyping(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { conversationId: string; isTyping: boolean },
   ) {
-    const userId = this.connectedUsers.get(client.id);
-    if (userId) {
-      client.to(`conversation_${data.conversationId}`).emit('userTyping', {
-        userId,
-        isTyping: data.isTyping,
-      });
+    const userId = client.data.userId;
+
+    if (!userId) {
+      return { ok: false, error: 'Unauthorized' };
     }
-  }
 
-  // Method to emit real-time updates when messages are read
-  async emitMessageRead(messageId: number, conversationId: number) {
-    this.server
-      .to(`conversation_${conversationId}`)
-      .emit('messageRead', { messageId });
-  }
-
-  // Method to emit real-time updates when new conversations are created
-  async emitNewConversation(conversation: any, userId: number) {
-    // Notify the other participant about the new conversation
-    const otherParticipants = conversation.participants.filter(
-      (p: any) => p.userId !== userId,
+    await this.chatService.assertConversationMembership(
+      data.conversationId,
+      userId,
     );
-    otherParticipants.forEach((participant: any) => {
-      this.server.emit('newConversation', {
-        conversation,
-        forUser: participant.userId,
-      });
+
+    client.to(this.getConversationRoom(data.conversationId)).emit('typing', {
+      conversationId: data.conversationId,
+      userId,
+      isTyping: data.isTyping,
+      at: new Date().toISOString(),
     });
+
+    return { ok: true };
   }
 
-  // Method to emit real-time order status updates to specific users
-  async emitOrderStatusUpdate(userId: number, orderData: any) {
+  emitOrderStatusUpdate(userId: number, orderData: unknown) {
     this.server.emit('orderStatusUpdate', {
       userId,
       orderData,
     });
   }
 
-  // Method to emit order tracking updates to specific users
-  async emitOrderTrackingUpdate(userId: number, trackingData: any) {
+  emitOrderTrackingUpdate(userId: number, trackingData: unknown) {
     this.server.emit('orderTrackingUpdate', {
       userId,
       trackingData,
     });
   }
 
-  // Helper method to get connected users for order updates
-  getConnectedUsers(): Map<string, number> {
-    return this.connectedUsers;
+  private getConversationRoom(conversationId: string) {
+    return `conversation:${conversationId}`;
+  }
+
+  private trackUserSocket(userId: number, socketId: string) {
+    const sockets = this.userSockets.get(userId) || new Set<string>();
+    sockets.add(socketId);
+    this.userSockets.set(userId, sockets);
+  }
+
+  private untrackUserSocket(userId: number, socketId: string) {
+    const sockets = this.userSockets.get(userId);
+    if (!sockets) {
+      return;
+    }
+
+    sockets.delete(socketId);
+    if (sockets.size === 0) {
+      this.userSockets.delete(userId);
+    }
   }
 }

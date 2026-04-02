@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { ConflictException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../prisma/prisma.service';
 
 // Type for user data without password (for security)
 type UserWithoutPassword = Omit<User, 'password'>;
@@ -94,16 +94,18 @@ export class UsersService {
   async deleteUser(id: number): Promise<User> {
     // First, delete all related records to avoid foreign key constraint errors
 
-    // Delete user's chat messages (as sender and receiver)
+    // Delete user's sent chat messages
     await this.prisma.chatMessage.deleteMany({
       where: {
-        OR: [{ senderId: id }, { receiverId: id }],
+        senderId: id,
       },
     });
 
-    // Delete user's conversation participations
-    await this.prisma.chatConversationParticipant.deleteMany({
-      where: { userId: id },
+    // Delete direct conversations where user participates
+    await this.prisma.chatConversation.deleteMany({
+      where: {
+        OR: [{ participant1Id: id }, { participant2Id: id }],
+      },
     });
 
     // Delete user's comments (cascade is already set in schema, but being explicit)

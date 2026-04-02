@@ -15,37 +15,38 @@ model Category {
 }
 
 model Product {
-  id                 Int                     @id @default(autoincrement())
-  name               String
-  price              Float
-  imageUrl           String?
-  createdAt          DateTime                @default(now())
-  commentCount       Int                     @default(0)
-  repostCount        Int                     @default(0)
-  reactionCount      Int                     @default(0)
-  categoryId         Int
-  comments           Comment[]
-  orderItems         OrderItem[]
-  category           Category                @relation(fields: [categoryId], references: [id])
-  reposts            Repost[]
-  reactions          Reaction[]
-  communityPosts     CommunityPost[]
-  reviews            Review[]
-  userBehaviors      UserBehavior[]
-  recommendations    ProductRecommendation[]
+  id              Int                     @id @default(autoincrement())
+  name            String
+  price           Float
+  imageUrl        String?
+  createdAt       DateTime                @default(now())
+  commentCount    Int                     @default(0)
+  repostCount     Int                     @default(0)
+  reactionCount   Int                     @default(0)
+  categoryId      Int
+  comments        Comment[]
+  orderItems      OrderItem[]
+  category        Category                @relation(fields: [categoryId], references: [id])
+  reposts         Repost[]
+  reactions       Reaction[]
+  communityPosts  CommunityPost[]
+  reviews         Review[]
+  userBehaviors   UserBehavior[]
+  recommendations ProductRecommendation[]
 }
 
 model User {
-  id                 Int                           @id @default(autoincrement())
-  email              String                        @unique
+  id                 Int                     @id @default(autoincrement())
+  email              String                  @unique
   password           String
-  role               String                        @default("customer")
-  createdAt          DateTime                      @default(now())
-  isOnline           Boolean                       @default(false)
-  lastSeen           DateTime                      @default(now())
-  conversations      ChatConversationParticipant[]
-  receivedMessages   ChatMessage[]                 @relation("MessageReceiver")
-  sentMessages       ChatMessage[]                 @relation("MessageSender")
+  role               String                  @default("customer")
+  createdAt          DateTime                @default(now())
+  isOnline           Boolean                 @default(false)
+  lastSeen           DateTime                @default(now())
+  chatPublicKey      String?
+  conversationsAsP1  ChatConversation[]      @relation("ConversationParticipant1")
+  conversationsAsP2  ChatConversation[]      @relation("ConversationParticipant2")
+  sentMessages       ChatMessage[]           @relation("MessageSender")
   comments           Comment[]
   orders             Order[]
   reposts            Repost[]
@@ -127,42 +128,39 @@ model Repost {
 }
 
 model ChatConversation {
-  id            Int                           @id @default(autoincrement())
-  createdAt     DateTime                      @default(now())
-  updatedAt     DateTime                      @updatedAt
-  isGlobalGroup Boolean                       @default(false)
-  participants  ChatConversationParticipant[]
-  messages      ChatMessage[]
-}
+  id                    String        @id @default(uuid()) @db.Uuid
+  participant1Id        Int
+  participant2Id        Int
+  participant1KeyBundle String
+  participant2KeyBundle String
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  participant1          User          @relation("ConversationParticipant1", fields: [participant1Id], references: [id], onDelete: Cascade)
+  participant2          User          @relation("ConversationParticipant2", fields: [participant2Id], references: [id], onDelete: Cascade)
+  messages              ChatMessage[]
 
-model ChatConversationParticipant {
-  id             Int              @id @default(autoincrement())
-  conversationId Int
-  userId         Int
-  joinedAt       DateTime         @default(now())
-  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([conversationId, userId])
-  @@index([userId])
+  @@unique([participant1Id, participant2Id])
+  @@index([participant1Id])
+  @@index([participant2Id])
 }
 
 model ChatMessage {
-  id             Int              @id @default(autoincrement())
-  conversationId Int
-  senderId       Int
-  receiverId     Int?
-  content        String
-  isRead         Boolean          @default(false)
-  readAt         DateTime?
-  createdAt      DateTime         @default(now())
-  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  receiver       User?            @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-  sender         User             @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  id               String           @id @default(uuid()) @db.Uuid
+  conversationId   String           @db.Uuid
+  senderId         Int
+  encryptedContent String
+  iv               String
+  algorithm        String           @default("AES-GCM")
+  clientMessageId  String?
+  isRead           Boolean          @default(false)
+  readAt           DateTime?
+  createdAt        DateTime         @default(now())
+  conversation     ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender           User             @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
   @@index([senderId])
-  @@index([receiverId])
+  @@index([createdAt])
 }
 
 enum PaymentStatus {
@@ -339,24 +337,24 @@ enum EmailStatus {
 }
 
 model Review {
-  id               Int                    @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   productId        Int
   userId           Int
   title            String?
   content          String
   rating           Int
-  verifiedPurchase Boolean                @default(false)
-  helpfulCount     Int                    @default(0)
-  notHelpfulCount  Int                    @default(0)
-  createdAt        DateTime               @default(now())
-  updatedAt        DateTime               @updatedAt
-  isApproved       Boolean                @default(false)
+  verifiedPurchase Boolean  @default(false)
+  helpfulCount     Int      @default(0)
+  notHelpfulCount  Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  isApproved       Boolean  @default(false)
   reviewImages     String[]
-  
-  product          Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  helpfulness      UserReviewHelpfulness[]
-  
+
+  product     Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  helpfulness UserReviewHelpfulness[]
+
   @@index([productId])
   @@index([userId])
   @@index([rating])
@@ -365,32 +363,32 @@ model Review {
 }
 
 model UserReviewHelpfulness {
-  id         Int      @id @default(autoincrement())
-  reviewId   Int
-  userId     Int
-  isHelpful  Boolean
-  createdAt  DateTime @default(now())
-  
-  review     Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id        Int      @id @default(autoincrement())
+  reviewId  Int
+  userId    Int
+  isHelpful Boolean
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([reviewId, userId])
   @@index([reviewId])
   @@index([userId])
 }
 
 model UserBehavior {
-  id          Int       @id @default(autoincrement())
-  userId      Int
-  productId   Int?
-  actionType  String    // 'view', 'cart_add', 'purchase', 'review', 'search'
-  metadata    Json?
-  timestamp   DateTime  @default(now())
-  sessionId   String?
-  
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
-  
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  productId  Int?
+  actionType String // 'view', 'cart_add', 'purchase', 'review', 'search'
+  metadata   Json?
+  timestamp  DateTime @default(now())
+  sessionId  String?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
   @@index([userId])
   @@index([productId])
   @@index([actionType])
@@ -399,24 +397,24 @@ model UserBehavior {
 }
 
 model ProductRecommendation {
-  id                  Int                    @id @default(autoincrement())
-  userId              Int
-  productId           Int
-  recommendationType  String                 // 'collaborative', 'content_based', 'trending', 'personalized'
-  score               Float                  // AI confidence score
-  reason              String?                // Explanation for the recommendation
-  createdAt           DateTime               @default(now())
-  isViewed            Boolean                @default(false)
-  isClicked           Boolean                @default(false)
-  isPurchased         Boolean                @default(false)
-  
-  user                User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product             Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  productId          Int
+  recommendationType String // 'collaborative', 'content_based', 'trending', 'personalized'
+  score              Float // AI confidence score
+  reason             String? // Explanation for the recommendation
+  createdAt          DateTime @default(now())
+  isViewed           Boolean  @default(false)
+  isClicked          Boolean  @default(false)
+  isPurchased        Boolean  @default(false)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId, recommendationType])
   @@index([userId])
   @@index([productId])
   @@index([recommendationType])
   @@index([score])
   @@index([createdAt])
-  @@unique([userId, productId, recommendationType])
 }

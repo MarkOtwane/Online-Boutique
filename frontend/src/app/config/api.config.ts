@@ -31,12 +31,12 @@ export const API_CONFIG = {
     },
     CHAT: {
       CONVERSATIONS: '/chat/conversations',
-      CONVERSATION_MESSAGES: (id: number) =>
+      CONVERSATION_MESSAGES: (id: string) =>
         `/chat/conversations/${id}/messages`,
       MESSAGES: '/chat/messages',
-      MESSAGE_READ: (id: number) => `/chat/messages/${id}/read`,
+      MESSAGE_READ: (id: string) => `/chat/messages/${id}/read`,
       ONLINE_USERS: '/chat/users/online',
-      GLOBAL_GROUP: '/chat/global-group',
+      PUBLIC_KEY: '/chat/keys/public',
     },
     TRACKING: {
       BASE: '/tracking',
