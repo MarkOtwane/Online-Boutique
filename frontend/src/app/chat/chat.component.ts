@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ChatConversation, ChatMessage, ChatUser } from '../interfaces/chat';
@@ -16,6 +16,10 @@ import { ChatService } from '../services/chat.service';
   styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  private readonly chatService = inject(ChatService);
+  private readonly authService = inject(AuthService);
+  private readonly chatCryptoService = inject(ChatCryptoService);
+
   conversations: ChatConversation[] = [];
   activeConversation: ChatConversation | null = null;
   messages: ChatMessage[] = [];
@@ -26,12 +30,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   selectedUser: ChatUser | null = null;
   showNewChatModal = false;
   private typingTimeout: ReturnType<typeof setTimeout> | null = null;
-
-  constructor(
-    private chatService: ChatService,
-    private authService: AuthService,
-    private chatCryptoService: ChatCryptoService,
-  ) {}
 
   ngOnInit(): void {
     this.authService.user$.subscribe((user) => {

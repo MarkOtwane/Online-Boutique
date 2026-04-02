@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatConversation, ChatMessage } from '../interfaces/chat';
 import { User } from '../interfaces/user';
@@ -14,6 +14,9 @@ import { ChatService } from '../services/chat.service';
   styleUrls: ['./group-chat.component.css'],
 })
 export class GroupChatComponent implements OnInit, OnDestroy {
+  private readonly chatService = inject(ChatService);
+  private readonly authService = inject(AuthService);
+
   globalGroupChat: ChatConversation | null = null;
   messages: ChatMessage[] = [];
   newMessage = '';
@@ -22,11 +25,6 @@ export class GroupChatComponent implements OnInit, OnDestroy {
   loading = false;
   onlineUsers: any[] = [];
   showOnlineUsers = false;
-
-  constructor(
-    private chatService: ChatService,
-    private authService: AuthService,
-  ) {}
 
   ngOnInit(): void {
     this.authService.user$.subscribe((user) => {
