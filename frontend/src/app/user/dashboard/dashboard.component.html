@@ -1,147 +1,257 @@
-<div class="user-dashboard">
-  <div class="dashboard-header">
-    <h1>My Dashboard</h1>
-    <p>Welcome back, {{ user?.email }}!</p>
-  </div>
+<section class="dashboard">
+  <ng-container *ngIf="!isLoading; else loadingState">
+    <header class="dashboard__hero">
+      <div>
+        <p class="dashboard__eyebrow">Customer dashboard</p>
+        <h1>Welcome back, {{ user?.email || "valued customer" }}</h1>
+        <p>
+          Keep track of your orders, monitor live activity, and jump back into
+          shopping with a layout built for quick decisions.
+        </p>
 
-  <!-- User Stats -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <div class="dashboard__hero-actions">
+          <a class="dashboard__button primary" routerLink="/products"
+            >Shop products</a
+          >
+          <a class="dashboard__button secondary" routerLink="/user/messages"
+            >Open messages</a
+          >
+        </div>
       </div>
-      <div class="stat-info">
-        <h3>Total Orders</h3>
-        <p class="stat-value">{{ dashboardData.totalOrders }}</p>
-      </div>
-    </div>
 
-    <div class="stat-card">
-      <div class="stat-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div class="stat-info">
-        <h3>Member Since</h3>
-        <p class="stat-value">{{ getMemberSince() }}</p>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div class="stat-info">
-        <h3>Total Spent</h3>
-        <p class="stat-value">{{ formatCurrency(getTotalSpent()) }}</p>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div class="stat-info">
-        <h3>Account Status</h3>
-        <p class="stat-value active">{{ dashboardData.accountStatus }}</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="quick-actions">
-    <h2>Quick Actions</h2>
-    <div class="action-buttons">
-      <button class="action-btn" routerLink="../products">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11M5 9H19L18 21H6L5 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Shop Now
-      </button>
-      <button class="action-btn" routerLink="../profile">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Edit Profile
-      </button>
-      <button class="action-btn" routerLink="../orders">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        View Orders
-      </button>
-    </div>
-  </div>
-
-  <!-- Recent Orders -->
-  <div class="recent-orders">
-    <div class="section-header">
-      <h2>Recent Orders</h2>
-      <button class="btn-outline" routerLink="../orders">View All</button>
-    </div>
-
-    <div class="orders-list" *ngIf="getRecentOrders().length > 0; else noOrders">
-      <div *ngFor="let order of getRecentOrders()" class="order-card">
-        <div class="order-header">
-          <div class="order-info">
-            <h3>Order #{{ order.id }}</h3>
-            <p class="order-date">{{ formatDate(order.date) }}</p>
+      <div class="dashboard__hero-panel">
+        <div class="dashboard__mini-metrics">
+          <div class="dashboard__mini-card">
+            <span class="dashboard__mini-label">Member since</span>
+            <strong class="dashboard__mini-value">{{
+              getMemberSince() || "Today"
+            }}</strong>
           </div>
-          <div class="order-status">
-            <span class="status-badge" [class]="getStatusClass(order.status)">{{ order.status }}</span>
+          <div class="dashboard__mini-card">
+            <span class="dashboard__mini-label">Account status</span>
+            <strong class="dashboard__mini-value">{{
+              dashboardData.accountStatus
+            }}</strong>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="dashboard__cards">
+      <article class="dashboard__card" *ngFor="let metric of metrics">
+        <div class="dashboard__card-head">
+          <div>
+            <p class="dashboard__card-label">{{ metric.label }}</p>
+            <div class="dashboard__card-value">{{ metric.value }}</div>
+          </div>
+          <div class="dashboard__card-icon">
+            <ng-container [ngSwitch]="metric.icon">
+              <svg *ngSwitchCase="'orders'" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M6 6h15l-2 9H8L6 6Z"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linejoin="round"
+                />
+                <circle
+                  cx="9"
+                  cy="19"
+                  r="1.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <circle
+                  cx="18"
+                  cy="19"
+                  r="1.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+              </svg>
+              <svg *ngSwitchCase="'revenue'" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 3v18"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M16.5 7.5c0-1.93-2.01-3.5-4.5-3.5S7.5 5.57 7.5 7.5 9.51 11 12 11s4.5 1.57 4.5 3.5-2.01 3.5-4.5 3.5-4.5-1.57-4.5-3.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <svg *ngSwitchCase="'customers'" viewBox="0 0 24 24" fill="none">
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="3.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <path
+                  d="M4.5 20a7.5 7.5 0 0 1 15 0"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <svg *ngSwitchCase="'messages'" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H11l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </ng-container>
+          </div>
+        </div>
+        <p class="dashboard__meta">{{ metric.detail }}</p>
+      </article>
+    </section>
+
+    <section class="dashboard__grid">
+      <article class="dashboard__panel">
+        <div class="dashboard__panel-header">
+          <div>
+            <h2 class="dashboard__section-title">Recent Orders</h2>
+            <p>
+              Track recent purchases and quickly reopen the ones you want to
+              revisit.
+            </p>
+          </div>
+          <a class="dashboard__button secondary" routerLink="/user/orders"
+            >View all</a
+          >
+        </div>
+
+        <ng-container *ngIf="hasRecentOrders; else noOrdersState">
+          <table class="dashboard__table">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of dashboardData.recentOrders">
+                <td>
+                  <div class="dashboard__order-id">#{{ order.id }}</div>
+                  <div class="dashboard__meta">
+                    {{ order.items?.length || 0 }} item(s)
+                  </div>
+                </td>
+                <td>{{ formatDate(order.date || order.createdAt) }}</td>
+                <td>
+                  <span
+                    class="dashboard__badge"
+                    [class]="getStatusClass(order.status)"
+                    >{{ order.status || "Processing" }}</span
+                  >
+                </td>
+                <td>{{ formatCurrency(order.total || 0) }}</td>
+                <td>
+                  <button
+                    class="dashboard__button secondary"
+                    type="button"
+                    (click)="trackOrder(order)"
+                  >
+                    Track
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
+
+        <ng-template #noOrdersState>
+          <div class="dashboard__empty">
+            <svg
+              width="56"
+              height="56"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 6h15l-2 9H8L6 6Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M6 6 5.5 3.5H3"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <h3>No orders yet</h3>
+            <p>
+              Once you place your first order, it will appear here with shipping
+              and tracking shortcuts.
+            </p>
+            <a class="dashboard__button primary" routerLink="/products"
+              >Start shopping</a
+            >
+          </div>
+        </ng-template>
+      </article>
+
+      <article class="dashboard__panel">
+        <div class="dashboard__panel-header">
+          <div>
+            <h2 class="dashboard__section-title">Activity Feed</h2>
+            <p>Recent updates and account activity in one place.</p>
           </div>
         </div>
 
-        <div class="order-items">
-          <div *ngFor="let item of order.items" class="order-item">
-            <div class="item-info">
-              <h4>{{ item.name }}</h4>
-              <p>Quantity: {{ item.quantity }} × {{ formatCurrency(item.price) }}</p>
+        <div class="dashboard__activity">
+          <div
+            class="dashboard__activity-item"
+            *ngFor="let item of activityFeed"
+          >
+            <div class="dashboard__activity-dot"></div>
+            <div>
+              <h3 class="dashboard__activity-title">{{ item.title }}</h3>
+              <p class="dashboard__activity-copy">{{ item.copy }}</p>
+              <div class="dashboard__meta">{{ item.time }}</div>
             </div>
           </div>
         </div>
+      </article>
+    </section>
+  </ng-container>
 
-        <div class="order-footer">
-          <div class="order-total">
-            <strong>Total: {{ formatCurrency(order.total) }}</strong>
-          </div>
-          <div class="order-actions">
-            <button class="btn-outline small" (click)="trackOrder(order)">Track Order</button>
-            <button class="btn-primary small">Reorder</button>
-          </div>
-        </div>
-      </div>
+  <ng-template #loadingState>
+    <div class="dashboard__skeleton-grid">
+      <div
+        class="dashboard__skeleton-card"
+        *ngFor="let _ of [1, 2, 3, 4]"
+      ></div>
     </div>
 
-    <ng-template #noOrders>
-      <div class="no-orders">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <h3>No orders yet</h3>
-        <p>Start shopping to see your orders here</p>
-        <button class="btn-primary" routerLink="/products">Start Shopping</button>
-      </div>
-    </ng-template>
-  </div>
+    <div class="dashboard__grid">
+      <article class="dashboard__panel">
+        <div class="dashboard__skeleton-line" style="width: 42%"></div>
+        <div class="dashboard__skeleton-line" style="width: 68%"></div>
+        <div class="dashboard__skeleton-line" style="width: 54%"></div>
+        <div class="dashboard__skeleton-line" style="width: 76%"></div>
+        <div class="dashboard__skeleton-line" style="width: 36%"></div>
+      </article>
 
-  <!-- Router outlet for child routes -->
-  <router-outlet></router-outlet>
-</div>
+      <article class="dashboard__panel">
+        <div class="dashboard__skeleton-line" style="width: 38%"></div>
+        <div class="dashboard__skeleton-pill"></div>
+        <div class="dashboard__skeleton-line" style="width: 82%"></div>
+        <div class="dashboard__skeleton-line" style="width: 74%"></div>
+        <div class="dashboard__skeleton-line" style="width: 88%"></div>
+      </article>
+    </div>
+  </ng-template>
+</section>

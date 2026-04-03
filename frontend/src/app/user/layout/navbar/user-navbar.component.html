@@ -1,0 +1,94 @@
+<header class="navbar">
+  <div class="navbar__search">
+    <svg class="navbar__search-icon" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M21 21l-4.35-4.35"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+      <circle
+        cx="10.5"
+        cy="10.5"
+        r="6.5"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
+    </svg>
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (keydown.enter)="submitSearch()"
+      placeholder="Search products, orders, and updates"
+      aria-label="Search"
+    />
+    <button type="button" class="navbar__search-btn" (click)="submitSearch()">
+      Search
+    </button>
+  </div>
+
+  <div class="navbar__actions">
+    <button type="button" class="navbar__icon-btn" aria-label="Notifications">
+      <span class="navbar__badge" *ngIf="notificationCount > 0">{{
+        notificationCount
+      }}</span>
+      <svg viewBox="0 0 24 24" fill="none">
+        <path
+          d="M15 17H9a3 3 0 0 0 6 0Z"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M18 16V11a6 6 0 1 0-12 0v5l-2 2h16l-2-2Z"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+
+    <div
+      class="navbar__profile"
+      (mouseenter)="dropdownOpen = true"
+      (mouseleave)="dropdownOpen = false"
+    >
+      <button
+        type="button"
+        class="navbar__profile-btn"
+        (click)="toggleDropdown()"
+      >
+        <span class="navbar__avatar">{{ getUserInitials() }}</span>
+        <span class="navbar__profile-copy">
+          <span class="navbar__eyebrow">Welcome back</span>
+          <span class="navbar__email">{{ getUserEmail() }}</span>
+        </span>
+        <svg class="navbar__chevron" viewBox="0 0 24 24" fill="none">
+          <path
+            d="m6 9 6 6 6-6"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <div class="navbar__dropdown" *ngIf="dropdownOpen">
+        <a
+          routerLink="/user/profile"
+          class="navbar__dropdown-item"
+          (click)="closeDropdown()"
+          >Settings</a
+        >
+        <button
+          type="button"
+          class="navbar__dropdown-item danger"
+          (click)="logout()"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

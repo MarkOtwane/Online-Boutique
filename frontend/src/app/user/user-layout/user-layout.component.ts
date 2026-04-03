@@ -1,69 +1,42 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, NavigationEnd, RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { CartService } from '../../services/cart.service';
+import { ChatService } from '../../services/chat.service';
+import { UserNavbarComponent } from '../layout/navbar/user-navbar.component';
+import { UserSidebarComponent } from '../layout/sidebar/user-sidebar.component';
 
 @Component({
   selector: 'app-user-layout',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    UserNavbarComponent,
+    UserSidebarComponent,
+  ],
   templateUrl: './user-layout.component.html',
-  styleUrls: ['./user-layout.component.css'],
-  imports: [CommonModule, RouterOutlet, RouterLink]
+  styleUrls: ['./user-layout.component.scss'],
 })
 export class UserLayoutComponent implements OnInit, OnDestroy {
-  currentUser: any;
+  private readonly authService = inject(AuthService);
+  private readonly chatService = inject(ChatService);
+  private readonly subscriptions = new Subscription();
+
   sidebarCollapsed = false;
-  currentRoute = '';
-  cartItemCount = 0;
-  private routerSubscription: Subscription = new Subscription();
 
-  constructor(
-    private authService: AuthService,
-    private cartService: CartService,
-    private router: Router
-  ) {}
-
-  ngOnInit() {
-    this.currentUser = this.authService.getUser();
-
-    // Track current route for active navigation highlighting
-    this.routerSubscription = this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.currentRoute = event.urlAfterRedirects;
-      });
-
-    // Subscribe to cart changes
-    this.cartService.getCartItems().subscribe(items => {
-      this.cartItemCount = items.length;
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      void this.chatService.initializeSocketConnection();
     }
   }
 
-  toggleSidebar() {
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  toggleSidebar(): void {
     this.sidebarCollapsed = !this.sidebarCollapsed;
-  }
-
-  isActiveRoute(route: string): boolean {
-    return this.currentRoute.includes(route);
-  }
-
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
-
-  getUserInitials(): string {
-    if (this.currentUser?.email) {
-      return this.currentUser.email.charAt(0).toUpperCase();
-    }
-    return 'U';
   }
 }
