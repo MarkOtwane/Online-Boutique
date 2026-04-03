@@ -1,80 +1,82 @@
 <section class="dashboard">
   <ng-container *ngIf="!isLoading; else loadingState">
+
+    <!-- ── Hero banner ─────────────────────────────────────── -->
     <header class="dashboard__hero">
-      <div>
+      <div class="dashboard__hero-body">
         <p class="dashboard__eyebrow">Customer dashboard</p>
-        <h1>Welcome back, {{ user?.email || "valued customer" }}</h1>
-        <p>
-          Keep track of your orders, monitor live activity, and jump back into
-          shopping with a layout built for quick decisions.
+        <h1 class="dashboard__hero-title">
+          Welcome back,&nbsp;<span class="dashboard__hero-name">{{
+            user?.email?.split('@')[0] || 'valued customer'
+          }}</span>
+        </h1>
+        <p class="dashboard__hero-desc">
+          Track your orders, monitor live activity, and jump back into shopping
+          — all in one place.
         </p>
 
         <div class="dashboard__hero-actions">
-          <a class="dashboard__button primary" routerLink="/products"
-            >Shop products</a
-          >
-          <a class="dashboard__button secondary" routerLink="/user/messages"
-            >Open messages</a
-          >
+          <a class="dashboard__btn dashboard__btn--primary" routerLink="/products">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M20 7.5 12 3 4 7.5v9L12 21l8-4.5v-9Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Shop products
+          </a>
+          <a class="dashboard__btn dashboard__btn--ghost" routerLink="/user/messages">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H11l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Open messages
+          </a>
         </div>
       </div>
 
       <div class="dashboard__hero-panel">
-        <div class="dashboard__mini-metrics">
-          <div class="dashboard__mini-card">
-            <span class="dashboard__mini-label">Member since</span>
-            <strong class="dashboard__mini-value">{{
-              getMemberSince() || "Today"
-            }}</strong>
-          </div>
-          <div class="dashboard__mini-card">
-            <span class="dashboard__mini-label">Account status</span>
-            <strong class="dashboard__mini-value">{{
-              dashboardData.accountStatus
-            }}</strong>
-          </div>
+        <div class="dashboard__mini-card">
+          <span class="dashboard__mini-label">Member since</span>
+          <strong class="dashboard__mini-value">{{
+            getMemberSince() || 'Today'
+          }}</strong>
+        </div>
+        <div class="dashboard__mini-card">
+          <span class="dashboard__mini-label">Account status</span>
+          <strong class="dashboard__mini-value dashboard__mini-value--green">{{
+            dashboardData.accountStatus
+          }}</strong>
         </div>
       </div>
     </header>
 
-    <section class="dashboard__cards">
+    <!-- ── Stat cards ──────────────────────────────────────── -->
+    <section class="dashboard__cards" aria-label="Key metrics">
       <article class="dashboard__card" *ngFor="let metric of metrics">
         <div class="dashboard__card-head">
-          <div>
-            <p class="dashboard__card-label">{{ metric.label }}</p>
-            <div class="dashboard__card-value">{{ metric.value }}</div>
-          </div>
-          <div class="dashboard__card-icon">
+          <p class="dashboard__card-label">{{ metric.label }}</p>
+          <div class="dashboard__card-icon" [attr.data-icon]="metric.icon">
             <ng-container [ngSwitch]="metric.icon">
               <svg *ngSwitchCase="'orders'" viewBox="0 0 24 24" fill="none">
                 <path
-                  d="M6 6h15l-2 9H8L6 6Z"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linejoin="round"
-                />
-                <circle
-                  cx="9"
-                  cy="19"
-                  r="1.5"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                />
-                <circle
-                  cx="18"
-                  cy="19"
-                  r="1.5"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                />
-              </svg>
-              <svg *ngSwitchCase="'revenue'" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 3v18"
+                  d="M6 6h15l-2 9H8L6 6ZM6 6 5.5 3.5H3"
                   stroke="currentColor"
                   stroke-width="1.8"
                   stroke-linecap="round"
+                  stroke-linejoin="round"
                 />
+                <circle cx="9" cy="19" r="1.5" stroke="currentColor" stroke-width="1.8" />
+                <circle cx="18" cy="19" r="1.5" stroke="currentColor" stroke-width="1.8" />
+              </svg>
+              <svg *ngSwitchCase="'revenue'" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3v18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
                 <path
                   d="M16.5 7.5c0-1.93-2.01-3.5-4.5-3.5S7.5 5.57 7.5 7.5 9.51 11 12 11s4.5 1.57 4.5 3.5-2.01 3.5-4.5 3.5-4.5-1.57-4.5-3.5"
                   stroke="currentColor"
@@ -83,13 +85,7 @@
                 />
               </svg>
               <svg *ngSwitchCase="'customers'" viewBox="0 0 24 24" fill="none">
-                <circle
-                  cx="12"
-                  cy="8"
-                  r="3.5"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                />
+                <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8" />
                 <path
                   d="M4.5 20a7.5 7.5 0 0 1 15 0"
                   stroke="currentColor"
@@ -108,148 +104,181 @@
             </ng-container>
           </div>
         </div>
-        <p class="dashboard__meta">{{ metric.detail }}</p>
+        <div class="dashboard__card-value">{{ metric.value }}</div>
+        <p class="dashboard__card-detail">{{ metric.detail }}</p>
       </article>
     </section>
 
+    <!-- ── Spending chart ──────────────────────────────────── -->
+    <section class="dashboard__chart-panel" aria-label="Spending overview">
+      <div class="dashboard__panel-header">
+        <div>
+          <h2 class="dashboard__section-title">Spending overview</h2>
+          <p class="dashboard__section-sub">Your spend activity over the last 6 months</p>
+        </div>
+        <span class="dashboard__chart-total">
+          {{ formatCurrency(dashboardData.totalSpent) }}
+          <em>lifetime</em>
+        </span>
+      </div>
+
+      <div class="dashboard__chart">
+        <div class="dashboard__chart-bars">
+          <div
+            class="dashboard__chart-col"
+            *ngFor="let d of spendData"
+          >
+            <div class="dashboard__chart-bar-wrap">
+              <div
+                class="dashboard__chart-bar"
+                [style.height.%]="getBarHeight(d.value)"
+              >
+                <span class="dashboard__chart-tooltip">
+                  {{ formatCurrency(d.value) }}
+                </span>
+              </div>
+            </div>
+            <span class="dashboard__chart-label">{{ d.month }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Orders + Activity grid ─────────────────────────── -->
     <section class="dashboard__grid">
+
+      <!-- Recent Orders -->
       <article class="dashboard__panel">
         <div class="dashboard__panel-header">
           <div>
-            <h2 class="dashboard__section-title">Recent Orders</h2>
-            <p>
-              Track recent purchases and quickly reopen the ones you want to
-              revisit.
+            <h2 class="dashboard__section-title">Recent orders</h2>
+            <p class="dashboard__section-sub">
+              Track purchases and open tracking shortcuts.
             </p>
           </div>
-          <a class="dashboard__button secondary" routerLink="/user/orders"
-            >View all</a
-          >
+          <a class="dashboard__btn dashboard__btn--sm" routerLink="/user/orders">View all</a>
         </div>
 
         <ng-container *ngIf="hasRecentOrders; else noOrdersState">
-          <table class="dashboard__table">
-            <thead>
-              <tr>
-                <th>Order</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let order of dashboardData.recentOrders">
-                <td>
-                  <div class="dashboard__order-id">#{{ order.id }}</div>
-                  <div class="dashboard__meta">
-                    {{ order.items?.length || 0 }} item(s)
-                  </div>
-                </td>
-                <td>{{ formatDate(order.date || order.createdAt) }}</td>
-                <td>
-                  <span
-                    class="dashboard__badge"
-                    [class]="getStatusClass(order.status)"
-                    >{{ order.status || "Processing" }}</span
-                  >
-                </td>
-                <td>{{ formatCurrency(order.total || 0) }}</td>
-                <td>
-                  <button
-                    class="dashboard__button secondary"
-                    type="button"
-                    (click)="trackOrder(order)"
-                  >
-                    Track
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="dashboard__table-wrap">
+            <table class="dashboard__table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of dashboardData.recentOrders">
+                  <td>
+                    <div class="dashboard__order-id">#{{ order.id }}</div>
+                    <div class="dashboard__meta">
+                      {{ order.items?.length || 0 }} item(s)
+                    </div>
+                  </td>
+                  <td>{{ formatDate(order.date || order.createdAt) }}</td>
+                  <td>
+                    <span
+                      class="dashboard__badge"
+                      [ngClass]="getStatusClass(order.status)"
+                    >{{ order.status || 'Processing' }}</span>
+                  </td>
+                  <td>{{ formatCurrency(order.total || 0) }}</td>
+                  <td>
+                    <button
+                      class="dashboard__btn dashboard__btn--sm"
+                      type="button"
+                      (click)="trackOrder(order)"
+                    >
+                      Track
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </ng-container>
 
         <ng-template #noOrdersState>
           <div class="dashboard__empty">
-            <svg
-              width="56"
-              height="56"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6 6h15l-2 9H8L6 6Z"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M6 6 5.5 3.5H3"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-              />
-            </svg>
+            <div class="dashboard__empty-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M6 6h15l-2 9H8L6 6ZM6 6 5.5 3.5H3"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <circle cx="9" cy="19" r="1.5" stroke="currentColor" stroke-width="1.8" />
+                <circle cx="18" cy="19" r="1.5" stroke="currentColor" stroke-width="1.8" />
+              </svg>
+            </div>
             <h3>No orders yet</h3>
-            <p>
-              Once you place your first order, it will appear here with shipping
-              and tracking shortcuts.
-            </p>
-            <a class="dashboard__button primary" routerLink="/products"
-              >Start shopping</a
-            >
+            <p>Your orders will appear here once you start shopping.</p>
+            <a class="dashboard__btn dashboard__btn--primary" routerLink="/products">
+              Start shopping
+            </a>
           </div>
         </ng-template>
       </article>
 
+      <!-- Activity Feed -->
       <article class="dashboard__panel">
         <div class="dashboard__panel-header">
           <div>
-            <h2 class="dashboard__section-title">Activity Feed</h2>
-            <p>Recent updates and account activity in one place.</p>
+            <h2 class="dashboard__section-title">Activity feed</h2>
+            <p class="dashboard__section-sub">Recent updates at a glance.</p>
           </div>
         </div>
 
         <div class="dashboard__activity">
           <div
             class="dashboard__activity-item"
-            *ngFor="let item of activityFeed"
+            *ngFor="let item of activityFeed; let last = last"
           >
-            <div class="dashboard__activity-dot"></div>
-            <div>
+            <div class="dashboard__activity-track">
+              <div class="dashboard__activity-dot"></div>
+              <div class="dashboard__activity-line" *ngIf="!last"></div>
+            </div>
+            <div class="dashboard__activity-body">
               <h3 class="dashboard__activity-title">{{ item.title }}</h3>
               <p class="dashboard__activity-copy">{{ item.copy }}</p>
-              <div class="dashboard__meta">{{ item.time }}</div>
+              <span class="dashboard__activity-time">{{ item.time }}</span>
             </div>
           </div>
         </div>
       </article>
     </section>
+
   </ng-container>
 
+  <!-- ── Loading state ────────────────────────────────────── -->
   <ng-template #loadingState>
-    <div class="dashboard__skeleton-grid">
-      <div
-        class="dashboard__skeleton-card"
-        *ngFor="let _ of [1, 2, 3, 4]"
-      ></div>
+    <div class="dashboard__skeleton-hero"></div>
+
+    <div class="dashboard__skeleton-grid4">
+      <div class="dashboard__skeleton-card" *ngFor="let _ of [1, 2, 3, 4]"></div>
     </div>
+
+    <div class="dashboard__skeleton-chart"></div>
 
     <div class="dashboard__grid">
       <article class="dashboard__panel">
-        <div class="dashboard__skeleton-line" style="width: 42%"></div>
-        <div class="dashboard__skeleton-line" style="width: 68%"></div>
-        <div class="dashboard__skeleton-line" style="width: 54%"></div>
-        <div class="dashboard__skeleton-line" style="width: 76%"></div>
-        <div class="dashboard__skeleton-line" style="width: 36%"></div>
-      </article>
-
-      <article class="dashboard__panel">
+        <div class="dashboard__skeleton-line" style="width: 40%"></div>
+        <div class="dashboard__skeleton-line" style="width: 65%"></div>
+        <div class="dashboard__skeleton-line" style="width: 52%"></div>
+        <div class="dashboard__skeleton-line" style="width: 78%"></div>
         <div class="dashboard__skeleton-line" style="width: 38%"></div>
+      </article>
+      <article class="dashboard__panel">
+        <div class="dashboard__skeleton-line" style="width: 36%"></div>
         <div class="dashboard__skeleton-pill"></div>
-        <div class="dashboard__skeleton-line" style="width: 82%"></div>
-        <div class="dashboard__skeleton-line" style="width: 74%"></div>
+        <div class="dashboard__skeleton-line" style="width: 80%"></div>
+        <div class="dashboard__skeleton-line" style="width: 72%"></div>
         <div class="dashboard__skeleton-line" style="width: 88%"></div>
       </article>
     </div>

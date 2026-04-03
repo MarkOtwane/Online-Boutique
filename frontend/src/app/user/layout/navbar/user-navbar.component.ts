@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   EventEmitter,
+  Input,
   OnDestroy,
   Output,
   inject,
@@ -24,11 +25,17 @@ export class UserNavbarComponent implements OnDestroy {
   private readonly chatService = inject(ChatService);
   private readonly router = inject(Router);
 
+  @Input() darkMode = false;
+
   @Output() searchSubmitted = new EventEmitter<string>();
+  @Output() menuToggle = new EventEmitter<void>();
+  @Output() darkModeToggle = new EventEmitter<void>();
 
   searchTerm = '';
   notificationCount = 0;
   dropdownOpen = false;
+  searchExpanded = false;
+
   private readonly subscriptions = new Subscription();
 
   constructor() {
@@ -53,12 +60,10 @@ export class UserNavbarComponent implements OnDestroy {
 
   submitSearch(): void {
     const query = this.searchTerm.trim();
-    if (!query) {
-      return;
-    }
-
+    if (!query) return;
     this.searchSubmitted.emit(query);
     this.router.navigate(['/products'], { queryParams: { q: query } });
+    this.searchExpanded = false;
   }
 
   toggleDropdown(): void {
@@ -67,6 +72,11 @@ export class UserNavbarComponent implements OnDestroy {
 
   closeDropdown(): void {
     this.dropdownOpen = false;
+  }
+
+  toggleSearch(): void {
+    this.searchExpanded = !this.searchExpanded;
+    if (!this.searchExpanded) this.searchTerm = '';
   }
 
   logout(): void {

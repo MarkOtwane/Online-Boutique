@@ -10,6 +10,11 @@ import {
 } from '../../services/dashboard.service';
 import { TrackingService } from '../../services/tracking.service';
 
+interface SpendDataPoint {
+  month: string;
+  value: number;
+}
+
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
@@ -42,6 +47,16 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     icon: 'orders' | 'revenue' | 'customers' | 'messages';
   }> = [];
   activityFeed: Array<{ title: string; copy: string; time: string }> = [];
+
+  /** Dummy spend-over-time data for the sparkline chart */
+  readonly spendData: SpendDataPoint[] = [
+    { month: 'Nov', value: 1240 },
+    { month: 'Dec', value: 3890 },
+    { month: 'Jan', value: 2150 },
+    { month: 'Feb', value: 4320 },
+    { month: 'Mar', value: 3680 },
+    { month: 'Apr', value: 5100 },
+  ];
 
   ngOnInit(): void {
     this.loadUserData();
@@ -112,16 +127,19 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     return (this.dashboardData.recentOrders?.length || 0) > 0;
   }
 
+  /** Returns a bare class name for the status badge (e.g. 'delivered') */
   getStatusClass(status: string): string {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case 'delivered':
-        return 'status-delivered';
+        return 'delivered';
       case 'shipped':
-        return 'status-shipped';
+        return 'shipped';
       case 'processing':
-        return 'status-processing';
+        return 'processing';
+      case 'pending':
+        return 'pending';
       default:
-        return 'status-default';
+        return 'default';
     }
   }
 
@@ -148,10 +166,34 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     return this.dashboardData.recentOrders;
   }
 
+  getMemberSince(): string {
+    return this.dashboardService.formatDate(this.dashboardData.memberSince);
+  }
+
+  /** Returns the height percentage (0-100) for the chart bar */
+  getBarHeight(value: number): number {
+    const max = Math.max(...this.spendData.map((d) => d.value));
+    return Math.round((value / max) * 100);
+  }
+
+  trackOrder(order: any): void {
+    this.trackingService.getOrderTracking(order.id).subscribe({
+      next: (trackingInfo) => {
+        if (trackingInfo && trackingInfo.trackingId) {
+          window.location.href = `/tracking?id=${trackingInfo.trackingId}`;
+        } else {
+          alert('Tracking information is not available for this order yet.');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching tracking info:', error);
+        alert('Unable to fetch tracking information. Please try again later.');
+      },
+    });
+  }
+
   private refreshMetrics(): void {
-    if (!this.dashboardData) {
-      return;
-    }
+    if (!this.dashboardData) return;
 
     this.metrics = [
       {
@@ -208,28 +250,5 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     });
 
     return feed;
-  }
-
-  getMemberSince(): string {
-    return this.dashboardService.formatDate(this.dashboardData.memberSince);
-  }
-
-  trackOrder(order: any): void {
-    // First try to get tracking info for the order
-    this.trackingService.getOrderTracking(order.id).subscribe({
-      next: (trackingInfo) => {
-        if (trackingInfo && trackingInfo.trackingId) {
-          // Navigate to tracking page with tracking ID
-          window.location.href = `/tracking?id=${trackingInfo.trackingId}`;
-        } else {
-          // If no tracking info found, show a message
-          alert('Tracking information is not available for this order yet.');
-        }
-      },
-      error: (error) => {
-        console.error('Error fetching tracking info:', error);
-        alert('Unable to fetch tracking information. Please try again later.');
-      },
-    });
   }
 }

@@ -28,7 +28,9 @@ export class UserSidebarComponent {
   private readonly router = inject(Router);
 
   @Input() collapsed = false;
+  @Input() mobileOpen = false;
   @Output() toggleSidebar = new EventEmitter<void>();
+  @Output() closeSidebar = new EventEmitter<void>();
 
   readonly navItems: SidebarItem[] = [
     {
@@ -51,10 +53,7 @@ export class UserSidebarComponent {
 
   getUserInitials(): string {
     const email = this.authService.getUser()?.email || '';
-    if (!email) {
-      return 'U';
-    }
-
+    if (!email) return 'U';
     return email.charAt(0).toUpperCase();
   }
 }

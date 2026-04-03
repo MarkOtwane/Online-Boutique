@@ -25,11 +25,15 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   private readonly subscriptions = new Subscription();
 
   sidebarCollapsed = false;
+  mobileOpen = false;
+  darkMode = false;
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
       void this.chatService.initializeSocketConnection();
     }
+    this.darkMode = localStorage.getItem('boutique-dark-mode') === 'true';
+    document.documentElement.classList.toggle('dark-mode', this.darkMode);
   }
 
   ngOnDestroy(): void {
@@ -38,5 +42,19 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
 
   toggleSidebar(): void {
     this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
+
+  toggleMobileSidebar(): void {
+    this.mobileOpen = !this.mobileOpen;
+  }
+
+  closeMobileSidebar(): void {
+    this.mobileOpen = false;
+  }
+
+  toggleDarkMode(): void {
+    this.darkMode = !this.darkMode;
+    localStorage.setItem('boutique-dark-mode', String(this.darkMode));
+    document.documentElement.classList.toggle('dark-mode', this.darkMode);
   }
 }

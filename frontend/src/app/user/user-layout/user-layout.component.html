@@ -1,11 +1,25 @@
-<div class="user-shell">
+<div class="user-shell" [class.sidebar-collapsed]="sidebarCollapsed">
+  <!-- Mobile backdrop -->
+  <div
+    *ngIf="mobileOpen"
+    class="user-shell__backdrop"
+    (click)="closeMobileSidebar()"
+    aria-hidden="true"
+  ></div>
+
   <app-user-sidebar
     [collapsed]="sidebarCollapsed"
+    [mobileOpen]="mobileOpen"
     (toggleSidebar)="toggleSidebar()"
+    (closeSidebar)="closeMobileSidebar()"
   ></app-user-sidebar>
 
-  <div class="user-shell__content" [class.collapsed]="sidebarCollapsed">
-    <app-user-navbar></app-user-navbar>
+  <div class="user-shell__content">
+    <app-user-navbar
+      [darkMode]="darkMode"
+      (menuToggle)="toggleMobileSidebar()"
+      (darkModeToggle)="toggleDarkMode()"
+    ></app-user-navbar>
 
     <main class="user-shell__page">
       <router-outlet></router-outlet>

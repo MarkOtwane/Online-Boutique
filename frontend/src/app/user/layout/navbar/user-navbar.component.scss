@@ -1,39 +1,150 @@
+// ── Design Tokens ──────────────────────────────────────────────
+$bg: rgba(248, 250, 252, 0.88);
+$bg-dark: rgba(13, 17, 23, 0.9);
+$border: rgba(15, 23, 42, 0.07);
+$border-dark: rgba(255, 255, 255, 0.07);
+$shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+$shadow-elevated: 0 8px 32px rgba(15, 23, 42, 0.12);
+$accent-start: #f59e0b;
+$accent-end: #f97316;
+$text: #0f172a;
+$text-dark: #f1f5f9;
+$muted: #64748b;
+$muted-dark: #94a3b8;
+$card: #fff;
+$card-dark: #1e293b;
+$transition: 160ms ease;
+$transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
 :host {
   display: block;
 }
 
+// ── Navbar ──────────────────────────────────────────────────
 .navbar {
   position: sticky;
   top: 0;
   z-index: 30;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 18px 28px;
-  background: rgba(248, 250, 252, 0.86);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  gap: 12px;
+  padding: 14px 24px;
+  background: $bg;
+  border-bottom: 1px solid $border;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: $shadow;
+  transition:
+    background $transition,
+    border-color $transition;
+
+  &.dark-mode {
+    background: $bg-dark;
+    border-color: $border-dark;
+
+    .navbar__search {
+      background: $card-dark;
+      border-color: rgba(255, 255, 255, 0.08);
+
+      input {
+        color: $text-dark;
+
+        &::placeholder {
+          color: $muted-dark;
+        }
+      }
+    }
+
+    .navbar__icon-btn {
+      background: $card-dark;
+      color: $text-dark;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .navbar__profile-btn {
+      background: $card-dark;
+      color: $text-dark;
+    }
+
+    .navbar__email {
+      color: $text-dark;
+    }
+
+    .navbar__dropdown {
+      background: #1e293b;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .navbar__dropdown-item {
+      color: $text-dark;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.07);
+      }
+    }
+
+    .navbar__hamburger {
+      background: $card-dark;
+      color: $text-dark;
+    }
+  }
 }
 
+// ── Hamburger ───────────────────────────────────────────────
+.navbar__hamburger {
+  display: none;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: $card;
+  color: $text;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background $transition,
+    transform $transition-bounce,
+    box-shadow $transition;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+
+  &:hover {
+    background: darken(#fff, 3%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ── Search ──────────────────────────────────────────────────
 .navbar__search {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
-  max-width: 760px;
-  padding: 12px 16px;
-  border-radius: 18px;
-  background: #fff;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+  gap: 10px;
+  max-width: 720px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: $card;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  transition:
+    box-shadow $transition,
+    border-color $transition;
+
+  &:focus-within {
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+  }
 }
 
 .navbar__search-icon {
   width: 18px;
   height: 18px;
-  color: #94a3b8;
+  color: $muted;
   flex: 0 0 auto;
 }
 
@@ -42,61 +153,98 @@
   outline: none;
   background: transparent;
   width: 100%;
-  color: #0f172a;
-  font-size: 0.95rem;
+  color: $text;
+  font-size: 0.93rem;
+  font-family: inherit;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
 }
 
 .navbar__search-btn {
+  flex: 0 0 auto;
   border: 0;
-  border-radius: 12px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
   color: #fff;
-  padding: 10px 16px;
+  padding: 8px 14px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.88rem;
+  transition: transform $transition;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
 }
 
+// Mobile search trigger (icon-only button)
+.navbar__search-trigger {
+  display: none;
+}
+
+// ── Actions ─────────────────────────────────────────────────
 .navbar__actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .navbar__icon-btn {
   position: relative;
-  width: 48px;
-  height: 48px;
-  border: 0;
-  border-radius: 16px;
-  background: #fff;
-  color: #0f172a;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: $card;
+  color: $text;
   display: grid;
   place-items: center;
   cursor: pointer;
-}
+  transition:
+    background $transition,
+    transform $transition-bounce,
+    border-color $transition,
+    box-shadow $transition;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 
-.navbar__icon-btn svg {
-  width: 20px;
-  height: 20px;
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: $shadow-elevated;
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.98);
+  }
 }
 
 .navbar__badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
   border-radius: 999px;
-  background: #f97316;
+  background: linear-gradient(135deg, $accent-start 0%, $accent-end 100%);
   color: #fff;
   display: grid;
   place-items: center;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
+  border: 2px solid #f8fafc;
 }
 
+// ── Profile ─────────────────────────────────────────────────
 .navbar__profile {
   position: relative;
 }
@@ -104,101 +252,161 @@
 .navbar__profile-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border: 0;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: $card;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
   cursor: pointer;
+  transition:
+    background $transition,
+    transform $transition-bounce,
+    box-shadow $transition;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-elevated;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .navbar__avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  background: linear-gradient(135deg, $accent-start 0%, $accent-end 100%);
   color: #fff;
   font-weight: 800;
+  font-size: 0.95rem;
 }
 
 .navbar__profile-copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  text-align: left;
 }
 
 .navbar__eyebrow {
-  color: #64748b;
-  font-size: 0.72rem;
+  color: $muted;
+  font-size: 0.7rem;
 }
 
 .navbar__email {
-  color: #0f172a;
-  font-size: 0.92rem;
+  color: $text;
+  font-size: 0.88rem;
   font-weight: 700;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .navbar__chevron {
-  width: 18px;
-  height: 18px;
-  color: #64748b;
+  width: 16px;
+  height: 16px;
+  color: $muted;
+  flex: 0 0 auto;
 }
 
+// ── Dropdown ─────────────────────────────────────────────────
 .navbar__dropdown {
   position: absolute;
   right: 0;
-  top: calc(100% + 10px);
-  min-width: 180px;
-  background: #fff;
-  border-radius: 18px;
-  padding: 10px;
+  top: calc(100% + 8px);
+  min-width: 200px;
+  background: $card;
+  border-radius: 16px;
+  padding: 8px;
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.16);
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  z-index: 100;
+  animation: dropdown-in 150ms ease;
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .navbar__dropdown-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   border: 0;
   background: transparent;
   text-decoration: none;
-  color: #0f172a;
-  padding: 12px 14px;
-  border-radius: 12px;
+  color: $text;
+  padding: 10px 12px;
+  border-radius: 10px;
   text-align: left;
   font: inherit;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: background $transition;
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  &.danger {
+    color: #dc2626;
+  }
 }
 
-.navbar__dropdown-item:hover {
-  background: #f8fafc;
-}
-
-.navbar__dropdown-item.danger {
-  color: #dc2626;
-}
-
+// ── Responsive ───────────────────────────────────────────────
 @media (max-width: 1024px) {
-  .navbar {
-    padding-inline: 20px;
+  .navbar__hamburger {
+    display: grid;
   }
 
   .navbar__profile-copy {
     display: none;
   }
+
+  .navbar__chevron {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
-  .navbar__search-btn {
-    display: none;
+  .navbar {
+    padding: 12px 16px;
   }
 
   .navbar__search {
-    padding-right: 12px;
+    display: none;
+
+    &.expanded {
+      display: flex;
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 100%;
+      z-index: 20;
+      border-radius: 0 0 14px 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+    }
+  }
+
+  .navbar__search-trigger {
+    display: grid;
+  }
+
+  .navbar__search-btn {
+    display: none;
   }
 }

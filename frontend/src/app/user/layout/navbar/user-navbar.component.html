@@ -1,25 +1,32 @@
-<header class="navbar">
-  <div class="navbar__search">
-    <svg class="navbar__search-icon" viewBox="0 0 24 24" fill="none">
+<header class="navbar" [class.dark-mode]="darkMode">
+  <!-- Hamburger – visible on tablet & mobile -->
+  <button
+    type="button"
+    class="navbar__hamburger"
+    (click)="menuToggle.emit()"
+    aria-label="Open navigation menu"
+  >
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <path
-        d="M21 21l-4.35-4.35"
+        d="M4 6H20M4 12H14M4 18H20"
         stroke="currentColor"
-        stroke-width="1.8"
+        stroke-width="2"
         stroke-linecap="round"
       />
-      <circle
-        cx="10.5"
-        cy="10.5"
-        r="6.5"
-        stroke="currentColor"
-        stroke-width="1.8"
-      />
+    </svg>
+  </button>
+
+  <!-- Search bar -->
+  <div class="navbar__search" [class.expanded]="searchExpanded">
+    <svg class="navbar__search-icon" viewBox="0 0 24 24" fill="none">
+      <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8" />
+      <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
     </svg>
     <input
       type="text"
       [(ngModel)]="searchTerm"
       (keydown.enter)="submitSearch()"
-      placeholder="Search products, orders, and updates"
+      placeholder="Search products, orders…"
       aria-label="Search"
     />
     <button type="button" class="navbar__search-btn" (click)="submitSearch()">
@@ -27,20 +34,64 @@
     </button>
   </div>
 
+  <!-- Mobile search trigger -->
+  <button
+    type="button"
+    class="navbar__icon-btn navbar__search-trigger"
+    (click)="toggleSearch()"
+    aria-label="Toggle search"
+  >
+    <svg viewBox="0 0 24 24" fill="none">
+      <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.8" />
+      <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  <!-- Right-side actions -->
   <div class="navbar__actions">
+    <!-- Dark mode toggle -->
+    <button
+      type="button"
+      class="navbar__icon-btn"
+      (click)="darkModeToggle.emit()"
+      [attr.aria-label]="darkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+      <!-- Moon (shown in light mode) -->
+      <svg *ngIf="!darkMode" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <!-- Sun (shown in dark mode) -->
+      <svg *ngIf="darkMode" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8" />
+        <path
+          d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+
+    <!-- Notifications -->
     <button type="button" class="navbar__icon-btn" aria-label="Notifications">
       <span class="navbar__badge" *ngIf="notificationCount > 0">{{
         notificationCount
       }}</span>
       <svg viewBox="0 0 24 24" fill="none">
         <path
-          d="M15 17H9a3 3 0 0 0 6 0Z"
+          d="M18 16V11a6 6 0 1 0-12 0v5l-2 2h16l-2-2Z"
           stroke="currentColor"
           stroke-width="1.8"
           stroke-linejoin="round"
         />
         <path
-          d="M18 16V11a6 6 0 1 0-12 0v5l-2 2h16l-2-2Z"
+          d="M15 17H9a3 3 0 0 0 6 0Z"
           stroke="currentColor"
           stroke-width="1.8"
           stroke-linejoin="round"
@@ -48,6 +99,7 @@
       </svg>
     </button>
 
+    <!-- Profile dropdown -->
     <div
       class="navbar__profile"
       (mouseenter)="dropdownOpen = true"
@@ -57,6 +109,8 @@
         type="button"
         class="navbar__profile-btn"
         (click)="toggleDropdown()"
+        aria-haspopup="true"
+        [attr.aria-expanded]="dropdownOpen"
       >
         <span class="navbar__avatar">{{ getUserInitials() }}</span>
         <span class="navbar__profile-copy">
@@ -74,18 +128,28 @@
         </svg>
       </button>
 
-      <div class="navbar__dropdown" *ngIf="dropdownOpen">
+      <div class="navbar__dropdown" *ngIf="dropdownOpen" role="menu">
         <a
           routerLink="/user/profile"
           class="navbar__dropdown-item"
           (click)="closeDropdown()"
-          >Settings</a
+          role="menuitem"
         >
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+            <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M4.5 20a7.5 7.5 0 0 1 15 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+          Profile &amp; Settings
+        </a>
         <button
           type="button"
           class="navbar__dropdown-item danger"
           (click)="logout()"
+          role="menuitem"
         >
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+            <path d="M17 16l4-4m0 0l-4-4m4 4H7M3 12v7a2 2 0 0 0 2 2h4M3 12V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
           Logout
         </button>
       </div>
