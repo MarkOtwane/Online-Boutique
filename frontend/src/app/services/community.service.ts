@@ -1,17 +1,17 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import {
-  CommunityPost,
-  CommunityComment,
-  CommunityReaction,
-  CommunityDiscussion,
-  CommunityChatMessage,
-  CreateCommunityPostDto,
-  CreateCommunityCommentDto,
-  CommunityPostFilters,
-} from '../interfaces/community-post';
 import { environment } from '../../environments/environment';
+import {
+  CommunityChatMessage,
+  CommunityComment,
+  CommunityDiscussion,
+  CommunityPost,
+  CommunityPostFilters,
+  CommunityReaction,
+  CreateCommunityCommentDto,
+  CreateCommunityPostDto,
+} from '../interfaces/community-post';
 
 @Injectable({
   providedIn: 'root',
