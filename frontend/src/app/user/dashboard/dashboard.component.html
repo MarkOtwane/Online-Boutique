@@ -1,13 +1,12 @@
 <section class="dashboard">
   <ng-container *ngIf="!isLoading; else loadingState">
-
     <!-- ── Hero banner ─────────────────────────────────────── -->
     <header class="dashboard__hero">
       <div class="dashboard__hero-body">
         <p class="dashboard__eyebrow">Customer dashboard</p>
         <h1 class="dashboard__hero-title">
           Welcome back,&nbsp;<span class="dashboard__hero-name">{{
-            user?.email?.split('@')[0] || 'valued customer'
+            user?.email?.split("@")[0] || "valued customer"
           }}</span>
         </h1>
         <p class="dashboard__hero-desc">
@@ -16,7 +15,10 @@
         </p>
 
         <div class="dashboard__hero-actions">
-          <a class="dashboard__btn dashboard__btn--primary" routerLink="/products">
+          <a
+            class="dashboard__btn dashboard__btn--primary"
+            routerLink="/user/products"
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path
                 d="M20 7.5 12 3 4 7.5v9L12 21l8-4.5v-9Z"
@@ -27,7 +29,10 @@
             </svg>
             Shop products
           </a>
-          <a class="dashboard__btn dashboard__btn--ghost" routerLink="/user/messages">
+          <a
+            class="dashboard__btn dashboard__btn--ghost"
+            routerLink="/user/messages"
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path
                 d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H11l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
@@ -45,7 +50,7 @@
         <div class="dashboard__mini-card">
           <span class="dashboard__mini-label">Member since</span>
           <strong class="dashboard__mini-value">{{
-            getMemberSince() || 'Today'
+            getMemberSince() || "Today"
           }}</strong>
         </div>
         <div class="dashboard__mini-card">
@@ -72,11 +77,28 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 />
-                <circle cx="9" cy="19" r="1.5" stroke="currentColor" stroke-width="1.8" />
-                <circle cx="18" cy="19" r="1.5" stroke="currentColor" stroke-width="1.8" />
+                <circle
+                  cx="9"
+                  cy="19"
+                  r="1.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <circle
+                  cx="18"
+                  cy="19"
+                  r="1.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
               </svg>
               <svg *ngSwitchCase="'revenue'" viewBox="0 0 24 24" fill="none">
-                <path d="M12 3v18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path
+                  d="M12 3v18"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
                 <path
                   d="M16.5 7.5c0-1.93-2.01-3.5-4.5-3.5S7.5 5.57 7.5 7.5 9.51 11 12 11s4.5 1.57 4.5 3.5-2.01 3.5-4.5 3.5-4.5-1.57-4.5-3.5"
                   stroke="currentColor"
@@ -85,7 +107,13 @@
                 />
               </svg>
               <svg *ngSwitchCase="'customers'" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8" />
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="3.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
                 <path
                   d="M4.5 20a7.5 7.5 0 0 1 15 0"
                   stroke="currentColor"
@@ -114,7 +142,9 @@
       <div class="dashboard__panel-header">
         <div>
           <h2 class="dashboard__section-title">Spending overview</h2>
-          <p class="dashboard__section-sub">Your spend activity over the last 6 months</p>
+          <p class="dashboard__section-sub">
+            Your spend activity over the last 6 months
+          </p>
         </div>
         <span class="dashboard__chart-total">
           {{ formatCurrency(dashboardData.totalSpent) }}
@@ -124,10 +154,7 @@
 
       <div class="dashboard__chart">
         <div class="dashboard__chart-bars">
-          <div
-            class="dashboard__chart-col"
-            *ngFor="let d of spendData"
-          >
+          <div class="dashboard__chart-col" *ngFor="let d of spendData">
             <div class="dashboard__chart-bar-wrap">
               <div
                 class="dashboard__chart-bar"
@@ -146,7 +173,6 @@
 
     <!-- ── Orders + Activity grid ─────────────────────────── -->
     <section class="dashboard__grid">
-
       <!-- Recent Orders -->
       <article class="dashboard__panel">
         <div class="dashboard__panel-header">
@@ -156,7 +182,9 @@
               Track purchases and open tracking shortcuts.
             </p>
           </div>
-          <a class="dashboard__btn dashboard__btn--sm" routerLink="/user/orders">View all</a>
+          <a class="dashboard__btn dashboard__btn--sm" routerLink="/user/orders"
+            >View all</a
+          >
         </div>
 
         <ng-container *ngIf="hasRecentOrders; else noOrdersState">
@@ -184,7 +212,8 @@
                     <span
                       class="dashboard__badge"
                       [ngClass]="getStatusClass(order.status)"
-                    >{{ order.status || 'Processing' }}</span>
+                      >{{ order.status || "Processing" }}</span
+                    >
                   </td>
                   <td>{{ formatCurrency(order.total || 0) }}</td>
                   <td>
@@ -213,13 +242,28 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 />
-                <circle cx="9" cy="19" r="1.5" stroke="currentColor" stroke-width="1.8" />
-                <circle cx="18" cy="19" r="1.5" stroke="currentColor" stroke-width="1.8" />
+                <circle
+                  cx="9"
+                  cy="19"
+                  r="1.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <circle
+                  cx="18"
+                  cy="19"
+                  r="1.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
               </svg>
             </div>
             <h3>No orders yet</h3>
             <p>Your orders will appear here once you start shopping.</p>
-            <a class="dashboard__btn dashboard__btn--primary" routerLink="/products">
+            <a
+              class="dashboard__btn dashboard__btn--primary"
+              routerLink="/user/products"
+            >
               Start shopping
             </a>
           </div>
@@ -253,7 +297,6 @@
         </div>
       </article>
     </section>
-
   </ng-container>
 
   <!-- ── Loading state ────────────────────────────────────── -->
@@ -261,7 +304,10 @@
     <div class="dashboard__skeleton-hero"></div>
 
     <div class="dashboard__skeleton-grid4">
-      <div class="dashboard__skeleton-card" *ngFor="let _ of [1, 2, 3, 4]"></div>
+      <div
+        class="dashboard__skeleton-card"
+        *ngFor="let _ of [1, 2, 3, 4]"
+      ></div>
     </div>
 
     <div class="dashboard__skeleton-chart"></div>

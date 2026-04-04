@@ -39,11 +39,11 @@ export class UserSidebarComponent {
       icon: 'dashboard',
       exact: true,
     },
-    { label: 'Shop / Products', route: '/products', icon: 'products' },
+    { label: 'Shop / Products', route: '/user/products', icon: 'products' },
     { label: 'Orders', route: '/user/orders', icon: 'orders' },
     { label: 'Messages / Chat', route: '/user/messages', icon: 'messages' },
-    { label: 'Customers', route: '/community', icon: 'customers' },
-    { label: 'Settings', route: '/user/profile', icon: 'settings' },
+    { label: 'Customers', route: '/user/customers', icon: 'customers' },
+    { label: 'Settings', route: '/user/settings', icon: 'settings' },
   ];
 
   logout(): void {

@@ -62,7 +62,7 @@ export class UserNavbarComponent implements OnDestroy {
     const query = this.searchTerm.trim();
     if (!query) return;
     this.searchSubmitted.emit(query);
-    this.router.navigate(['/products'], { queryParams: { q: query } });
+    this.router.navigate(['/user/products'], { queryParams: { q: query } });
     this.searchExpanded = false;
   }
 
