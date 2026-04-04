@@ -1,0 +1,32 @@
+<section class="chat-shell">
+  <header class="chat-shell__header">
+    <div>
+      <p class="chat-shell__eyebrow">Community hub</p>
+      <h3>Group chat</h3>
+    </div>
+    <span class="chat-shell__status">Live</span>
+  </header>
+
+  <div *ngIf="loading" class="chat-shell__loading">Loading chat...</div>
+
+  <div #messagesContainer class="chat-shell__messages" *ngIf="!loading">
+    <article *ngFor="let message of messages" class="chat-shell__message">
+      <div class="chat-shell__meta">
+        <strong>{{ message.user.email }}</strong>
+        <span>{{ message.createdAt | date: "shortTime" }}</span>
+      </div>
+      <p>{{ message.message }}</p>
+    </article>
+  </div>
+
+  <footer class="chat-shell__composer">
+    <textarea
+      [(ngModel)]="draft"
+      rows="3"
+      placeholder="Write a message..."
+    ></textarea>
+    <button type="button" (click)="send()" [disabled]="!draft.trim()">
+      Send
+    </button>
+  </footer>
+</section>

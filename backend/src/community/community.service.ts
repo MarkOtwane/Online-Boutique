@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -9,6 +10,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   CommunityPostFilters,
   CreateCommunityCommentDto,
+  CreateCommunityChatMessageDto,
+  CreateCommunityDiscussionDto,
   CreateCommunityPostDto,
   UpdateCommunityPostDto,
 } from './community.dto';
@@ -45,7 +48,7 @@ export class CommunityService {
         userId,
         content: dto.content,
         imageUrl: dto.imageUrl,
-        caption: dto.caption,
+        caption: dto.caption || dto.content.slice(0, 120),
         postType: dto.postType || 'GENERAL',
         productId: dto.productId,
       },
@@ -517,5 +520,187 @@ export class CommunityService {
     });
 
     return { message: 'Comment deleted successfully' };
+  }
+
+  async getCommunityPostComments(postId: number) {
+    return this.prisma.communityComment.findMany({
+      where: {
+        communityPostId: postId,
+        parentId: null,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+        replies: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async likeCommunityPost(userId: number, postId: number) {
+    return this.toggleCommunityReaction(userId, postId);
+  }
+
+  async unlikeCommunityPost(userId: number, postId: number) {
+    const existingReaction = await this.prisma.communityReaction.findUnique({
+      where: {
+        communityPostId_userId: {
+          communityPostId: postId,
+          userId,
+        },
+      },
+    });
+
+    if (!existingReaction) {
+      return { message: 'Reaction already removed', reaction: null };
+    }
+
+    await this.prisma.communityReaction.delete({
+      where: { id: existingReaction.id },
+    });
+
+    await this.prisma.communityPost.update({
+      where: { id: postId },
+      data: {
+        reactionCount: {
+          decrement: 1,
+        },
+      },
+    });
+
+    return { message: 'Reaction removed', reaction: null };
+  }
+
+  async createCommunityDiscussion(
+    userId: number,
+    dto: CreateCommunityDiscussionDto,
+  ) {
+    const message = dto.message?.trim();
+    if (!message) {
+      throw new BadRequestException('Message is required');
+    }
+
+    const product = await this.prisma.product.findUnique({
+      where: { id: dto.productId },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return this.prisma.communityDiscussion.create({
+      data: {
+        userId,
+        productId: dto.productId,
+        message,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+        product: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            imageUrl: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getCommunityDiscussions(productId: number) {
+    return this.prisma.communityDiscussion.findMany({
+      where: { productId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+        product: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            imageUrl: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async getCommunityChatMessages(limit = 100) {
+    return this.prisma.communityChatMessage.findMany({
+      take: limit,
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async createCommunityChatMessage(
+    userId: number,
+    dto: CreateCommunityChatMessageDto,
+  ) {
+    const message = dto.message?.trim();
+    if (!message) {
+      throw new BadRequestException('Message is required');
+    }
+
+    return this.prisma.communityChatMessage.create({
+      data: {
+        userId,
+        message,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+    });
   }
 }

@@ -1,7 +1,7 @@
 export interface CreateCommunityPostDto {
   content: string;
   imageUrl?: string;
-  caption: string;
+  caption?: string;
   postType?: 'GENERAL' | 'PRODUCT_REVIEW' | 'ADMIN_ANNOUNCEMENT';
   productId?: number;
 }
@@ -16,6 +16,15 @@ export interface UpdateCommunityPostDto {
 export interface CreateCommunityCommentDto {
   content: string;
   parentId?: number;
+}
+
+export interface CreateCommunityDiscussionDto {
+  productId: number;
+  message: string;
+}
+
+export interface CreateCommunityChatMessageDto {
+  message: string;
 }
 
 export interface CommunityPostFilters {

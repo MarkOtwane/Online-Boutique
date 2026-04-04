@@ -5,7 +5,12 @@ export interface CommunityPost {
   content: string;
   imageUrl?: string;
   caption: string;
-  postType: 'GENERAL' | 'PRODUCT_REVIEW' | 'LIFESTYLE' | 'TRENDS' | 'ADMIN_ANNOUNCEMENT';
+  postType:
+    | 'GENERAL'
+    | 'PRODUCT_REVIEW'
+    | 'LIFESTYLE'
+    | 'TRENDS'
+    | 'ADMIN_ANNOUNCEMENT';
   createdAt: string;
   updatedAt: string;
   commentCount: number;
@@ -78,11 +83,47 @@ export interface CommunityRepost {
   communityPost: CommunityPost;
 }
 
+export interface CommunityDiscussion {
+  id: number;
+  productId: number;
+  userId: number;
+  message: string;
+  createdAt: string;
+  user: {
+    id: number;
+    email: string;
+    role: string;
+  };
+  product: {
+    id: number;
+    name: string;
+    price: number;
+    imageUrl?: string;
+  };
+}
+
+export interface CommunityChatMessage {
+  id: number;
+  userId: number;
+  message: string;
+  createdAt: string;
+  user: {
+    id: number;
+    email: string;
+    role: string;
+  };
+}
+
 export interface CreateCommunityPostDto {
   content: string;
   imageUrl?: string;
-  caption: string;
-  postType?: 'GENERAL' | 'PRODUCT_REVIEW' | 'LIFESTYLE' | 'TRENDS' | 'ADMIN_ANNOUNCEMENT';
+  caption?: string;
+  postType?:
+    | 'GENERAL'
+    | 'PRODUCT_REVIEW'
+    | 'LIFESTYLE'
+    | 'TRENDS'
+    | 'ADMIN_ANNOUNCEMENT';
   productId?: number;
 }
 

@@ -29,7 +29,7 @@ export const routes: Routes = [
   { path: 'feed', component: ProductFeedComponent },
   { path: 'product/:id', component: ProductDetailComponent },
   { path: 'cart', component: CartComponent },
-  { path: 'community', component: CommunityComponent },
+  { path: 'community', redirectTo: '/user/community', pathMatch: 'full' },
   { path: 'tracking', component: TrackingComponent, canActivate: [AuthGuard] },
   {
     path: 'user',
@@ -43,7 +43,8 @@ export const routes: Routes = [
       { path: 'shops', component: ProductsComponent },
       { path: 'orders', component: UserDashboardComponent },
       { path: 'settings', component: UserDashboardComponent },
-      { path: 'customers', component: CommunityComponent },
+      { path: 'community', component: CommunityComponent },
+      { path: 'customers', redirectTo: 'community', pathMatch: 'full' },
       { path: 'profile', redirectTo: 'settings', pathMatch: 'full' },
     ],
   },

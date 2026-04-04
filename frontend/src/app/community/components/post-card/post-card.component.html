@@ -1,0 +1,35 @@
+<article class="post-card">
+  <header class="post-card__header">
+    <div>
+      <h4>{{ post.user.email }}</h4>
+      <p>{{ post.createdAt | date: "medium" }}</p>
+    </div>
+    <button
+      *ngIf="currentUserId === post.userId"
+      type="button"
+      class="post-card__delete"
+      (click)="deletePost()"
+    >
+      Delete
+    </button>
+  </header>
+
+  <p class="post-card__content">{{ post.content }}</p>
+  <p class="post-card__caption" *ngIf="post.caption">{{ post.caption }}</p>
+
+  <img
+    *ngIf="post.imageUrl"
+    [src]="post.imageUrl"
+    [alt]="post.caption || post.content"
+    class="post-card__image"
+  />
+
+  <footer class="post-card__actions">
+    <button type="button" (click)="toggleLike()" [disabled]="liking">
+      {{ hasLiked ? "Unlike" : "Like" }} · {{ post.reactionCount }}
+    </button>
+    <span>{{ post.commentCount }} comments</span>
+  </footer>
+
+  <app-comment-section [postId]="post.id"></app-comment-section>
+</article>

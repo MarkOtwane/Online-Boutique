@@ -1,0 +1,63 @@
+<section class="composer" *ngIf="canCreate; else loginPrompt">
+  <header class="composer__header">
+    <div>
+      <p class="composer__eyebrow">Share with the community</p>
+      <h3>Create a post</h3>
+    </div>
+    <button type="button" class="composer__reset" (click)="reset()">
+      Clear
+    </button>
+  </header>
+
+  <form class="composer__form" (ngSubmit)="submit()">
+    <textarea
+      [(ngModel)]="content"
+      name="content"
+      rows="4"
+      placeholder="What are you thinking about today?"
+      required
+    ></textarea>
+
+    <input
+      [(ngModel)]="caption"
+      name="caption"
+      type="text"
+      placeholder="Optional caption"
+    />
+
+    <div class="composer__media">
+      <label class="composer__upload">
+        <input
+          type="file"
+          accept="image/*"
+          (change)="onImageSelected($event)"
+          hidden
+        />
+        <span>Choose image</span>
+      </label>
+      <span class="composer__hint">PNG, JPG, WEBP, GIF up to 10MB</span>
+    </div>
+
+    <img
+      *ngIf="imagePreview"
+      [src]="imagePreview"
+      alt="Image preview"
+      class="composer__preview"
+    />
+
+    <button
+      class="composer__submit"
+      type="submit"
+      [disabled]="loading || !content.trim()"
+    >
+      {{ loading ? "Posting..." : "Post to community" }}
+    </button>
+  </form>
+</section>
+
+<ng-template #loginPrompt>
+  <div class="composer__locked">
+    <h3>Sign in to post</h3>
+    <p>You need an authenticated session to share in the community hub.</p>
+  </div>
+</ng-template>

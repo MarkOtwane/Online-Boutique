@@ -1,0 +1,50 @@
+<section class="discussion-shell">
+  <header class="discussion-shell__header">
+    <div>
+      <p class="discussion-shell__eyebrow">Product-specific</p>
+      <h3>Discussions</h3>
+    </div>
+  </header>
+
+  <div class="discussion-shell__filters">
+    <select [(ngModel)]="selectedProductId" (change)="loadDiscussions()">
+      <option value="">Choose a product</option>
+      <option *ngFor="let product of products" [value]="product.id">
+        {{ product.name }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="canPost && selectedProductId" class="discussion-shell__composer">
+    <textarea
+      [(ngModel)]="draft"
+      rows="3"
+      placeholder="Start a discussion about this product..."
+    ></textarea>
+    <button type="button" (click)="submit()" [disabled]="!draft.trim()">
+      Post discussion
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="discussion-shell__loading">
+    Loading discussions...
+  </div>
+
+  <div
+    *ngIf="!loading && discussions.length === 0"
+    class="discussion-shell__empty"
+  >
+    Select a product to see its discussion thread.
+  </div>
+
+  <article
+    *ngFor="let discussion of discussions"
+    class="discussion-shell__item"
+  >
+    <div class="discussion-shell__meta">
+      <strong>{{ discussion.user.email }}</strong>
+      <span>{{ discussion.createdAt | date: "medium" }}</span>
+    </div>
+    <p>{{ discussion.message }}</p>
+  </article>
+</section>

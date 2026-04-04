@@ -15,51 +15,54 @@ model Category {
 }
 
 model Product {
-  id              Int                     @id @default(autoincrement())
-  name            String
-  price           Float
-  imageUrl        String?
-  createdAt       DateTime                @default(now())
-  commentCount    Int                     @default(0)
-  repostCount     Int                     @default(0)
-  reactionCount   Int                     @default(0)
-  categoryId      Int
-  comments        Comment[]
-  orderItems      OrderItem[]
-  category        Category                @relation(fields: [categoryId], references: [id])
-  reposts         Repost[]
-  reactions       Reaction[]
-  communityPosts  CommunityPost[]
-  reviews         Review[]
-  userBehaviors   UserBehavior[]
-  recommendations ProductRecommendation[]
+  id                   Int                     @id @default(autoincrement())
+  name                 String
+  price                Float
+  imageUrl             String?
+  createdAt            DateTime                @default(now())
+  commentCount         Int                     @default(0)
+  repostCount          Int                     @default(0)
+  reactionCount        Int                     @default(0)
+  categoryId           Int
+  comments             Comment[]
+  orderItems           OrderItem[]
+  category             Category                @relation(fields: [categoryId], references: [id])
+  reposts              Repost[]
+  reactions            Reaction[]
+  communityPosts       CommunityPost[]
+  communityDiscussions CommunityDiscussion[]
+  reviews              Review[]
+  userBehaviors        UserBehavior[]
+  recommendations      ProductRecommendation[]
 }
 
 model User {
-  id                 Int                     @id @default(autoincrement())
-  email              String                  @unique
-  password           String
-  role               String                  @default("customer")
-  createdAt          DateTime                @default(now())
-  isOnline           Boolean                 @default(false)
-  lastSeen           DateTime                @default(now())
-  chatPublicKey      String?
-  conversationsAsP1  ChatConversation[]      @relation("ConversationParticipant1")
-  conversationsAsP2  ChatConversation[]      @relation("ConversationParticipant2")
-  sentMessages       ChatMessage[]           @relation("MessageSender")
-  comments           Comment[]
-  orders             Order[]
-  reposts            Repost[]
-  reactions          Reaction[]
-  communityPosts     CommunityPost[]
-  communityComments  CommunityComment[]
-  communityReactions CommunityReaction[]
-  communityReposts   CommunityRepost[]
-  emailLogs          EmailLog[]
-  reviews            Review[]
-  userBehaviors      UserBehavior[]
-  reviewHelpfulness  UserReviewHelpfulness[]
-  recommendations    ProductRecommendation[]
+  id                    Int                     @id @default(autoincrement())
+  email                 String                  @unique
+  password              String
+  role                  String                  @default("customer")
+  createdAt             DateTime                @default(now())
+  isOnline              Boolean                 @default(false)
+  lastSeen              DateTime                @default(now())
+  chatPublicKey         String?
+  conversationsAsP1     ChatConversation[]      @relation("ConversationParticipant1")
+  conversationsAsP2     ChatConversation[]      @relation("ConversationParticipant2")
+  sentMessages          ChatMessage[]           @relation("MessageSender")
+  comments              Comment[]
+  orders                Order[]
+  reposts               Repost[]
+  reactions             Reaction[]
+  communityPosts        CommunityPost[]
+  communityComments     CommunityComment[]
+  communityReactions    CommunityReaction[]
+  communityReposts      CommunityRepost[]
+  communityDiscussions  CommunityDiscussion[]
+  communityChatMessages CommunityChatMessage[]
+  emailLogs             EmailLog[]
+  reviews               Review[]
+  userBehaviors         UserBehavior[]
+  reviewHelpfulness     UserReviewHelpfulness[]
+  recommendations       ProductRecommendation[]
 }
 
 model Order {
@@ -268,6 +271,31 @@ model CommunityRepost {
   @@unique([communityPostId, userId])
   @@index([communityPostId])
   @@index([userId])
+}
+
+model CommunityDiscussion {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  userId    Int
+  message   String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model CommunityChatMessage {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model OrderTracking {

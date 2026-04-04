@@ -42,7 +42,7 @@ export class UserSidebarComponent {
     { label: 'Shop / Products', route: '/user/products', icon: 'products' },
     { label: 'Orders', route: '/user/orders', icon: 'orders' },
     { label: 'Messages / Chat', route: '/user/messages', icon: 'messages' },
-    { label: 'Customers', route: '/user/customers', icon: 'customers' },
+    { label: 'Community', route: '/user/community', icon: 'customers' },
     { label: 'Settings', route: '/user/settings', icon: 'settings' },
   ];
 

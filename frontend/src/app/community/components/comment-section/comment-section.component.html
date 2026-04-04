@@ -1,0 +1,72 @@
+<section class="comments">
+  <button type="button" class="comments__toggle" (click)="toggle()">
+    {{ expanded ? "Hide comments" : "Show comments" }}
+    <span>{{ totalComments }}</span>
+  </button>
+
+  <div *ngIf="expanded" class="comments__panel">
+    <div *ngIf="isAuthenticated" class="comments__composer">
+      <textarea
+        [(ngModel)]="newComment"
+        rows="3"
+        placeholder="Write a comment..."
+      ></textarea>
+      <button
+        type="button"
+        (click)="addComment()"
+        [disabled]="!newComment.trim()"
+      >
+        Comment
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="comments__loading">Loading comments...</div>
+
+    <div *ngIf="!loading && comments.length === 0" class="comments__empty">
+      No comments yet.
+    </div>
+
+    <article *ngFor="let comment of comments" class="comments__item">
+      <div class="comments__meta">
+        <strong>{{ comment.user.email }}</strong>
+        <span>{{ comment.createdAt | date: "medium" }}</span>
+      </div>
+      <p>{{ comment.content }}</p>
+
+      <div class="comments__actions" *ngIf="isAuthenticated">
+        <button type="button" (click)="startReply(comment.id)">Reply</button>
+        <button type="button" (click)="deleteComment(comment.id)">
+          Delete
+        </button>
+      </div>
+
+      <div *ngIf="replyingTo === comment.id" class="comments__reply">
+        <textarea
+          [(ngModel)]="replyContent"
+          rows="2"
+          placeholder="Write a reply..."
+        ></textarea>
+        <button
+          type="button"
+          (click)="addComment(comment.id)"
+          [disabled]="!replyContent.trim()"
+        >
+          Send reply
+        </button>
+      </div>
+
+      <div class="comments__replies" *ngIf="comment.replies?.length">
+        <article
+          *ngFor="let reply of comment.replies"
+          class="comments__reply-item"
+        >
+          <div class="comments__meta">
+            <strong>{{ reply.user.email }}</strong>
+            <span>{{ reply.createdAt | date: "medium" }}</span>
+          </div>
+          <p>{{ reply.content }}</p>
+        </article>
+      </div>
+    </article>
+  </div>
+</section>
