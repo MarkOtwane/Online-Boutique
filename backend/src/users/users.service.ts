@@ -49,6 +49,7 @@ export class UsersService {
         createdAt: true,
         isOnline: true,
         lastSeen: true,
+        chatPublicKey: true,
       }, // Exclude password
     });
   }
@@ -62,6 +63,7 @@ export class UsersService {
         createdAt: true,
         isOnline: true,
         lastSeen: true,
+        chatPublicKey: true,
       }, // Exclude password
     });
   }
@@ -81,6 +83,7 @@ export class UsersService {
           createdAt: true,
           isOnline: true,
           lastSeen: true,
+          chatPublicKey: true,
         }, // Exclude password
       });
     } catch (error) {
