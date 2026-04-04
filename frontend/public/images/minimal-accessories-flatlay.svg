@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Minimal Accessories Flatlay</title>
+  <desc id="desc">Minimal flatlay illustration of boutique accessories including bag, jewelry, and shoes.</desc>
+  <rect width="1200" height="800" fill="#f8fafc" />
+  <rect x="120" y="100" width="960" height="600" rx="26" fill="#e2e8f0" />
+  <rect x="220" y="220" width="240" height="280" rx="24" fill="#334155" />
+  <circle cx="620" cy="280" r="70" fill="#0f172a" />
+  <circle cx="820" cy="280" r="70" fill="#475569" />
+  <path d="M560 500C640 420 760 420 840 500L840 560H560V500Z" fill="#1e293b" />
+  <text x="600" y="740" text-anchor="middle" font-size="44" fill="#0f172a" font-family="Georgia, serif">MINIMAL ACCESSORY EDIT</text>
+</svg>

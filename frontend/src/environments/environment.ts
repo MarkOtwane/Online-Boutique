@@ -1,4 +1,5 @@
 export const environment = {
-  production: true,
+  production: false,
   apiUrl: 'https://online-boutique-tv00.onrender.com',
+  gaMeasurementId: '',
 };

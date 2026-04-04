@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Elegant Evening Dress Collection</title>
+  <desc id="desc">Stylized fashion illustration of elegant evening dresses on display.</desc>
+  <rect width="1200" height="800" fill="#fff7ed" />
+  <rect x="90" y="100" width="1020" height="600" rx="30" fill="#ffedd5" />
+  <path d="M290 230L360 180L430 230L400 620H320L290 230Z" fill="#9a3412" />
+  <path d="M520 230L600 170L680 230L650 620H550L520 230Z" fill="#c2410c" />
+  <path d="M760 230L840 190L920 230L890 620H790L760 230Z" fill="#ea580c" />
+  <text x="600" y="730" text-anchor="middle" font-size="48" fill="#7c2d12" font-family="Georgia, serif">ELEGANT EVENING EDIT</text>
+</svg>
