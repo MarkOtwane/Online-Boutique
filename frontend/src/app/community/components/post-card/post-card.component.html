@@ -4,18 +4,67 @@
       <h4>{{ post.user.email }}</h4>
       <p>{{ post.createdAt | date: "medium" }}</p>
     </div>
-    <button
-      *ngIf="currentUserId === post.userId"
-      type="button"
-      class="post-card__delete"
-      (click)="deletePost()"
-    >
-      Delete
-    </button>
+    <div *ngIf="isOwner" class="post-card__owner-actions">
+      <button
+        *ngIf="!editing"
+        type="button"
+        class="post-card__action"
+        (click)="startEdit()"
+      >
+        Edit
+      </button>
+      <button
+        type="button"
+        class="post-card__delete"
+        [disabled]="saving"
+        (click)="deletePost()"
+      >
+        Delete
+      </button>
+    </div>
   </header>
 
-  <p class="post-card__content">{{ post.content }}</p>
-  <p class="post-card__caption" *ngIf="post.caption">{{ post.caption }}</p>
+  <div *ngIf="editing" class="post-card__editor">
+    <textarea
+      [(ngModel)]="editContent"
+      name="editContent"
+      rows="4"
+      class="post-card__input"
+      placeholder="Update your post content"
+    ></textarea>
+
+    <input
+      [(ngModel)]="editCaption"
+      name="editCaption"
+      type="text"
+      class="post-card__input"
+      placeholder="Update caption (optional)"
+    />
+
+    <div class="post-card__editor-actions">
+      <button
+        type="button"
+        class="post-card__action"
+        [disabled]="saving || !editContent.trim()"
+        (click)="saveEdit()"
+      >
+        {{ saving ? "Saving..." : "Save" }}
+      </button>
+      <button
+        type="button"
+        class="post-card__action"
+        [disabled]="saving"
+        (click)="cancelEdit()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!editing">
+    <p class="post-card__content">{{ post.content }}</p>
+    <p class="post-card__caption" *ngIf="post.caption">{{ post.caption }}</p>
+  </ng-container>
 
   <img
     *ngIf="post.imageUrl"

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CommunityPost } from '../../../interfaces/community-post';
 import { AuthService } from '../../../services/auth.service';
 import { CommunityService } from '../../../services/community.service';
@@ -8,7 +9,7 @@ import { CommentSectionComponent } from '../comment-section/comment-section.comp
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule, CommentSectionComponent],
+  imports: [CommonModule, FormsModule, CommentSectionComponent],
   templateUrl: './post-card.component.html',
   styleUrls: ['./post-card.component.css'],
 })
@@ -20,9 +21,28 @@ export class PostCardComponent {
   @Output() removed = new EventEmitter<number>();
 
   liking = false;
+  editing = false;
+  saving = false;
+  editContent = '';
+  editCaption = '';
 
   get currentUserId(): number | null {
-    return this.authService.getUser()?.id ?? null;
+    const userId = this.authService.getUser()?.id;
+    if (userId === null || userId === undefined) {
+      return null;
+    }
+
+    const parsedId = Number(userId);
+    return Number.isNaN(parsedId) ? null : parsedId;
+  }
+
+  get isOwner(): boolean {
+    const userId = this.currentUserId;
+    if (!userId) {
+      return false;
+    }
+
+    return userId === Number(this.post.userId);
   }
 
   get hasLiked(): boolean {
@@ -72,9 +92,64 @@ export class PostCardComponent {
   }
 
   deletePost(): void {
+    if (!this.isOwner) {
+      return;
+    }
+
     this.communityService.deleteCommunityPost(this.post.id).subscribe({
       next: () => this.removed.emit(this.post.id),
       error: (error) => console.error('Error deleting post:', error),
     });
+  }
+
+  startEdit(): void {
+    if (!this.isOwner) {
+      return;
+    }
+
+    this.editing = true;
+    this.editContent = this.post.content;
+    this.editCaption = this.post.caption || '';
+  }
+
+  cancelEdit(): void {
+    this.editing = false;
+    this.saving = false;
+    this.editContent = '';
+    this.editCaption = '';
+  }
+
+  saveEdit(): void {
+    if (!this.isOwner || this.saving) {
+      return;
+    }
+
+    const content = this.editContent.trim();
+    if (!content) {
+      return;
+    }
+
+    this.saving = true;
+    const caption = this.editCaption.trim();
+
+    this.communityService
+      .updateCommunityPost(this.post.id, {
+        content,
+        caption: caption || content,
+      })
+      .subscribe({
+        next: (updatedPost) => {
+          this.post = {
+            ...this.post,
+            ...updatedPost,
+          };
+          this.saving = false;
+          this.cancelEdit();
+        },
+        error: (error) => {
+          console.error('Error updating post:', error);
+          this.saving = false;
+        },
+      });
   }
 }

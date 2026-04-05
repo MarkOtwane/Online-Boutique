@@ -58,6 +58,7 @@
 }
 
 .post-card__actions button,
+.post-card__action,
 .post-card__delete {
   border: 0;
   background: #e2e8f0;
@@ -65,4 +66,31 @@
   border-radius: 999px;
   padding: 8px 12px;
   cursor: pointer;
+}
+
+.post-card__owner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.post-card__editor {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.post-card__input {
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font: inherit;
+  color: #0f172a;
+  background: #fff;
+}
+
+.post-card__editor-actions {
+  display: flex;
+  gap: 8px;
 }
