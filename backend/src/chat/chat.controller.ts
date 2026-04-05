@@ -53,17 +53,7 @@ export class ChatController {
       return null;
     }
 
-    // Format the response to match frontend expectations
-    const participants = conversation.participants || [];
-    const otherParticipants = participants
-      .filter((p: any) => p.userId !== req.user.id)
-      .map((p: any) => p.user);
-
-    return {
-      ...conversation,
-      participants: otherParticipants,
-      unreadCount: 0,
-    };
+    return conversation;
   }
 
   @Post('messages')
