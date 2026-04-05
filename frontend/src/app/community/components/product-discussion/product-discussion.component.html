@@ -15,6 +15,25 @@
     </select>
   </div>
 
+  <article
+    *ngIf="selectedProduct as product"
+    class="discussion-shell__selected"
+  >
+    <img
+      *ngIf="product.imageUrl"
+      [src]="product.imageUrl"
+      [alt]="product.name"
+      class="discussion-shell__selected-image"
+    />
+    <div class="discussion-shell__selected-meta">
+      <h4>{{ product.name }}</h4>
+      <p>
+        Discussing this product now
+        <span *ngIf="product.price">· {{ product.price | currency }}</span>
+      </p>
+    </div>
+  </article>
+
   <div *ngIf="canPost && selectedProductId" class="discussion-shell__composer">
     <textarea
       [(ngModel)]="draft"
@@ -41,6 +60,21 @@
     *ngFor="let discussion of discussions"
     class="discussion-shell__item"
   >
+    <div class="discussion-shell__product" *ngIf="discussion.product">
+      <img
+        *ngIf="discussion.product.imageUrl"
+        [src]="discussion.product.imageUrl"
+        [alt]="discussion.product.name"
+        class="discussion-shell__product-image"
+      />
+      <div>
+        <strong>{{ discussion.product.name }}</strong>
+        <span *ngIf="discussion.product.price">
+          · {{ discussion.product.price | currency }}
+        </span>
+      </div>
+    </div>
+
     <div class="discussion-shell__meta">
       <strong>{{ discussion.user.email }}</strong>
       <span>{{ discussion.createdAt | date: "medium" }}</span>

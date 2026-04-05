@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Product } from '../../../interfaces/product';
 import { CommunityDiscussion } from '../../../interfaces/community-post';
+import { Product } from '../../../interfaces/product';
 import { AuthService } from '../../../services/auth.service';
 import { CommunityService } from '../../../services/community.service';
 import { ProductService } from '../../../services/product.service';
@@ -34,6 +34,15 @@ export class ProductDiscussionComponent implements OnInit {
 
   get canPost(): boolean {
     return this.authService.isAuthenticated();
+  }
+
+  get selectedProduct(): Product | null {
+    const productId = Number(this.selectedProductId);
+    if (!productId) {
+      return null;
+    }
+
+    return this.products.find((product) => product.id === productId) || null;
   }
 
   loadDiscussions(): void {
