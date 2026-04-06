@@ -258,7 +258,7 @@
     </div>
     <div class="modal-body">
       <div class="online-users">
-        <h4>Online Users</h4>
+        <h4>Users</h4>
         <div class="users-list">
           <div
             *ngFor="let user of onlineUsers"
@@ -271,7 +271,9 @@
             </div>
             <div class="user-info">
               <span class="user-name">{{ user.email }}</span>
-              <span class="user-status online">Online</span>
+              <span class="user-status" [class.online]="user.isOnline">
+                {{ user.isOnline ? "Online" : "Offline" }}
+              </span>
             </div>
           </div>
         </div>

@@ -68,6 +68,12 @@ export class ChatController {
     return this.chatService.getOnlineUsers(req.user.id);
   }
 
+  @Get('users')
+  @UseGuards(JwtAuthGuard)
+  async getChatUsers(@Request() req) {
+    return this.chatService.getChatUsers(req.user.id);
+  }
+
   @Put('messages/:id/read')
   @UseGuards(JwtAuthGuard)
   async markMessageAsRead(@Request() req, @Param('id') messageId: string) {

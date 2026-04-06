@@ -37,7 +37,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       if (user && (user.role === 'customer' || user.role === 'admin')) {
         void this.chatService.initializeSocketConnection();
         this.loadConversations();
-        this.loadOnlineUsers();
+        this.loadChatUsers();
       }
     });
 
@@ -109,21 +109,24 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadOnlineUsers(): void {
-    this.chatService.getOnlineUsers().subscribe({
+  loadChatUsers(): void {
+    this.chatService.getChatUsers().subscribe({
       next: (users) => {
-        this.onlineUsers = users.filter(
+        const chatUsers = users.filter(
           (user) => user.id !== this.currentUser?.id,
         );
+        this.onlineUsers = chatUsers;
+        this.chatService.updateChatUsers(chatUsers);
       },
       error: (error) => {
-        console.error('Error loading online users:', error);
+        console.error('Error loading chat users:', error);
       },
     });
   }
 
   selectConversation(conversation: ChatConversation): void {
     this.chatService.setActiveConversation(conversation);
+    this.chatService.markConversationAsRead(conversation.id);
     this.markMessagesAsRead();
   }
 

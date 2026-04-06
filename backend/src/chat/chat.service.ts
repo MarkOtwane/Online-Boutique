@@ -258,6 +258,25 @@ export class ChatService {
     });
   }
 
+  async getChatUsers(userId: number) {
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          not: userId,
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        isOnline: true,
+        lastSeen: true,
+        chatPublicKey: true,
+      },
+      orderBy: [{ isOnline: 'desc' }, { lastSeen: 'desc' }],
+    });
+  }
+
   async markMessageAsRead(userId: number, messageId: string) {
     const message = await this.prisma.chatMessage.findUnique({
       where: { id: messageId },

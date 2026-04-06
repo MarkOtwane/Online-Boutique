@@ -162,6 +162,12 @@ export class ChatService {
     });
   }
 
+  getChatUsers(): Observable<ChatUser[]> {
+    return this.http.get<ChatUser[]>(`${this.apiUrl}/chat/users`, {
+      headers: this.getHeaders(),
+    });
+  }
+
   markMessageAsRead(messageId: string): Observable<void> {
     return this.http.put<void>(
       `${this.apiUrl}/chat/messages/${messageId}/read`,
@@ -211,6 +217,10 @@ export class ChatService {
 
   updateConversations(conversations: ChatConversation[]): void {
     this.conversationsSubject.next(conversations);
+  }
+
+  updateChatUsers(users: ChatUser[]): void {
+    this.onlineUsersSubject.next(users);
   }
 
   async sendEncryptedMessage(plainText: string): Promise<void> {
@@ -310,6 +320,31 @@ export class ChatService {
     if (this.socket) {
       this.socket.disconnect();
     }
+  }
+
+  markConversationAsRead(conversationId: string): void {
+    const updatedConversations = this.conversationsSubject
+      .getValue()
+      .map((conversation) =>
+        conversation.id === conversationId
+          ? {
+              ...conversation,
+              unreadCount: 0,
+            }
+          : conversation,
+      );
+
+    this.conversationsSubject.next(updatedConversations);
+
+    const updatedMessages = this.messagesSubject
+      .getValue()
+      .map((message) =>
+        message.conversationId === conversationId
+          ? { ...message, isRead: true }
+          : message,
+      );
+
+    this.messagesSubject.next(updatedMessages);
   }
 
   isUserTyping(userId: number): boolean {
@@ -417,31 +452,31 @@ export class ChatService {
 
   private handleUserOnline(userId: number): void {
     const currentUsers = this.onlineUsersSubject.getValue();
-    const userExists = currentUsers.find((user) => user.id === userId);
-
-    if (userExists) {
-      return;
-    }
-
-    this.http
-      .get<ChatUser[]>(`${this.apiUrl}/chat/users/online`, {
-        headers: this.getHeaders(),
-      })
-      .subscribe({
-        next: (users) => {
-          const updatedUser = users.find((user) => user.id === userId);
-          if (updatedUser) {
-            this.onlineUsersSubject.next([...currentUsers, updatedUser]);
+    const updatedUsers = currentUsers.map((user) =>
+      user.id === userId
+        ? {
+            ...user,
+            isOnline: true,
           }
-        },
-      });
+        : user,
+    );
+
+    this.onlineUsersSubject.next(updatedUsers);
   }
 
   private handleUserOffline(userId: number): void {
     const currentUsers = this.onlineUsersSubject.getValue();
-    this.onlineUsersSubject.next(
-      currentUsers.filter((user) => user.id !== userId),
+    const updatedUsers = currentUsers.map((user) =>
+      user.id === userId
+        ? {
+            ...user,
+            isOnline: false,
+            lastSeen: new Date().toISOString(),
+          }
+        : user,
     );
+
+    this.onlineUsersSubject.next(updatedUsers);
   }
 
   private handleUserTyping(data: { userId: number; isTyping: boolean }): void {
@@ -458,18 +493,37 @@ export class ChatService {
   }
 
   private updateConversationLastMessage(message: ChatMessage): void {
-    const updated = this.conversationsSubject
-      .getValue()
-      .map((conversation) =>
-        conversation.id === message.conversationId
-          ? {
-              ...conversation,
-              lastMessage: message,
-              updatedAt: message.createdAt,
-            }
-          : conversation,
-      );
+    const currentUserId = this.getCurrentUserId();
+    const updated = this.conversationsSubject.getValue().map((conversation) =>
+      conversation.id === message.conversationId
+        ? {
+            ...conversation,
+            lastMessage: message,
+            updatedAt: message.createdAt,
+            unreadCount:
+              this.activeConversationId === conversation.id
+                ? 0
+                : currentUserId && message.senderId !== currentUserId
+                  ? (conversation.unreadCount || 0) + 1
+                  : conversation.unreadCount,
+          }
+        : conversation,
+    );
 
     this.conversationsSubject.next(updated);
+  }
+
+  private getCurrentUserId(): number | null {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])) as { sub?: number };
+      return payload.sub ?? null;
+    } catch {
+      return null;
+    }
   }
 }
