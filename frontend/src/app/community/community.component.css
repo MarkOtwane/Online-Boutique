@@ -160,22 +160,10 @@
 
 .community-shell__panel {
   min-height: 240px;
-}
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-}
-
-.tab-button:hover {
-  background: #e9ecef;
-  color: #333;
-}
-
-.tab-button.active {
-  background: #007bff;
-  color: white;
-  box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
 }
 
 /* Community Feed */
