@@ -13,8 +13,8 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top right, rgba(249, 115, 22, 0.07), transparent 32%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+    radial-gradient(circle at top right, rgba(0, 123, 255, 0.07), transparent 32%),
+    linear-gradient(180deg, #fff 0%, #fff 100%);
 }
 
 // ── Backdrop ───────────────────────────────────────────────
@@ -88,6 +88,6 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 // ── Dark mode ──────────────────────────────────────────────
 :host-context(.dark-mode) .user-shell {
   background:
-    radial-gradient(circle at top right, rgba(249, 115, 22, 0.05), transparent 32%),
-    linear-gradient(180deg, #0d1117 0%, #111827 100%);
+    radial-gradient(circle at top right, rgba(0, 123, 255, 0.05), transparent 32%),
+    linear-gradient(180deg, #000 0%, #000 100%);
 }

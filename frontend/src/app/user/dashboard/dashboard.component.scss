@@ -1,17 +1,17 @@
 // ── Design Tokens ──────────────────────────────────────────
-$accent-start:  #f59e0b;
-$accent-end:    #f97316;
-$dark-start:    #111827;
-$dark-end:      #1f2937;
-$text:          #0f172a;
-$muted:         #64748b;
-$border:        rgba(148, 163, 184, 0.14);
+$accent-start:  #007bff;
+$accent-end:    #007bff;
+$dark-start:    #000000;
+$dark-end:      #000000;
+$text:          #000000;
+$muted:         #000000;
+$border:        rgba(0, 0, 0, 0.14);
 $card:          #ffffff;
 $card-surface:  rgba(255, 255, 255, 0.92);
-$bg-soft:       #f8fafc;
-$shadow-card:   0 4px 20px rgba(15, 23, 42, 0.06);
-$shadow-hover:  0 8px 28px rgba(15, 23, 42, 0.1);
-$shadow-elevated: 0 16px 40px rgba(15, 23, 42, 0.15);
+$bg-soft:       #ffffff;
+$shadow-card:   0 4px 20px rgba(0, 0, 0, 0.06);
+$shadow-hover:  0 8px 28px rgba(0, 0, 0, 0.1);
+$shadow-elevated: 0 16px 40px rgba(0, 0, 0, 0.15);
 $radius:        20px;
 $transition:    160ms ease;
 $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -35,7 +35,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   gap: 20px;
   padding: 32px;
   border-radius: 24px;
-  background: linear-gradient(135deg, $dark-start 0%, $dark-end 55%, #334155 100%);
+  background: linear-gradient(135deg, $dark-start 0%, $dark-end 55%, #000000 100%);
   color: #fff;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
   overflow: hidden;
@@ -125,7 +125,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   display: block;
 
   &--green {
-    color: #4ade80;
+    color: #007bff;
   }
 }
 
@@ -191,7 +191,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
     border: 1px solid $border;
 
     &:hover {
-      background: darken(#f8fafc, 4%);
+      background: rgba(0, 0, 0, 0.04);
       box-shadow: $shadow-card;
     }
   }
@@ -272,18 +272,18 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   &[data-icon='revenue'] {
-    background: linear-gradient(135deg, #059669, #10b981);
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.24);
+    background: linear-gradient(135deg, #007bff, #007bff);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.24);
   }
 
   &[data-icon='customers'] {
-    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.24);
+    background: linear-gradient(135deg, #007bff, #007bff);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.24);
   }
 
   &[data-icon='messages'] {
-    background: linear-gradient(135deg, #0284c7, #0ea5e9);
-    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.24);
+    background: linear-gradient(135deg, #007bff, #007bff);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.24);
   }
 }
 
@@ -522,28 +522,28 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   text-transform: capitalize;
 
   &.delivered {
-    color: #166534;
-    background: #dcfce7;
+    color: #000;
+    background: #fff;
   }
 
   &.shipped {
-    color: #1d4ed8;
-    background: #dbeafe;
+    color: #007bff;
+    background: #fff;
   }
 
   &.processing {
-    color: #92400e;
-    background: #fef3c7;
+    color: #007bff;
+    background: #fff;
   }
 
   &.pending {
-    color: #7c3aed;
-    background: #ede9fe;
+    color: #007bff;
+    background: #fff;
   }
 
   &.default {
-    color: #334155;
-    background: #e2e8f0;
+    color: #000;
+    background: #fff;
   }
 }
 
@@ -627,7 +627,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   display: grid;
   place-items: center;
   margin-bottom: 16px;
-  color: #cbd5e1;
+  color: #fff;
 }
 
 .dashboard__empty h3 {
@@ -647,7 +647,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 %shimmer {
   position: relative;
   overflow: hidden;
-  background: #e2e8f0;
+  background: #000;
   border-radius: 12px;
 
   &::after {
@@ -720,31 +720,31 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 // ── Dark mode ─────────────────────────────────────────────────
 :host-context(.dark-mode) {
   .dashboard {
-    color: #f1f5f9;
+    color: #fff;
   }
 
   .dashboard__hero {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #293548 100%);
+    background: linear-gradient(135deg, #000 0%, #000 55%, #000 100%);
   }
 
   .dashboard__card,
   .dashboard__panel,
   .dashboard__chart-panel {
-    background: rgba(30, 41, 59, 0.9);
+    background: rgba(0, 0, 0, 0.9);
     border-color: rgba(255, 255, 255, 0.07);
-    color: #f1f5f9;
+    color: #fff;
   }
 
   .dashboard__card-value,
   .dashboard__section-title,
   .dashboard__activity-title,
   .dashboard__order-id {
-    color: #f1f5f9;
+    color: #fff;
   }
 
   .dashboard__table th {
-    background: rgba(15, 23, 42, 0.6);
-    color: #94a3b8;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
   }
 
   .dashboard__table tbody tr:hover {
@@ -761,7 +761,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .dashboard__activity-body {
-    color: #f1f5f9;
+    color: #fff;
   }
 
   .dashboard__activity-line {
@@ -769,9 +769,9 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .dashboard__empty {
-    color: #94a3b8;
+    color: #fff;
 
-    h3 { color: #f1f5f9; }
+    h3 { color: #fff; }
   }
 
   .dashboard__empty-icon {
@@ -780,7 +780,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
   .dashboard__btn--sm {
     background: rgba(255, 255, 255, 0.07);
-    color: #f1f5f9;
+    color: #fff;
     border-color: rgba(255, 255, 255, 0.1);
 
     &:hover {

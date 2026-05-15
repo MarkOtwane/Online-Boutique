@@ -1,18 +1,18 @@
 // ── Design Tokens ──────────────────────────────────────────────
-$bg: rgba(248, 250, 252, 0.88);
-$bg-dark: rgba(13, 17, 23, 0.9);
-$border: rgba(15, 23, 42, 0.07);
+$bg: rgba(255, 255, 255, 0.88);
+$bg-dark: rgba(0, 0, 0, 0.9);
+$border: rgba(0, 0, 0, 0.07);
 $border-dark: rgba(255, 255, 255, 0.07);
-$shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
-$shadow-elevated: 0 8px 32px rgba(15, 23, 42, 0.12);
-$accent-start: #f59e0b;
-$accent-end: #f97316;
-$text: #0f172a;
-$text-dark: #f1f5f9;
-$muted: #64748b;
-$muted-dark: #94a3b8;
+$shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+$shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.12);
+$accent-start: #007bff;
+$accent-end: #007bff;
+$text: #000;
+$text-dark: #fff;
+$muted: #000;
+$muted-dark: #fff;
 $card: #fff;
-$card-dark: #1e293b;
+$card-dark: #000;
 $transition: 160ms ease;
 $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
@@ -71,7 +71,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .navbar__dropdown {
-      background: #1e293b;
+      background: #000;
       border-color: rgba(255, 255, 255, 0.08);
     }
 
@@ -109,9 +109,9 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 
   &:hover {
-    background: darken(#fff, 3%);
+    background: rgba(0, 0, 0, 0.03);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
 
   &:active {
@@ -158,7 +158,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   font-family: inherit;
 
   &::placeholder {
-    color: #94a3b8;
+    color: #000;
   }
 }
 
@@ -166,7 +166,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   flex: 0 0 auto;
   border: 0;
   border-radius: 10px;
-  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  background: linear-gradient(135deg, #000 0%, #000 100%);
   color: #fff;
   padding: 8px 14px;
   cursor: pointer;
@@ -241,7 +241,7 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   place-items: center;
   font-size: 0.68rem;
   font-weight: 700;
-  border: 2px solid #f8fafc;
+    border: 2px solid #fff;
 }
 
 // ── Profile ─────────────────────────────────────────────────
@@ -358,13 +358,13 @@ $transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
   transition: background $transition;
 
-  &:hover {
-    background: #f8fafc;
-  }
+    &:hover {
+      background: #fff;
+    }
 
-  &.danger {
-    color: #dc2626;
-  }
+    &.danger {
+      color: #007bff;
+    }
 }
 
 // ── Responsive ───────────────────────────────────────────────
