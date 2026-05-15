@@ -1,11 +1,21 @@
 <div class="admin-container">
+  <!-- Mobile Menu Button -->
+  <button *ngIf="isMobile" class="mobile-menu-btn" (click)="toggleSidebar()" [class.active]="sidebarOpen">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Mobile Overlay -->
+  <div *ngIf="isMobile && sidebarOpen" class="mobile-overlay" (click)="closeSidebar()"></div>
+
   <!-- Sidebar -->
-  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed" [class.open]="sidebarOpen">
     <div class="sidebar-header">
       <div class="logo">
         <h2>3G'S BOTIQUE SHOP</h2>
       </div>
-      <button class="toggle-btn" (click)="toggleSidebar()">
+      <button *ngIf="!isMobile" class="toggle-btn" (click)="toggleSidebar()">
         <svg
           width="20"
           height="20"

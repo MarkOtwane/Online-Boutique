@@ -380,3 +380,33 @@
     padding: 0.75rem 0.5rem;
   }
 }
+
+@media (max-width: 480px) {
+  .admin-orders {
+    padding: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .filters-section, .orders-table-container {
+    padding: 16px;
+  }
+
+  .no-data {
+    padding: 2rem 1rem;
+  }
+}

@@ -1,10 +1,12 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
+/* Global Styles */
 html,
 body {
   height: 100%;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .spacer {
@@ -19,4 +21,40 @@ body {
 .error-snackbar {
   background-color: #d32f2f;
   color: white;
+}
+
+/* Mobile Touch Improvements */
+@media (max-width: 768px) {
+  button, a, input, select, textarea {
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
