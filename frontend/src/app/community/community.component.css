@@ -7,6 +7,109 @@
   gap: 18px;
 }
 
+/* Responsive Design */
+@media (max-width: 1280px) {
+  .community-shell__hero {
+    padding: 24px;
+    border-radius: 24px;
+  }
+  
+  .community-shell__hero h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+  }
+  
+  .community-shell__tabs {
+    gap: 8px;
+  }
+  
+  .community-shell__tabs button {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .community-shell__hero {
+    padding: 20px;
+    border-radius: 20px;
+  }
+  
+  .community-shell__hero h1 {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+  }
+  
+  .community-shell__tabs {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .community-shell__tabs button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .community-shell {
+    gap: 16px;
+  }
+  
+  .community-shell__hero {
+    padding: 18px;
+    border-radius: 18px;
+  }
+  
+  .community-shell__hero h1 {
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+  }
+  
+  .community-shell__hero p:last-child {
+    font-size: 0.9rem;
+  }
+  
+  .community-shell__tabs {
+    gap: 4px;
+  }
+  
+  .community-shell__tabs button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .community-shell__panel {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .community-shell__hero {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .community-shell__hero h1 {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+  }
+  
+  .community-shell__eyebrow {
+    font-size: 10px;
+  }
+  
+  .community-shell__tabs {
+    gap: 2px;
+  }
+  
+  .community-shell__tabs button {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+  
+  .community-shell__panel {
+    min-height: 180px;
+    padding: 12px;
+  }
+}
+
 .community-shell__hero {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(37, 99, 235, 0.9));
   color: #fff;
