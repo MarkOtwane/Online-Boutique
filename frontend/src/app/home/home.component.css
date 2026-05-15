@@ -77,6 +77,11 @@
   align-items: center;
 }
 
+.hero-image img {
+  max-width: 100%;
+  height: auto;
+}
+
 .hero-placeholder {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -94,6 +99,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -328,32 +335,139 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .hero-content {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
+  .hero-section {
+    padding: 60px 0;
+    min-height: auto;
+  }
+
   .hero-content {
     grid-template-columns: 1fr;
     gap: 40px;
     text-align: center;
+    padding: 0 16px;
   }
-  
+
   .hero-text h1 {
     font-size: 2.5rem;
   }
-  
+
+  .hero-text p {
+    font-size: 1.1rem;
+  }
+
   .hero-buttons {
     justify-content: center;
+    flex-wrap: wrap;
   }
-  
+
+  .btn-primary, .btn-secondary {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+
+  .hero-image {
+    order: -1;
+  }
+
+  .hero-image img {
+    max-width: 80%;
+  }
+
+  .products-section {
+    padding: 60px 0;
+  }
+
   .products-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
     gap: 30px;
   }
-  
+
   .section-header h2 {
     font-size: 2rem;
+  }
+
+  .section-header p {
+    font-size: 1rem;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 40px 0;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    padding: 14px 20px;
+  }
+
+  .hero-image img {
+    max-width: 100%;
+  }
+
+  .products-section {
+    padding: 40px 0;
+  }
+
+  .section-header {
+    margin-bottom: 40px;
+  }
+
+  .section-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .product-info {
+    padding: 20px;
+  }
+
+  .product-name {
+    font-size: 1.1rem;
+  }
+
+  .features-section {
+    padding: 60px 0;
+  }
+
+  .feature-item {
+    padding: 30px 16px;
+  }
+
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .feature-item h3 {
+    font-size: 1.25rem;
   }
 }
