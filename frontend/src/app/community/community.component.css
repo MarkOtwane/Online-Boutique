@@ -5,6 +5,7 @@
 .community-shell {
   display: grid;
   gap: 18px;
+  background-color: #fff;
 }
 
 /* Responsive Design */
@@ -111,11 +112,11 @@
 }
 
 .community-shell__hero {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(37, 99, 235, 0.9));
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 123, 255, 0.9));
   color: #fff;
   border-radius: 28px;
   padding: 28px;
-  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
 }
 
 .community-shell__eyebrow {
@@ -135,7 +136,7 @@
 .community-shell__hero p:last-child {
   max-width: 58ch;
   margin: 14px 0 0;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(0, 0, 0, 0.82);
 }
 
 .community-shell__tabs {
@@ -145,16 +146,17 @@
 }
 
 .community-shell__tabs button {
-  border: 1px solid rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(255, 255, 255, 0.8);
   border-radius: 999px;
   padding: 12px 16px;
   cursor: pointer;
   font-weight: 700;
+  color: #333;
 }
 
 .community-shell__tabs button.active {
-  background: #0f172a;
+  background: #000;
   color: #fff;
 }
 
@@ -169,7 +171,7 @@
 /* Community Feed */
 .new-post-section {
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000;
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
@@ -183,7 +185,7 @@
 }
 
 .create-post-form {
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #000;
   padding-top: 20px;
   margin-top: 20px;
 }
@@ -223,6 +225,11 @@
 
 .filter-section select {
   min-width: 200px;
+  border: 1px solid #000;
+  background: #fff;
+  color: #333;
+  padding: 8px;
+  border-radius: 4px;
 }
 
 /* Posts List */
@@ -235,12 +242,12 @@
 .no-posts {
   text-align: center;
   padding: 60px 20px;
-  color: #666;
+  color: #000;
 }
 
 .no-posts i {
   font-size: 4rem;
-  color: #ddd;
+  color: #000;
   margin-bottom: 20px;
 }
 
@@ -251,7 +258,7 @@
 
 .post-card {
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -307,18 +314,18 @@
 }
 
 .user-role.admin {
-  background: #dc3545;
+  background: #007bff;
   color: white;
 }
 
 .user-role.customer {
-  background: #28a745;
+  background: #007bff;
   color: white;
 }
 
 .post-type {
   font-size: 0.8rem;
-  color: #666;
+  color: #000;
   text-transform: capitalize;
 }
 
@@ -329,7 +336,7 @@
 }
 
 .date {
-  color: #666;
+  color: #000;
   font-size: 0.9rem;
 }
 
@@ -356,18 +363,18 @@
 }
 
 .post-caption {
-  color: #555;
+  color: #333;
   font-size: 1rem;
   padding: 10px 0;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #fff;
 }
 
 .post-stats {
   display: flex;
   gap: 20px;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #fff;
   margin-bottom: 15px;
 }
 
@@ -375,7 +382,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #666;
+  color: #000;
   font-size: 0.9rem;
 }
 
@@ -387,24 +394,24 @@
 
 .btn-outline-secondary {
   background: transparent;
-  color: #6c757d;
-  border: 1px solid #6c757d;
+  color: #333;
+  border: 1px solid #333;
 }
 
 .btn-outline-secondary:hover {
-  background: #6c757d;
-  color: white;
+  background: #007bff;
+  color: #fff;
 }
 
 .btn-outline-info {
   background: transparent;
-  color: #17a2b8;
-  border: 1px solid #17a2b8;
+  color: #007bff;
+  border: 1px solid #007bff;
 }
 
 .btn-outline-info:hover {
-  background: #17a2b8;
-  color: white;
+  background: #ffffff;
+  color: #007bff;
 }
 
 /* Responsive Design for new components */

@@ -35,15 +35,15 @@
       <h3>Quick Actions</h3>
       <div class="actions-grid">
         <button class="action-btn primary" (click)="goToProducts()">
-          <span class="icon">🛍️</span>
+          <span class="icon">[Shop]</span>
           Browse Products
         </button>
         <button class="action-btn secondary" (click)="goToCart()">
-          <span class="icon">🛒</span>
+          <span class="icon">[Cart]</span>
           View Cart ({{ cartItems.length }})
         </button>
         <button class="action-btn secondary" (click)="goToOrderHistory()">
-          <span class="icon">📋</span>
+          <span class="icon">[History]</span>
           Order History
         </button>
         <button *ngIf="user.role === 'admin'" class="action-btn admin" (click)="goToAdminPanel()">
