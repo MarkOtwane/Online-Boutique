@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -7,18 +7,19 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.css']
+  styleUrls: ['./settings.component.css'],
 })
 export class AdminSettingsComponent implements OnInit {
   activeTab = 'general';
 
   // General Settings
   generalSettings = {
-    siteName: 'Boutique App',
-    siteDescription: 'Premium fashion and lifestyle boutique',
-    contactEmail: 'admin@boutiqueapp.com',
-    supportPhone: '+1 (555) 123-4567',
-    address: '123 Fashion Street, Style City, SC 12345'
+    siteName: "3G's Botique Shop",
+    siteDescription:
+      "Premium fashion and lifestyle collections from 3G's Botique Shop",
+    contactEmail: "threegirl's@gmail.com",
+    supportPhone: '0754962966',
+    address: 'Online Store',
   };
 
   // Notification Settings
@@ -28,7 +29,7 @@ export class AdminSettingsComponent implements OnInit {
     userRegistrationNotifications: true,
     lowStockAlerts: true,
     marketingEmails: false,
-    weeklyReports: true
+    weeklyReports: true,
   };
 
   // Security Settings
@@ -37,7 +38,7 @@ export class AdminSettingsComponent implements OnInit {
     sessionTimeout: 30,
     passwordExpiry: 90,
     maxLoginAttempts: 5,
-    requireStrongPasswords: true
+    requireStrongPasswords: true,
   };
 
   // System Settings
@@ -47,7 +48,7 @@ export class AdminSettingsComponent implements OnInit {
     cacheEnabled: true,
     backupFrequency: 'daily',
     timezone: 'UTC',
-    currency: 'KES'
+    currency: 'KES',
   };
 
   loading = false;
@@ -108,7 +109,11 @@ export class AdminSettingsComponent implements OnInit {
   }
 
   resetToDefaults(): void {
-    if (confirm('Are you sure you want to reset all settings to default values? This action cannot be undone.')) {
+    if (
+      confirm(
+        'Are you sure you want to reset all settings to default values? This action cannot be undone.',
+      )
+    ) {
       // Reset logic here
       alert('Settings reset to defaults!');
     }
@@ -119,10 +124,12 @@ export class AdminSettingsComponent implements OnInit {
       general: this.generalSettings,
       notifications: this.notificationSettings,
       security: this.securitySettings,
-      system: this.systemSettings
+      system: this.systemSettings,
     };
 
-    const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(settings, null, 2)], {
+      type: 'application/json',
+    });
     const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');

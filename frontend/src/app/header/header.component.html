@@ -1,24 +1,42 @@
 <header class="main-header">
   <div class="header-container">
     <div class="logo">
-      <h2 [routerLink]="['/']" class="logo-text">Boutique</h2>
+      <h2 [routerLink]="['/']" class="logo-text">3G's Botique Shop</h2>
     </div>
 
     <nav class="main-nav">
       <ul class="nav-links">
         <li><a [routerLink]="['/']" routerLinkActive="active">Home</a></li>
-        <li><a [routerLink]="['/products']" routerLinkActive="active">Products</a></li>
-        <li><a [routerLink]="['/community']" routerLinkActive="active">Community</a></li>
-        <li *ngIf="isLoggedIn"><a [routerLink]="['/tracking']" routerLinkActive="active">Track Order</a></li>
-        <li *ngIf="isLoggedIn"><a [routerLink]="['/dashboard']" routerLinkActive="active">Dashboard</a></li>
-        <li *ngIf="isLoggedIn && currentUser?.role === 'admin'"><a [routerLink]="['/admin']" routerLinkActive="active">Admin</a></li>
+        <li>
+          <a [routerLink]="['/products']" routerLinkActive="active">Products</a>
+        </li>
+        <li>
+          <a [routerLink]="['/community']" routerLinkActive="active"
+            >Community</a
+          >
+        </li>
+        <li *ngIf="isLoggedIn">
+          <a [routerLink]="['/tracking']" routerLinkActive="active"
+            >Track Order</a
+          >
+        </li>
+        <li *ngIf="isLoggedIn">
+          <a [routerLink]="['/dashboard']" routerLinkActive="active"
+            >Dashboard</a
+          >
+        </li>
+        <li *ngIf="isLoggedIn && currentUser?.role === 'admin'">
+          <a [routerLink]="['/admin']" routerLinkActive="active">Admin</a>
+        </li>
       </ul>
     </nav>
 
     <div class="auth-section">
       <div *ngIf="!isLoggedIn" class="auth-buttons">
         <button class="btn btn-outline" [routerLink]="['/login']">Login</button>
-        <button class="btn btn-primary" [routerLink]="['/register']">Sign Up</button>
+        <button class="btn btn-primary" [routerLink]="['/register']">
+          Sign Up
+        </button>
       </div>
 
       <div *ngIf="isLoggedIn" class="user-menu">

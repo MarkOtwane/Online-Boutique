@@ -22,7 +22,7 @@ declare global {
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'Boutique App';
+  title = "3G's Botique Shop";
   showHeader = true;
   showFooter = true;
   private readonly siteUrl = 'https://online-boutique-tv00.onrender.com';
@@ -90,11 +90,11 @@ export class AppComponent {
     const cleanUrl = url.split('?')[0];
 
     const defaultMeta = {
-      title: 'Online Boutique | Curated Fashion and Community',
+      title: "3G's Botique Shop | Curated Fashion and Community",
       description:
-        'Online Boutique is your destination for curated fashion, trend-forward products, and social shopping conversations.',
+        "3G's Botique Shop is your destination for curated fashion, trend-forward products, and social shopping conversations.",
       keywords:
-        'online boutique, fashion products, stylish outfits, boutique shopping, fashion community',
+        "3G's botique shop, fashion products, stylish outfits, social shopping, fashion community",
     };
 
     const routeMeta: Record<
@@ -102,45 +102,44 @@ export class AppComponent {
       { title: string; description: string; keywords: string }
     > = {
       '/': {
-        title: 'Online Boutique | Discover Curated Fashion',
+        title: "3G's Botique Shop | Discover Curated Fashion",
         description:
-          'Discover premium fashion collections, get styling inspiration, and shop the latest arrivals at Online Boutique.',
+          "Discover premium fashion collections, get styling inspiration, and shop the latest arrivals at 3G's Botique Shop.",
         keywords:
-          'fashion store, boutique home, curated outfits, online fashion shopping',
+          'fashion store, botique home, curated outfits, online fashion shopping',
       },
       '/products': {
-        title: 'Products | Online Boutique',
+        title: "Products | 3G's Botique Shop",
         description:
-          'Browse boutique products, compare styles, and find fashion pieces designed for every occasion.',
-        keywords:
-          'boutique products, fashion catalog, women and men fashion, accessories',
+          "Browse 3G's Botique Shop products, compare styles, and find fashion pieces designed for every occasion.",
+        keywords: 'botique products, fashion catalog, accessories',
       },
       '/user/community': {
-        title: 'Community Hub | Online Boutique',
+        title: "Community Hub | 3G's Botique Shop",
         description:
-          'Join the community hub to share posts, react to looks, and discuss your favorite boutique products in real time.',
+          'Join the community hub to share posts, react to looks, and discuss your favorite products in real time.',
         keywords:
           'fashion community, product discussions, group chat, social shopping',
       },
       '/tracking': {
-        title: 'Order Tracking | Online Boutique',
+        title: "Order Tracking | 3G's Botique Shop",
         description:
-          'Track your Online Boutique order status and stay updated from processing to final delivery.',
+          "Track your 3G's Botique Shop order status and stay updated from processing to final delivery.",
         keywords:
-          'order tracking, delivery updates, shipment status, boutique orders',
+          'order tracking, delivery updates, shipment status, botique orders',
       },
       '/login': {
-        title: 'Login | Online Boutique',
+        title: "Login | 3G's Botique Shop",
         description:
-          'Sign in to Online Boutique to manage your cart, orders, profile, and community activity.',
-        keywords: 'boutique login, customer account, secure sign in',
+          "Sign in to 3G's Botique Shop to manage your cart, orders, profile, and community activity.",
+        keywords: 'botique login, customer account, secure sign in',
       },
       '/register': {
-        title: 'Create Account | Online Boutique',
+        title: "Create Account | 3G's Botique Shop",
         description:
-          'Create your Online Boutique account to save favorites, place orders, and join the shopping community.',
+          "Create your 3G's Botique Shop account to save favorites, place orders, and join the shopping community.",
         keywords:
-          'register boutique account, create account, online shopping profile',
+          'register botique account, create account, online shopping profile',
       },
     };
 
@@ -148,10 +147,10 @@ export class AppComponent {
       routeMeta[cleanUrl] ??
       (cleanUrl.startsWith('/product/')
         ? {
-            title: 'Product Details | Online Boutique',
+            title: "Product Details | 3G's Botique Shop",
             description:
               'View product details, pricing, and availability before adding your next favorite piece to cart.',
-            keywords: 'product details, fashion item, boutique product page',
+            keywords: 'product details, fashion item, botique product page',
           }
         : defaultMeta);
 

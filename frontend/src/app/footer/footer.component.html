@@ -2,9 +2,15 @@
   <div class="footer-container">
     <div class="footer-content">
       <div class="footer-section">
-        <h3>Boutique</h3>
-        <p *ngIf="!isLoggedIn">Your premier destination for fashion and accessories. Discover unique pieces that express your style.</p>
-        <p *ngIf="isLoggedIn">Welcome back! Continue your shopping journey and discover amazing products tailored just for you.</p>
+        <h3>3G's Botique Shop</h3>
+        <p *ngIf="!isLoggedIn">
+          Your premier destination for fashion and accessories. Discover unique
+          pieces that express your style.
+        </p>
+        <p *ngIf="isLoggedIn">
+          Welcome back! Continue your shopping journey and discover amazing
+          products tailored just for you.
+        </p>
       </div>
 
       <div class="footer-section">
@@ -49,21 +55,44 @@
         <div class="social-links">
           <ng-container *ngIf="isLoggedIn; else socialMedia">
             <div class="account-actions">
-              <a [routerLink]="['/dashboard']" class="account-link">My Dashboard</a>
+              <a [routerLink]="['/dashboard']" class="account-link"
+                >My Dashboard</a
+              >
               <button class="logout-btn" (click)="logout()">Logout</button>
             </div>
           </ng-container>
           <ng-template #socialMedia>
-            <a href="#" class="social-link">Facebook</a>
-            <a href="#" class="social-link">Instagram</a>
-            <a href="#" class="social-link">Twitter</a>
+            <a
+              href="https://www.facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              >Facebook: 3G's botique shop</a
+            >
+            <a
+              href="https://www.instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              >Instagram: 3G's botique</a
+            >
+            <a
+              href="https://www.tiktok.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              >TikTok: 3G's botique</a
+            >
           </ng-template>
         </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; 2025 Boutique. All rights reserved.</p>
+      <p>
+        &copy; 2026 3G's Botique Shop. Contact: threegirl's&#64;gmail.com |
+        0754962966
+      </p>
     </div>
   </div>
 </footer>
